@@ -1,0 +1,98 @@
+.approve-order{
+     text-align: center;
+    .top{
+        display: flex;
+        justify-content: end;
+        padding: 0;
+        margin: 0;
+        button{
+            background-color: transparent;
+            border: none;
+        }
+    }
+    .title{
+        font-size: 1.5rem;
+        color: green;
+        font-weight: bold;
+    }
+
+    .approve-order-details{
+        color: black;
+        display: flex;
+        flex-direction: column;
+        justify-self: center;
+         width: 90%;
+        .det-1{
+            display: flex;
+            justify-content: center;
+            gap: 5rem;
+          
+        }
+        .product-list{
+            margin-top: 1rem;
+            .product-list-title{
+                font-weight: bold;
+                color: green;
+            }
+            .product{
+                display: flex;
+                justify-content: space-between;
+            }
+        }
+    }
+
+    .Amount{
+        margin-top: 1rem;
+        display: flex;
+        justify-content: space-between;
+        span{
+            input{
+                width: 5rem;
+                height: 80%;
+            }
+        }
+    }
+
+}
+
+
+.approve-order-fun-btn{
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+
+    button{
+        width: 5rem;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        font-weight: bold;
+    }
+     .approve{
+            background-color: green;
+            
+        }
+     .edit{
+        background-color: yellow;
+     } 
+     .cancel{
+        background-color: red;
+     }  
+}
+
+.input-field{
+    width: 5rem;
+}
+
+.orderInstructions{
+    margin: 1rem;
+    div{
+        font-size: 1.2rem;
+        color: black;
+        font-weight: bold;
+    }
+    p{
+        margin: 0;
+        color: black;
+    }
+}

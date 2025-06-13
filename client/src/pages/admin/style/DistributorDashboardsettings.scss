@@ -1,0 +1,38 @@
+.nav-active{
+    color: white;
+}
+       
+.Distributor-Das-set-nav {
+  display: flex;
+  background-color: rgb(153, 228, 228);
+  width: 50%;
+  gap: 2rem;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+
+  div {
+    font-weight: bold;
+    padding: 0.6rem;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  // 📱 Mobile styles
+  @media (max-width: 768px) {
+    flex-direction: column;
+    width: 100%;
+    gap: 1rem;
+    align-items: center;
+
+    div {
+      width: 90%;
+      text-align: center;
+      padding: 0.8rem;
+      font-size: 1rem;
+    }
+  }
+}
+
+

@@ -1,0 +1,134 @@
+/* EmployeeOrders.scss */
+
+.employee-orders {
+  padding: 1rem;
+  margin-top: 4rem;
+  .order-card {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: #f9f9f9;
+
+    .order-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      button {
+        margin-top: 0.5rem;
+        padding: 0.4rem 0.8rem;
+        background-color: #1976d2;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+
+        &:hover {
+          background-color: #1565c0;
+        }
+      }
+    }
+
+    .product-list {
+      margin-top: 1rem;
+
+      h4 {
+        margin-bottom: 0.5rem;
+      }
+
+      ul {
+        list-style: none;
+        padding: 0;
+
+        li {
+          display: flex;
+          justify-content: space-between;
+          padding: 0.4rem 0;
+          border-bottom: 1px solid #ddd;
+
+          span {
+            display: inline-block;
+            min-width: 100px;
+          }
+        }
+      }
+    }
+  }
+}
+
+  .no-orders,
+  .loading {
+    text-align: center;
+    margin: 2rem 0;
+    color: #666;
+  }
+
+.employee-orders-top {
+  margin-bottom: 1rem;  
+
+  background-color: #f9f9f9;
+
+  .employee-orders-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+
+  .employee-order-table-search {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .filter-orders {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      label {
+        font-weight: 500;
+      }
+
+      select,
+      input[type="date"] {
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+      }
+    }
+
+    .employee-order-search {
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      width: 100%;
+    }
+  }
+
+  // Optional: enhance spacing between inputs on larger screens
+  @media (min-width: 600px) {
+    .employee-order-table-search {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+
+      .filter-orders {
+        flex-direction: row;
+        align-items: center;
+
+        select,
+        input[type="date"] {
+          width: auto;
+        }
+      }
+
+      .employee-order-search {
+        max-width: 300px;
+      }
+    }
+  }
+}

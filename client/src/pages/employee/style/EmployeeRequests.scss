@@ -1,0 +1,25 @@
+.EmployeeRequests-div{
+    margin-top: 4rem;
+}
+.EmployeeRequests-div {
+  padding: 1rem;
+}
+
+.EmployeeRequests-nav {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.employee-nav-link {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  background: #f2f2f2;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.employee-nav-link.active {
+  background: #007bff;
+  color: white;
+}

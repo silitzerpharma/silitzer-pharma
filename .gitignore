@@ -1,0 +1,27 @@
+# Node modules in both client and server
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# React production build
+client/build/
+
+# Environment files
+.env
+client/.env
+server/.env
+
+# Logs
+*.log
+logs/
+
+# IDE and system files
+.DS_Store
+.idea/
+.vscode/
+Thumbs.db
+
+# Other
+*.tgz
+*.tar.gz
+*.zip

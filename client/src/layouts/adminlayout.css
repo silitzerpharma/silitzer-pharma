@@ -1,0 +1,27 @@
+.admin-main-screen{
+    display: block;
+}
+
+.admin-cantain{
+    display: flex;
+    margin-top: 4rem;
+}
+.left-navbar-cantain{
+ flex: 1.8;
+}
+.admin-main-cantain{
+    flex: 10;
+      width: 100%;
+}
+
+
+@media screen and (max-width: 768px) {
+  .left-navbar-cantain {
+    display: none; 
+  }
+
+  .admin-main-cantain {
+    margin-left: 0;
+    width: 100%;
+  }
+}

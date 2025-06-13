@@ -1,0 +1,118 @@
+// .ViewEmployee-nav {
+//   display: flex;
+//   gap: 1rem;
+//   padding: 0.5rem;
+//   background: #d1ecf8;
+//   border-bottom: 1px solid #ccc;
+//   margin: 1rem 1rem;
+// }
+
+// .nav-link {
+//   padding: 0.5rem 1rem;
+//   cursor: pointer;
+//   border-radius: 5px;
+//   font-weight: bold;
+//   color: #333;
+//   transition: background 0.3s;
+//   &.active {
+//     background-color: #69be8c;
+//     color: white;
+//     font-weight: bold;
+//   }
+//   &:hover {
+//     background-color: #0fd669;
+//   }
+// }
+
+// .btn {
+//   margin-left: auto;
+//   background: none;
+//   border: none;
+//   cursor: pointer;
+// }
+
+// .ViewEmployee-container{
+//   margin: 1rem;
+// }
+
+// .ViewEmployee-nav .nav-link .MuiBadge-root {
+//   display: inline-flex;
+//   align-items: center;
+// }
+
+
+
+
+
+.ViewEmployee-nav {
+  display: flex;
+  gap: 1rem;
+  padding: 0.5rem;
+  background: #d1ecf8;
+  border-bottom: 1px solid #ccc;
+  margin: 1rem;
+
+  .nav-link {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: bold;
+    color: #333;
+    transition: background 0.3s;
+
+    &.active {
+      background-color: #69be8c;
+      color: white;
+      font-weight: bold;
+    }
+
+    &:hover {
+      background-color: #0fd669;
+    }
+
+    .MuiBadge-root {
+      display: inline-flex;
+      align-items: center;
+    }
+  }
+
+  .btn {
+    margin-left: auto;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+}
+
+.ViewEmployee-container {
+  margin: 1rem;
+}
+
+// ----------------------
+// ✅ Responsive styles
+// ----------------------
+@media screen and (max-width: 768px) {
+  .ViewEmployee-nav {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 0.5rem;
+
+    .nav-link {
+      flex: 1 1 auto;
+      text-align: center;
+      padding: 0.1rem;
+      font-size: 0.95rem;
+    }
+
+    .btn {
+      width: fit-content;
+      text-align: center;
+    }
+  }
+
+  .ViewEmployee-container {
+    margin: 0.5rem;
+  }
+}
+

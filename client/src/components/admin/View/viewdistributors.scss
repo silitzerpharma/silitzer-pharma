@@ -1,0 +1,106 @@
+.view-distributors {
+  width: 80%;
+  background-color: rgb(247, 251, 255);
+  justify-self: center;
+
+  .top {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+
+    button {
+      background-color: transparent;
+      color: black;
+      font-size: 30px;
+      border: none;
+      cursor: pointer;
+    }
+  }
+
+  .title {
+    text-align: center;
+
+    span {
+      color: green;
+      font-weight: bold;
+    }
+  }
+}
+
+.distributors-details {
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+  justify-self: center;
+
+  .derails-row {
+    padding: 0.5rem;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+
+    div {
+      span {
+        font-weight: bold;
+      }
+    }
+  }
+}
+
+.fun-btn {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+  flex-wrap: wrap;
+
+  button {
+    font-weight: bold;
+    border-radius: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    border: none;
+    cursor: pointer;
+  }
+
+  .remove {
+    background-color: red;
+    color: white;
+  }
+
+  .edit {
+    background-color: yellow;
+    color: green;
+  }
+}
+
+// ----------------------
+// ✅ Responsive styles
+// ----------------------
+@media screen and (max-width: 768px) {
+  .view-distributors,
+  .distributors-details {
+    width: 95%;
+  }
+
+  .distributors-details .derails-row {
+    grid-template-columns: 1fr; // stack on mobile
+  }
+
+  .fun-btn {
+    flex-direction: column;
+    align-items: center;
+
+    button {
+      width: 100%;
+      max-width: 300px;
+    }
+  }
+
+  .view-distributors .top {
+    justify-content: center;
+
+    button {
+      font-size: 24px;
+    }
+  }
+}

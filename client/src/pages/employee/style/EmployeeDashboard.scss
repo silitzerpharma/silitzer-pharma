@@ -1,0 +1,63 @@
+.EmployeeDashboard {
+    margin-top: 3rem;
+  padding: 16px;
+
+  .welcome-header {
+    background: linear-gradient(to right, #e3f2fd, #f1f8ff);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+    text-align: left;
+
+    h2 {
+      font-size: 20px;
+      color: #2a3f54;
+      margin-bottom: 8px;
+    }
+
+    p {
+      font-size: 15px;
+      margin-bottom: 12px;
+
+      strong {
+        color: #1e88e5;
+      }
+    }
+
+    .task-link {
+      font-size: 14px;
+      font-weight: 500;
+      color: #00796b;
+      text-decoration: none;
+      border-bottom: 1px dashed transparent;
+      transition: border 0.2s;
+
+      &:hover {
+        border-bottom: 1px dashed #00796b;
+      }
+    }
+  }
+}
+
+.today-login-link {
+  margin-top: 1rem;
+
+  .login-nav {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: #007bff;
+    color: #fff;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: #0056b3;
+    }
+
+    &:active {
+      background-color: #004494;
+    }
+  }
+}

@@ -1,0 +1,81 @@
+.product-card {
+  display: flex;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
+  padding: 10px;
+  margin: 10px 0;
+  max-width: 360px;
+  gap: 12px;
+
+  .product-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 8px;
+    object-fit: contain;
+  }
+
+  .product-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .product-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 0 0 4px 0;
+      color: #222;
+    }
+
+    .product-code {
+      font-size: 0.9rem;
+      color: #555;
+      margin-bottom: 6px;
+    }
+
+    .in-stock {
+      font-weight: 600;
+      margin-bottom: 6px;
+
+      &.stock-yes {
+        color: green;
+      }
+      &.stock-no {
+        color: red;
+      }
+    }
+
+    .stock,
+    .units-per-box {
+      font-size: 0.85rem;
+      color: #666;
+      margin: 2px 0;
+    }
+  }
+}
+
+/* Responsive tweak if needed */
+@media (max-width: 400px) {
+  .product-card {
+    max-width: 100%;
+    padding: 8px;
+
+    .product-image {
+      width: 80px;
+      height: 80px;
+    }
+
+    .product-info {
+      .product-name {
+        font-size: 1rem;
+      }
+      .product-code,
+      .in-stock,
+      .stock,
+      .units-per-box {
+        font-size: 0.8rem;
+      }
+    }
+  }
+}

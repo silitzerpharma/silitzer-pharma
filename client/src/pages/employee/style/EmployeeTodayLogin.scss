@@ -1,0 +1,31 @@
+.employee-today-login {
+    margin-top: 3rem;
+  padding: 1rem;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .task-nav {
+    margin-top: 1rem;
+    text-align: center;
+  }
+}
+
+.session-card {
+  border-radius: 10px;
+  padding: 10px;
+  transition: all 0.3s;
+  &:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+}

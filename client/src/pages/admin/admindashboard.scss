@@ -1,0 +1,52 @@
+.AdminDashboard {
+  display: flex;
+  flex-direction: column;
+
+  .widgets,
+  .charts {
+    width: 100%;
+    display: flex;
+    padding: 20px;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .charts {
+    padding: 5px 20px;
+  }
+
+  .listContainer {
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1),
+                0px 3px 6px rgba(0, 0, 0, 0.06);
+    margin: 1rem;
+    padding: 1rem;
+
+    .listTitle {
+      font-weight: bold;
+      font-size: 1.4rem;
+      color: green;
+      margin-bottom: 1rem;
+    }
+  }
+
+  // Mobile responsiveness
+  @media (max-width: 768px) {
+    flex-direction: column;
+    .widgets,
+    .charts {
+      flex-direction: column;
+      padding: 10px;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .listContainer {
+      margin: 0.5rem;
+      padding: 0.75rem;
+
+      .listTitle {
+        font-size: 1.2rem;
+      }
+    }
+  }
+}

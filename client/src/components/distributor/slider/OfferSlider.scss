@@ -1,0 +1,78 @@
+.offer-slider-container {
+  position: relative;
+  .slider-heading {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+
+  .offer-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    
+    
+    &:hover {
+      transform: scale(1.02);
+      cursor: pointer;
+    }
+
+    .offer-image {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+    }
+
+    .offer-info {
+      padding: 1rem;
+      .offer-company {
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+      .offer-description {
+        font-size: 0.95rem;
+        margin: 0.5rem 0;
+      }
+      .offer-validity {
+        font-size: 0.85rem;
+        color: gray;
+      }
+      .offer-btn {
+        margin-top: 0.5rem;
+        background: #0a74da;
+        color: white;
+        padding: 0.4rem 0.8rem;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+
+        &:hover {
+          background: #095aba;
+        }
+      }
+    }
+  }
+
+  .slider-nav-button {
+    position: absolute;
+    top: 45%;
+    background: white;
+    border-radius: 9999px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    box-shadow: 0 0 6px rgba(0,0,0,0.2);
+    z-index: 10;
+
+    &.left-button {
+      left: 0;
+    }
+
+    &.right-button {
+      right: 0;
+    }
+  }
+}

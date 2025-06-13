@@ -1,0 +1,20 @@
+.Tasks{
+    margin-top: 4rem;
+}
+
+.tasks-nav{
+    background-color: rgb(219, 236, 252);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem;
+    .tasks-nav-link{
+        font-weight: bold;
+    }
+    .tasks-nav-link.active{
+    color: darkgreen;
+    }
+}
+
+
+

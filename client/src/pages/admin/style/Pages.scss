@@ -1,0 +1,35 @@
+.page{
+.page-title{
+     text-align: center;
+        font-size: 1.5rem;
+        font-weight: bold;
+        padding: 1rem;
+        color: darkgreen;
+        background-color: #a1dad2;
+  }
+.page-nav{
+    background-color: #bfece6;
+   display: flex;
+   padding: 0.6rem;
+   justify-content: center;
+   align-items: center;
+   gap: 1rem;
+   font-weight: bold;
+   button{
+          font-size: 1.2rem;
+          font-weight: bold;
+          border-radius: 0.5rem;
+          border: 3px solid green;
+          background-color: #caf7f1;
+          color: darkgreen;
+          padding: 0 2rem;
+
+          &:hover{
+            cursor: pointer;
+            background-color: #a1dad2;
+            border: 3px solid rgb(233, 238, 233);
+          }
+   }
+}
+}
+

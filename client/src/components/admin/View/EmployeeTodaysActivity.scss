@@ -1,0 +1,264 @@
+
+.EmployeeTodaysActivity {
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f9f9f9;
+  color: #333;
+
+  &-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 5px;
+  }
+
+  &-row {
+    display: flex;
+    gap: 20px;
+
+    .row-col-left,
+    .row-col-right {
+      flex: 1;
+      background-color: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .row-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 5px;
+    }
+
+  }
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+
+  .modal-dialog {
+    background: #ffffff;
+    padding: 25px 30px;
+    border-radius: 12px;
+    width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+    // Close button
+    button {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      background: transparent;
+      border: none;
+      font-size: 20px;
+      font-weight: bold;
+      color: #888;
+      cursor: pointer;
+
+      &:hover {
+        color: #e74c3c;
+      }
+    }
+
+    // Each section of the dialog
+    div {
+      margin-bottom: 15px;
+      line-height: 1.6;
+
+      span {
+        display: inline-block;
+        margin-right: 15px;
+        margin-bottom: 6px;
+      }
+
+      strong {
+        font-weight: 600;
+        color: #2c3e50;
+      }
+
+      p {
+        background-color: #f8f9fa;
+        padding: 10px;
+        border-left: 4px solid #3498db;
+        margin-top: 6px;
+        border-radius: 4px;
+        color: #333;
+      }
+
+      // Special style for status
+      .status-span {
+        background-color: #fef4e7;
+        padding: 6px 10px;
+        border-radius: 5px;
+        color: #e67e22;
+        font-weight: bold;
+      }
+
+      // Completion location block
+      .location-span {
+        display: block;
+        margin-top: 6px;
+        background-color: #f0f9ff;
+        padding: 10px;
+        border-radius: 6px;
+        border-left: 4px solid #2980b9;
+
+        span {
+          display: block;
+          margin: 2px 0;
+          color: #555;
+        }
+      }
+    }
+
+    // Section titles
+    h3, h4 {
+      margin-bottom: 10px;
+      font-size: 18px;
+      color: #34495e;
+    }
+  }
+}
+
+.emp-task-list {
+  list-style: none;
+  padding: 0;
+  max-height: 320px; // approx 4 items tall
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+
+  li {
+    background-color: #f0f4f8;
+    padding: 12px;
+    border-bottom: 1px solid #e0e0e0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #e0e7ef;
+    }
+
+    div {
+      margin: 4px 0;
+    }
+
+    span {
+      margin-right: 12px;
+      display: inline-block;
+    }
+
+    strong {
+      color: #222;
+    }
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+}
+
+.row-col-right {
+  flex: 1;
+  background-color: #fff;
+  padding: 16px 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+
+  .row-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 6px;
+  }
+
+  div {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    background-color: #f7f9fb;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    border-left: 4px solid #3498db;
+    border-radius: 6px;
+
+    span {
+      width: 48%;
+      margin-bottom: 6px;
+      color: #444;
+
+      strong {
+        color: #2c3e50;
+      }
+    }
+  }
+}
+
+.session-list{
+    list-style: none;
+    overflow-y: auto;
+    max-height: 320px;
+}
+
+
+@media screen and (max-width: 768px) {
+  .EmployeeTodaysActivity {
+    padding: 10px;
+
+    &-title {
+      font-size: 20px;
+      text-align: center;
+    }
+
+    &-row {
+      flex-direction: column;
+      gap: 12px;
+    }
+  }
+
+  .modal-overlay .modal-dialog {
+    width: 90%;
+    padding: 20px;
+  }
+
+  .row-col-right div span {
+    width: 100%; // stack items in detail rows
+  }
+
+  .emp-task-list li {
+    font-size: 14px;
+  }
+}

@@ -1,0 +1,337 @@
+// .slidercard-container{     
+//  height: 19rem;
+//  width:  12rem;
+//  display: flex;
+//  flex-direction: column;
+
+//  .slidercard-top{
+//     flex: 2;
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+//    img{
+//     width: 11.2rem;
+//     align-items: center;
+//     border: 1px solid rgb(199, 199, 199);
+//     border-radius: 0.5rem;
+//    }
+//    &:hover{
+//     cursor: pointer;
+//      box-shadow: 0 8px 16px rgba(92, 89, 89, 0.2);
+//    }
+//  }
+//  .slidercard-bottom{
+//    margin-top: 0.5rem;
+//    margin-left: 0.5rem;
+//    flex: 2;
+//    .name{
+//     font-weight: 500;
+//     &:hover{
+//     cursor: pointer;
+//    }
+//    }
+//    .add-cart{
+//     margin-top: 1rem;
+//     display: flex;
+//     gap: 1rem;
+//     align-self: center;
+//     justify-content: center;
+    
+//     input{
+//         width: 3rem;
+//          border-radius: 0.2rem;
+//     }
+//     button{
+//         background-color: darkgreen;
+//         color: white;
+//         font-weight: bold;
+//         border-radius: 0.2rem;
+//         &:hover{
+//           cursor: pointer;
+//            box-shadow: 0 8px 20px rgba(17, 82, 147, 0.6);
+//         }
+//     }
+//    }
+//  }
+   
+
+// }
+// .name {
+//   font-size: 1rem;
+//   font-weight: 500;
+//   margin-bottom: 0.5rem;
+//   white-space: nowrap;        // Prevents text from wrapping
+//   overflow: hidden;           // Hides overflowed text
+//   text-overflow: ellipsis;    // Adds "..."
+//   width: 100%;                // Ensures full width is used
+//   display: block;             // Makes sure it works inline
+// }
+
+// .slidercard-container {
+//   height: 20rem;
+//   width: 13rem;
+//   display: flex;
+//   flex-direction: column;
+//   background: #fff;
+//   border-radius: 0.75rem;
+//   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+//   transition: box-shadow 0.3s ease;
+//   overflow: hidden;
+//   user-select: none;
+
+//   &:hover {
+//     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+//   }
+
+//   .slidercard-top {
+//     flex: 2.3;
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+//     padding: 0.5rem;
+
+//     img {
+//       max-width: 100%;
+//       max-height: 9.5rem;
+//       object-fit: contain;
+//       border: 1.5px solid #ddd;
+//       border-radius: 0.6rem;
+//       transition: transform 0.3s ease;
+
+//       &:hover {
+//         transform: scale(1.05);
+//         cursor: pointer;
+//       }
+//     }
+//   }
+
+//   .slidercard-bottom {
+//     flex: 1.7;
+//     padding: 0 1rem 1rem;
+//     display: flex;
+//     flex-direction: column;
+//     justify-content: space-between;
+
+//     .name {
+//       font-size: 1rem;
+//       font-weight: 600;
+//       color: #222;
+//       margin-bottom: 0.5rem;
+//       white-space: nowrap;
+//       overflow: hidden;
+//       text-overflow: ellipsis;
+//       cursor: pointer;
+//       user-select: text;
+
+//       &:hover {
+//         color: #165dff;
+//         text-decoration: underline;
+//       }
+//     }
+
+//     .stock-status {
+//       font-size: 0.85rem;
+//       font-weight: 600;
+//       padding: 0.25rem 0.75rem;
+//       border-radius: 20px;
+//       text-align: center;
+//       width: fit-content;
+//       user-select: none;
+//       margin-bottom: 0.8rem;
+
+//       &.in-stock {
+//         color: #146c43;
+//         background-color: #d1e7dd;
+//         border: 1.5px solid #badbcc;
+//       }
+
+//       &.out-of-stock {
+//         color: #842029;
+//         background-color: #f8d7da;
+//         border: 1.5px solid #f5c2c7;
+//       }
+//     }
+
+//     .add-cart {
+//       display: flex;
+//       gap: 0.8rem;
+//       align-items: center;
+//       justify-content: center;
+
+//       input {
+//         width: 3.5rem;
+//         padding: 0.4rem 0.6rem;
+//         font-size: 1rem;
+//         border-radius: 0.4rem;
+//         border: 1.5px solid #ccc;
+//         text-align: center;
+//         transition: border-color 0.3s ease;
+
+//         &:focus {
+//           outline: none;
+//           border-color: #165dff;
+//           box-shadow: 0 0 6px #165dffaa;
+//         }
+//       }
+
+//       button {
+//         flex: 1;
+//         background-color: #165dff;
+//         color: white;
+//         font-weight: 700;
+//         border-radius: 0.5rem;
+//         padding: 0.45rem 0.7rem;
+//         border: none;
+//         transition: background-color 0.3s ease, box-shadow 0.3s ease;
+//         box-shadow: 0 2px 6px rgba(22, 93, 255, 0.6);
+
+//         &:hover:not(:disabled) {
+//           background-color: #0b47d1;
+//           box-shadow: 0 6px 18px rgba(11, 71, 209, 0.8);
+//           cursor: pointer;
+//         }
+
+//         &:disabled {
+//           background-color: #9ca3af;
+//           cursor: not-allowed;
+//           box-shadow: none;
+//         }
+//       }
+//     }
+//   }
+// }
+
+.slidercard-container {
+  height: 20rem;
+  width: 13rem;
+  display: flex;
+  flex-direction: column;
+  background: #ebf0f1;  // use a light complementary base color from the gradient
+  border-radius: 0.75rem;
+  box-shadow: 0 6px 15px rgba(163, 247, 247, 0.4);  // subtle tealish shadow matching #a3f7f7
+  transition: box-shadow 0.3s ease;
+  overflow: hidden;
+  user-select: none;
+
+  &:hover {
+    box-shadow: 0 10px 30px rgba(163, 247, 247, 0.6);  // stronger tealish glow on hover
+  }
+
+  .slidercard-top {
+    flex: 2.3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+
+    img {
+      max-width: 100%;
+      max-height: 9.5rem;
+      object-fit: contain;
+      border: 1.5px solid #a3f7f7;  // tealish border matching gradient start
+      border-radius: 0.6rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+      &:hover {
+        transform: scale(1.05);
+        cursor: pointer;
+        box-shadow: 0 0 10px 2px rgba(163, 247, 247, 0.7);  // teal glow on hover
+      }
+    }
+  }
+
+  .slidercard-bottom {
+    flex: 1.7;
+    padding: 0 1rem 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .name {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #134e4a;  // dark teal-ish text for good contrast
+      margin-bottom: 0.5rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: pointer;
+      user-select: text;
+
+      &:hover {
+        color: #0c3735;  // darker teal on hover
+        text-decoration: underline;
+      }
+    }
+
+    .stock-status {
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      text-align: center;
+      width: fit-content;
+      user-select: none;
+      margin-bottom: 0.8rem;
+
+      &.in-stock {
+        color: #0f766e;
+        background-color: #d1f1f0;
+        border: 1.5px solid #7ee3df;
+      }
+
+      &.out-of-stock {
+        color: #7f1d1d;
+        background-color: #fce7e7;
+        border: 1.5px solid #fca5a5;
+      }
+    }
+
+    .add-cart {
+      display: flex;
+      gap: 0.8rem;
+      align-items: center;
+      justify-content: center;
+
+      input {
+        width: 3.5rem;
+        padding: 0.4rem 0.6rem;
+        font-size: 1rem;
+        border-radius: 0.4rem;
+        border: 1.5px solid #a3f7f7;  // teal border
+        text-align: center;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+
+        &:focus {
+          outline: none;
+          border-color: #22c55e;
+          box-shadow: 0 0 6px #22c55eaa;  // greenish glow on focus
+        }
+      }
+
+      button {
+        flex: 1;
+        background-color: #14b8a6;  // teal-green
+        color: white;
+        font-weight: 700;
+        border-radius: 0.5rem;
+        padding: 0.45rem 0.7rem;
+        border: none;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 0 2px 6px rgba(20, 184, 166, 0.6);
+
+        &:hover:not(:disabled) {
+          background-color: #0f766e;
+          box-shadow: 0 6px 18px rgba(15, 118, 110, 0.8);
+          cursor: pointer;
+        }
+
+        &:disabled {
+          background-color: #9ca3af;
+          cursor: not-allowed;
+          box-shadow: none;
+        }
+      }
+    }
+  }
+}

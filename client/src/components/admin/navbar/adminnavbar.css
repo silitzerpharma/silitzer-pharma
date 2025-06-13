@@ -1,0 +1,92 @@
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000; /* Keep it above other content */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  /* background-color: #ffffff; */
+ /* background: linear-gradient(to bottom, #f2fbfc, #e6f5f8); */
+ background: linear-gradient(to right, #e6f5f8, #d2f8e6);
+  border-bottom: 1px solid #ddd;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.logo img{
+  height: 40px;  
+  font-size: 20px;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.menu-toggle {
+  display: none;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #333;
+  padding: 5px;
+  position: relative;
+}
+
+.icon-btn:hover,
+.icon-btn:focus,
+.icon-btn:active,
+.menu-toggle:hover,
+.menu-toggle:focus,
+.menu-toggle:active {
+  background: none;
+  color: inherit;
+  outline: none;
+  box-shadow: none;
+}
+
+.icon-btn:hover,
+.menu-toggle:hover{
+    background-color: rgb(171, 228, 228);
+    color: green;
+}
+
+.counter{
+  width: 15px;
+  height: 15;
+  font-size: 10px;
+  background-color: red;
+  padding: 1px;
+  border-radius: 90%;
+  color: white;
+  font-weight: bold;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+
+@media screen and (max-width: 768px) {
+  .menu-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  color: #333;
+  display: block;
+}
+}

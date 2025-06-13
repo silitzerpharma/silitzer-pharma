@@ -1,0 +1,12 @@
+.chart{
+    flex: 3;
+       box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1), 
+              0px 3px 6px rgba(0, 0, 0, 0.06);
+
+    .title{
+        color: gray;
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin: 1rem;
+    }          
+}

@@ -1,0 +1,23 @@
+.leave-container {
+  padding: 1rem;
+  font-family: "Roboto", sans-serif;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .request-list {
+    margin-top: 1rem;
+  }
+
+  .MuiListItemText-primary {
+    font-size: 0.9rem;
+  }
+
+  .MuiListItemText-secondary {
+    font-size: 0.8rem;
+  }
+}

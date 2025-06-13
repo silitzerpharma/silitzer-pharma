@@ -1,0 +1,107 @@
+.EmployeeNavbar{
+ position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  color: white;
+
+}
+.emp-nav-top{
+    padding: 0.5rem 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+     background-color: rgb(192, 240, 237);
+       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+       .emp-nav-right{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+
+        .loginout-menu{
+            .menu-icon{
+                font-size: 1.4rem;
+                font-weight: bolder;
+            }
+            .logout{
+                color: darkgreen;
+            }
+            .login{
+                color: blue;
+            }
+        }
+
+       }
+}
+.nav-logo{
+    width: 10rem;
+}
+
+.emp-nav-menu{
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    background-color: aliceblue;
+    gap: 2rem;  
+    width: 50%;
+    height: 100vh;
+    padding-left: 1rem;
+
+    .menu-link{
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: black;
+    }
+
+    .menu-link-div{
+        button{
+            border: none;
+            background-color: transparent;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-weight: bold;
+             font-size: 1.4rem;
+        }
+    }
+    .logout-btn{
+        padding: 0;
+        margin: 0;
+        width: fit-content ;
+        font-size: 1.4rem;
+        background-color: transparent;
+        border: none;
+        .logout-btn-icon{
+            font-size: 1.6rem;
+        }
+
+    }
+
+}
+
+
+.menu-button{
+     background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+
+  svg {
+    background: none;
+  }
+
+}
+.menu-icon{
+    font-size: 2rem;
+    color: black;
+    background-color: transparent; 
+}

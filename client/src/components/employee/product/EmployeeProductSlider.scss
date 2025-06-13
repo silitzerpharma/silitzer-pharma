@@ -1,0 +1,71 @@
+.employee-product-slider {
+  padding: 12px;
+
+  .slider-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #333;
+  }
+}
+
+.emp-product-card{
+  border: 2px solid rgb(190, 247, 213);
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0.5rem;
+   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    &:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  }
+  div{
+    flex: 1;
+  }
+  .top{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    img{
+      height: 100px;
+      width: 100%;
+    }
+  }
+  .bottom{
+    margin-top: 0.2rem;
+    padding: 0.1rem;
+    .product-name{
+      font-size: 0.6rem;
+      font-weight: bold;
+      padding: 0;
+      margin: 0;
+    }
+    .product-info{
+       font-size: 0.6rem;
+       margin: 0.1rem;
+    }
+  }
+
+}
+.product-detail-overlay {
+  margin-top: 3rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: white; // white background for mobile
+  z-index: 999;
+  overflow-y: auto;
+  padding: 1rem;
+
+  @media (min-width: 768px) {
+    // Optional: restrict width on tablets/desktops
+    padding: 2rem;
+    max-width: 600px;
+    margin: auto;
+    border-radius: 12px;
+    background-color: #fff;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+  }
+}

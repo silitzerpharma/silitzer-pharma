@@ -1,0 +1,28 @@
+.task-details-dialog {
+  .MuiDialogTitle-root {
+    font-size: 1.3rem;
+    font-weight: 600;
+    padding-bottom: 0;
+  }
+
+  .MuiDialogContent-root {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .task-field {
+      font-size: 0.95rem;
+
+      strong {
+        color: #555;
+        width: 120px;
+        display: inline-block;
+      }
+
+      span {
+        color: #222;
+      }
+    }
+  }
+}

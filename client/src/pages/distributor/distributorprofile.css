@@ -1,0 +1,92 @@
+.profile-container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 30px 25px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.07);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+h2 {
+  text-align: center;
+  font-size: 28px;
+  margin-bottom: 30px;
+  color: #333;
+}
+
+.profile-form label {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+  font-size: 15px;
+  color: #444;
+  font-weight: 500;
+}
+
+.profile-form span,
+.profile-form input {
+  margin-top: 6px;
+}
+
+.profile-form span {
+  font-size: 16px;
+  color: #666;
+  padding: 8px 10px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.profile-form input {
+  padding: 10px 12px;
+  font-size: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.profile-form input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+}
+
+.edit-btn {
+  margin-top: 25px;
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.edit-btn:hover {
+  background: #0056b3;
+}
+
+@media (max-width: 480px) {
+  .profile-container {
+    margin-top: 6rem;
+    padding: 20px 15px;
+  }
+
+  h2 {
+    font-size: 22px;
+  }
+
+  .profile-form input,
+  .profile-form span {
+    font-size: 14px;
+    padding: 8px 10px;
+  }
+
+  .edit-btn {
+    font-size: 14px;
+    padding: 10px;
+  }
+}

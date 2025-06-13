@@ -1,0 +1,145 @@
+/* EditProduct.scss */
+
+form {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 1.5rem 2rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+  h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #333;
+  }
+
+  label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    color: #444;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  textarea {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    font-size: 1rem;
+    color: #222;
+    transition: border-color 0.3s ease;
+
+    &:focus {
+      outline: none;
+      border-color: #3f51b5;
+      box-shadow: 0 0 4px #3f51b5aa;
+    }
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 60px;
+  }
+
+  ul {
+    padding-left: 0;
+    list-style: none;
+    margin-bottom: 1rem;
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+
+    input[type="text"],
+    input[type="number"] {
+      flex-grow: 1;
+      font-size: 0.95rem;
+    }
+
+    input[type="number"] {
+      max-width: 80px;
+    }
+
+    button {
+      background: transparent;
+      border: none;
+      color: #d32f2f;
+      font-size: 1.25rem;
+      cursor: pointer;
+      padding: 0;
+
+      &:hover {
+        color: #b71c1c;
+      }
+    }
+  }
+
+  button[type="button"],
+  button[type="submit"] {
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s ease;
+  }
+
+  button[type="submit"] {
+    background-color: #3f51b5;
+    color: white;
+
+    &:hover {
+      background-color: #303f9f;
+    }
+  }
+
+  button[type="button"] {
+    background-color: #eee;
+    color: #333;
+
+    &:hover {
+      background-color: #ddd;
+    }
+  }
+
+  /* Button group */
+  div {
+    & > div:last-child {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+
+      button {
+        flex: 1;
+      }
+    }
+  }
+}
+
+/* Responsive tweaks */
+@media (max-width: 480px) {
+  form {
+    padding: 1rem;
+
+    ul li {
+      flex-direction: column;
+
+      input {
+        max-width: 100% !important;
+      }
+
+      button {
+        align-self: flex-end;
+        margin-top: 0.25rem;
+      }
+    }
+  }
+}

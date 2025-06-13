@@ -1,0 +1,52 @@
+
+.ViewTask{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    .ViewTask-row{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem;
+      gap: 1rem;
+      span{
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        gap: 0.2rem;
+      }
+    }
+   
+}
+
+  .ViewTask-status {
+   display: flex;
+   justify-content: center;  
+   gap: 1rem; 
+   div{
+    display: flex;
+    gap: 0.2rem;
+   }
+  
+  }
+
+  .ViewTask-row-loc{
+    display: flex;
+    justify-content: center;
+  }
+
+  .ViewTask-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.ViewTask-row-Location{
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem;
+  svg {
+    color: #1976d2; // Adjust color as needed
+  }
+}

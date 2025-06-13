@@ -1,0 +1,187 @@
+[
+  {
+    "id": 1,
+    "product_name": "Nitrile Examination Gloves – Powder-Free",
+    "product_description": "High-quality powder-free nitrile gloves offering excellent protection, durability, and sensitivity. Suitable for medical, laboratory, and general use.",
+    "specifications": {
+      "material": "Nitrile rubber",
+      "powder": "Free",
+      "sterility": "Non-sterile",
+      "thickness": "0.08 mm (±0.01 mm)",
+      "color": "Blue",
+      "sizes": ["S", "M", "L", "XL"],
+      "packaging": "100 gloves per box"
+    },
+    "how_to_use": [
+      "Select the correct size.",
+      "Wear gloves on clean, dry hands.",
+      "Avoid touching unnecessary surfaces.",
+      "Dispose of after single use."
+    ],
+    "uses": [
+      "Medical examinations",
+      "Laboratory handling",
+      "Food processing",
+      "Cleaning and sanitation"
+    ],
+    "features": [
+      "Powder-free and latex-free",
+      "Excellent tactile sensitivity",
+      "Resistant to punctures and chemicals",
+      "Ambidextrous fit"
+    ],
+    "advantages": [
+      "Reduces allergic reactions",
+      "Safe for food and medical applications",
+      "Durable under demanding tasks",
+      "Complies with EN455 and ASTM standards"
+    ]
+  },
+  {
+    "id": 2,
+    "product_name": "KN95 Respirator Face Mask – 5 Layer Protection",
+    "product_description": "Premium KN95 face mask with 5 layers of advanced filtration for high-level protection. Designed for comfort and effective respiratory defense.",
+    "specifications": {
+      "material": "Non-woven fabric, melt-blown fabric",
+      "layers": 5,
+      "filtration_efficiency": "≥ 95%",
+      "ear_loops": "Elastic, latex-free",
+      "nose_clip": "Adjustable aluminum strip",
+      "color": "White",
+      "size": "Universal",
+      "packaging": "10 masks per box"
+    },
+    "how_to_use": [
+      "Unfold the mask and place it over nose and mouth.",
+      "Secure the ear loops.",
+      "Adjust the nose clip for a secure fit.",
+      "Avoid touching the mask while in use.",
+      "Dispose after extended or contaminated use."
+    ],
+    "uses": [
+      "Healthcare settings",
+      "Air travel",
+      "Dusty environments",
+      "Daily protection"
+    ],
+    "features": [
+      "5-layer design for advanced filtration",
+      "Breathable and skin-friendly",
+      "Snug fit reduces leakage",
+      "Foldable design for portability"
+    ],
+    "advantages": [
+      "Protects against airborne particles",
+      "Comfortable for prolonged use",
+      "Meets GB2626-2019 standard",
+      "Reusable if stored hygienically"
+    ]
+  },
+  {
+    "id": 3,
+    "product_name": "Disposable Bouffant Cap – Non-Woven",
+    "product_description": "Lightweight and breathable bouffant cap designed to contain hair in sterile and clean environments. Ideal for surgical rooms and food production.",
+    "specifications": {
+      "material": "Spunbond non-woven fabric",
+      "diameter": "18, 21, or 24 inches",
+      "color": "Blue, green, white",
+      "elastic_band": "Soft and stretchable",
+      "packaging": "100 caps per pack"
+    },
+    "how_to_use": [
+      "Remove a cap from packaging.",
+      "Stretch open and place over head.",
+      "Ensure all hair is contained.",
+      "Dispose after use."
+    ],
+    "uses": [
+      "Surgical rooms",
+      "Food service and processing",
+      "Cleanrooms",
+      "Beauty salons"
+    ],
+    "features": [
+      "Breathable and lightweight",
+      "Universal fit",
+      "Non-irritating elastic",
+      "Dust and particle control"
+    ],
+    "advantages": [
+      "Maintains hygiene in sensitive areas",
+      "Cost-effective and disposable",
+      "Helps meet contamination control protocols",
+      "Available in multiple sizes and colors"
+    ]
+  },
+  {
+    "id": 4,
+    "product_name": "Disposable Shoe Covers – Non-Skid",
+    "product_description": "Protective shoe covers made from durable non-woven material with non-skid soles. Designed for use in cleanrooms, labs, and controlled environments.",
+    "specifications": {
+      "material": "Non-woven polypropylene",
+      "coating": "Anti-slip sole",
+      "color": "Blue",
+      "size": "Universal (fits up to US 12)",
+      "packaging": "100 covers per pack"
+    },
+    "how_to_use": [
+      "Wear over shoes before entering clean area.",
+      "Ensure full shoe coverage.",
+      "Remove and dispose after use."
+    ],
+    "uses": [
+      "Hospitals",
+      "Laboratories",
+      "Cleanrooms",
+      "Construction site visits"
+    ],
+    "features": [
+      "Non-skid design for safety",
+      "Elastic ankle opening",
+      "Water and dust resistant",
+      "Universal fit"
+    ],
+    "advantages": [
+      "Prevents contamination from footwear",
+      "Improves workplace hygiene",
+      "Safe for smooth or wet floors",
+      "Disposable and economical"
+    ]
+  },
+  {
+    "id": 5,
+    "product_name": "Alcohol-Based Hand Sanitizer Gel – 500ml",
+    "product_description": "Instant hand sanitizer gel with 70% alcohol content to kill 99.9% of germs. Enriched with moisturizers to prevent dryness.",
+    "specifications": {
+      "alcohol_content": "70%",
+      "base": "Ethanol",
+      "form": "Gel",
+      "fragrance": "Mild fresh scent",
+      "packaging": "500ml pump bottle",
+      "color": "Clear"
+    },
+    "how_to_use": [
+      "Dispense a small amount into palm.",
+      "Rub hands together until dry.",
+      "Do not rinse or wipe off."
+    ],
+    "uses": [
+      "Hospitals and clinics",
+      "Workplaces",
+      "Travel kits",
+      "Households"
+    ],
+    "features": [
+      "Kills 99.9% of bacteria and viruses",
+      "Non-sticky formula",
+      "Moisturizing ingredients",
+      "Quick-drying"
+    ],
+    "advantages": [
+      "Effective hand hygiene on the go",
+      "Convenient pump dispenser",
+      "Safe for frequent use",
+      "Meets WHO guidelines"
+    ]
+  }
+]

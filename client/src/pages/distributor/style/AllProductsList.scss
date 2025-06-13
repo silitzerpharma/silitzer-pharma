@@ -1,0 +1,29 @@
+.allproductslist-con{
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   border: 2px solid black;
+    margin: 1rem 2rem;
+    text-align: center;
+    .title{
+       font-weight: bold;
+       color: green;
+       font-size: 2rem;
+    }
+}
+
+
+.products-table{
+    width: 80%;
+}
+
+
+.stock-yes {
+  color: green;
+  font-weight: bold;
+}
+
+.stock-no {
+  color: red;
+  font-weight: bold;
+}
