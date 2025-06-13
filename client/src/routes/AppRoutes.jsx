@@ -31,7 +31,7 @@ const AdminOrders = lazy(() => import("../pages/admin/AdminOrders"));
 const Stock = lazy(() => import("../pages/admin/Stock"));
 const PendingOrders = lazy(() => import("../pages/admin/PendingOrders"));
 const StockTransaction = lazy(() => import("../pages/admin/StockTransaction"));
-const DistributorDashboardSettings = lazy(() => import("../pages/admin/DistributorDashboardsettings"));
+const DistributorDashboardSettings = lazy(() => import("../pages/admin/DistributorDashboardSettings"));
 const OrderRecords = lazy(() => import("../pages/admin/OrderRecords"));
 const AdminProfile = lazy(() => import("../pages/admin/AdminProfile"));
 const TodayOrders = lazy(() => import("../pages/admin/TodayOrders"));
