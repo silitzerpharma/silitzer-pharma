@@ -25,7 +25,7 @@ const SearchResultsPage = lazy(() => import("../components/distributor/SearchRes
 
 const AdminDashboard = lazy(() => import("../pages/admin/AdminDashboard"));
 const Distributors = lazy(() => import("../pages/admin/Distributors"));
-const Employees = lazy(() => import("../pages/admin/employees"));
+const Employees = lazy(() => import("../pages/admin/Employees"));
 const Products = lazy(() => import("../pages/admin/Products"));
 const AdminOrders = lazy(() => import("../pages/admin/AdminOrders"));
 const Stock = lazy(() => import("../pages/admin/Stock"));
