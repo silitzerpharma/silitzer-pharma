@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./style/table.scss"
+import "./style/Table.scss"
 import ViewOrder from "../View/ViewOrder";
 import socket from "../../../store/socket";
 import { Checkbox, FormControlLabel } from "@mui/material";
