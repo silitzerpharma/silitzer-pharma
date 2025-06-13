@@ -10,6 +10,8 @@ import EmployeeProfile from './employee/EmployeeProfile';
 import EmployeeLeave from './employee/EmployeeLeave';
 import EmployeeRequests from './employee/EmployeeRequests';  // NEW
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const ViewEmployee = ({ openViewEmployee, EmployeeId, EmployeeObjectId, refreshEmployeesList }) => {
   const [activeTab, setActiveTab] = useState('today');
   const [employee, setEmployee] = useState(null);
@@ -25,7 +27,7 @@ const ViewEmployee = ({ openViewEmployee, EmployeeId, EmployeeObjectId, refreshE
     if (!EmployeeId) return;
 
     setLoading(true);
-    fetch("http://localhost:3000/admin/employee/data", {
+    fetch(`${BASE_URL}/admin/employee/data`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: 'include',

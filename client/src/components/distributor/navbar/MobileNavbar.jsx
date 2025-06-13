@@ -12,6 +12,8 @@ import { FiSearch } from "react-icons/fi";
 import Badge from "@mui/material/Badge";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const MobileNavbar = () => {
   const totalQuantity = useSelector(selectTotalCartQuantity);
   const navigate = useNavigate();
@@ -41,7 +43,7 @@ const dispatch = useDispatch();
 
   const handleLogout = async () => {
     try {
-      const res = await fetch("http://localhost:3000/auth/logout", {
+      const res = await fetch(`${BASE_URL}/auth/logout`, {
         method: "POST",
         credentials: "include",
       });

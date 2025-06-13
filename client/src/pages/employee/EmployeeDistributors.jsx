@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 
 import './style/EmployeeDistributors.scss'
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 function EmployeeDistributors() {
   const [distributors, setDistributors] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -12,7 +14,7 @@ function EmployeeDistributors() {
     setLoading(true);
     setError(null);
 
-    const url = new URL("http://localhost:3000/employee/distributors");
+    const url = new URL(`${BASE_URL}/employee/distributors`);
     if (search) {
       url.searchParams.append("search", search);
     }

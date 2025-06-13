@@ -15,6 +15,8 @@ import {
 } from "@mui/material";
 import ViewTask from "../View/ViewTask";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const formatDate = (dateString) => {
   if (!dateString) return "-";
   const date = new Date(dateString);
@@ -47,7 +49,7 @@ const fetchTasks = async () => {
     if (searchText) params.append("search", searchText);
 
     const response = await fetch(
-      `http://localhost:3000/admin/employee/tasks?${params.toString()}`,
+      `${BASE_URL}/admin/employee/tasks?${params.toString()}`,
       {
         credentials: 'include' // ✅ Ensures cookies/session are sent
       }

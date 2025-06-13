@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import "./AddEmployee.scss"; // External CSS
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const AddEmployee = ({ openAddEmployeeForm , refreshEmployeesList }) => {
   const [formData, setFormData] = useState({
     EmployeeID: "",
@@ -26,7 +28,7 @@ const AddEmployee = ({ openAddEmployeeForm , refreshEmployeesList }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:3000/admin/employee/add", {
+      const response = await fetch(`${BASE_URL}/admin/employee/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

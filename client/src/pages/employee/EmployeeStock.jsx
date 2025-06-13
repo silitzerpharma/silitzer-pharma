@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import ProductDetailCard from "../../components/employee/ProductDetailCard";
 import './style/EmployeeStock.scss';
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const LIMIT = 10;
 
 const EmployeeStock = () => {
@@ -16,7 +18,7 @@ const EmployeeStock = () => {
   try {
     setLoading(true);
     const response = await fetch(
-      `http://localhost:3000/employee/products?page=${page}&limit=${LIMIT}&search=${encodeURIComponent(searchTerm)}`,
+      `${BASE_URL}/employee/products?page=${page}&limit=${LIMIT}&search=${encodeURIComponent(searchTerm)}`,
       {
         method: "GET",
         credentials: "include", // ✅ Send cookies like session/auth token

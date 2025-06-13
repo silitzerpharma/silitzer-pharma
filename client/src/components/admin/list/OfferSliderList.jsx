@@ -7,6 +7,8 @@ import DialogContent from "@mui/material/DialogContent";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const OfferSliderList = () => {
   const [showOfferForm, setShowOfferForm] = useState(false);
   const [editOfferId, setEditOfferId] = useState(null);
@@ -31,7 +33,7 @@ const OfferSliderList = () => {
 
 const fetchOfferList = async () => {
   try {
-    const response = await fetch("http://localhost:3000/admin/get-offer-List", {
+    const response = await fetch(`${BASE_URL}/admin/get-offer-List`, {
       method: "GET",
       credentials: "include", // ✅ Send cookies (auth/session token)
     });
@@ -61,7 +63,7 @@ const handleAddProduct = async () => {
   if (!productInput.trim()) return;
   try {
     const res = await fetch(
-      `http://localhost:3000/admin/products/check?name=${encodeURIComponent(productInput)}`,
+      `${BASE_URL}/admin/products/check?name=${encodeURIComponent(productInput)}`,
       {
         method: "GET",
         credentials: "include", // ✅ Include cookies (auth/session)
@@ -100,8 +102,8 @@ const handleAddProduct = async () => {
     };
 
     const url = editOfferId
-      ? `http://localhost:3000/admin/edit-offer-slider/${editOfferId}`
-      : "http://localhost:3000/admin/save-offer-slider";
+      ? `${BASE_URL}/admin/edit-offer-slider/${editOfferId}`
+      : `${BASE_URL}/admin/save-offer-slider`;
 
     const method = editOfferId ? "PUT" : "POST";
 
@@ -138,7 +140,7 @@ const handleAddProduct = async () => {
  const handleRemove = async (id) => {
   if (!window.confirm("Are you sure you want to delete this offer?")) return;
   try {
-    const response = await fetch(`http://localhost:3000/admin/remove-offer-slider/${id}`, {
+    const response = await fetch(`${BASE_URL}/admin/remove-offer-slider/${id}`, {
       method: "DELETE",
       credentials: "include", // ✅ Include cookies (for auth/session)
     });

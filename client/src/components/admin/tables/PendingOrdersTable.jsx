@@ -28,6 +28,9 @@ const PendingOrdersTable = () => {
   const [filterDate, setFilterDate] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
   // Fetch orders from backend
 const fetchPendingOrders = async () => {
   setLoading(true);
@@ -40,7 +43,7 @@ const fetchPendingOrders = async () => {
     });
 
     const response = await fetch(
-      `http://localhost:3000/admin/getallpendingorders?${params.toString()}`,
+      `${BASE_URL}/admin/getallpendingorders?${params.toString()}`,
       {
         credentials: 'include', // ✅ Ensures cookies are sent for authentication
       }

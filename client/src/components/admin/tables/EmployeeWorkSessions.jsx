@@ -21,6 +21,9 @@ import EmployeedaysActivity from "../View/EmployeedaysActivity"; // adjust path
 import { reverseGeocode } from "../../../services/reverseGeocode"; // adjust path
 import "./style/EmployeeWorkSessions.scss";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+
 const EmployeeWorkSessions = ({ employeeId }) => {
   const [sessions, setSessions] = useState([]);
   const [page, setPage] = useState(1);
@@ -36,7 +39,7 @@ const EmployeeWorkSessions = ({ employeeId }) => {
 
 const fetchSessions = async () => {
   try {
-    let url = `http://localhost:3000/admin/employee/employee-work-sessions?employeeId=${employeeId}&page=${page}&limit=${limit}`;
+    let url = `${BASE_URL}/admin/employee/employee-work-sessions?employeeId=${employeeId}&page=${page}&limit=${limit}`;
     if (startDate) url += `&startDate=${startDate}`;
     if (endDate) url += `&endDate=${endDate}`;
 
@@ -113,7 +116,7 @@ const fetchSessions = async () => {
 
 const handleDownload = async () => {
   try {
-    let url = `http://localhost:3000/admin/employee/worksessions/download?employeeId=${employeeId}`;
+    let url = `${BASE_URL}/admin/employee/worksessions/download?employeeId=${employeeId}`;
     if (startDate) url += `&startDate=${startDate}`;
     if (endDate) url += `&endDate=${endDate}`;
 

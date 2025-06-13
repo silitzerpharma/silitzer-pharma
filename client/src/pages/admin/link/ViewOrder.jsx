@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import "./style/ViewOrder.scss";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+
 const ViewOrder = () => {
   const params = useParams();
   const [order, setOrder] = useState(null);
@@ -11,7 +14,7 @@ const ViewOrder = () => {
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/admin/order?id=${params.id}`, {
+        const response = await fetch(`${BASE_URL}/admin/order?id=${params.id}`, {
           credentials: "include",
         });
         if (!response.ok) throw new Error("Failed to fetch order details");

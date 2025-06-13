@@ -13,6 +13,8 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const NotificationPanel = ({ onClose }) => {
   const [notifications, setNotifications] = useState([]);
   const [page, setPage] = useState(0);
@@ -22,7 +24,7 @@ const NotificationPanel = ({ onClose }) => {
 
   const fetchNotifications = async (pageToLoad = 0) => {
     try {
-      const res = await fetch(`http://localhost:3000/admin/notifications?page=${pageToLoad}&limit=${limit}`, {
+      const res = await fetch(`${BASE_URL}/admin/notifications?page=${pageToLoad}&limit=${limit}`, {
         credentials: 'include',
       });
       const data = await res.json();
@@ -37,7 +39,7 @@ const NotificationPanel = ({ onClose }) => {
 
   const handleNotificationClick = async (notification) => {
     try {
-      await fetch(`http://localhost:3000/admin/notifications/seen?Notification_id=${notification._id}`, {
+      await fetch(`${BASE_URL}/admin/notifications/seen?Notification_id=${notification._id}`, {
         method: 'POST',
         credentials: 'include',
       });

@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import "./style/EmployeeOrders.scss";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const EmployeeOrders = () => {
   const [orders, setOrders] = useState([]);
   const [expandedOrderId, setExpandedOrderId] = useState(null);
@@ -41,7 +43,7 @@ const EmployeeOrders = () => {
 
   try {
     const res = await fetch(
-      `http://localhost:3000/employee/orders?${params.toString()}`,
+      `${BASE_URL}/employee/orders?${params.toString()}`,
       {
         method: "GET",
         credentials: "include", // ✅ Include cookies (auth/session)

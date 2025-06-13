@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import "./style/TasksList.scss";
 import HourglassBottomIcon from "@mui/icons-material/HourglassBottom";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const PendingTasks = () => {
   const [tasks, setTasks] = useState([]);
   const [showDialog, setShowDialog] = useState(false);
@@ -18,7 +20,7 @@ const PendingTasks = () => {
   useEffect(() => {
     const fetchPendingTasks = async () => {
       try {
-        const response = await fetch("http://localhost:3000/employee/task/pending", {
+        const response = await fetch(`${BASE_URL}/employee/task/pending`, {
           credentials: "include",
         });
         if (!response.ok) {
@@ -75,7 +77,7 @@ const PendingTasks = () => {
           };
 
           try {
-            const response = await fetch("http://localhost:3000/employee/task/update-status", {
+            const response = await fetch(`${BASE_URL}/employee/task/update-status`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               credentials: "include",
@@ -106,7 +108,7 @@ const PendingTasks = () => {
       );
     } else {
       try {
-        const response = await fetch("http://localhost:3000/employee/task/update-status", {
+        const response = await fetch(`${BASE_URL}/employee/task/update-status`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
@@ -157,7 +159,7 @@ const PendingTasks = () => {
 
   const submitCancelRequest = async () => {
     try {
-      const response = await fetch("http://localhost:3000/employee/task/cancel", {
+      const response = await fetch(`${BASE_URL}/employee/task/cancel`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

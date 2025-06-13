@@ -1,6 +1,8 @@
 import "./addproduct.scss";
 import React, { useState } from "react";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const AddProduct = ({ refreshProductList }) => {
   const [productName, setProductName] = useState("");
   const [productDescription, setProductDescription] = useState("");
@@ -23,7 +25,7 @@ const AddProduct = ({ refreshProductList }) => {
   const [howToUse, setHowToUse] = useState([""]);
   const [specifications, setSpecifications] = useState([{ key: "", value: "" }]);
   const [taxes, setTaxes] = useState([{ name: "", rate: "" }]);
-  const [isLoading, setIsLoading] = useState(false);
+
 
 
   const handleChange = (setter, index, value) => {
@@ -143,7 +145,7 @@ const AddProduct = ({ refreshProductList }) => {
     };
 
     try {
-      const response = await fetch("http://localhost:3000/admin/addproduct", {
+      const response = await fetch(`${BASE_URL}/admin/addproduct`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

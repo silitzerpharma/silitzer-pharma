@@ -5,6 +5,8 @@ import {
   TableRow, Paper, TablePagination
 } from '@mui/material';
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const StockTransactionTable = () => {
   const today = new Date();
   const formattedDate = today.toISOString().split('T')[0]; // yyyy-mm-dd
@@ -67,7 +69,7 @@ const StockTransactionTable = () => {
     params.append('limit', limit);
 
     const res = await fetch(
-      `http://localhost:3000/admin/stocktransaction/instock?${params.toString()}`,
+      `${BASE_URL}/admin/stocktransaction/instock?${params.toString()}`,
       {
         credentials: 'include' // ✅ Include cookies (auth token/session)
       }
@@ -90,7 +92,7 @@ const fetchOutStock = async (page = outPage, limit = outRowsPerPage) => {
     params.append('limit', limit);
 
     const res = await fetch(
-      `http://localhost:3000/admin/stocktransaction/outstock?${params.toString()}`,
+      `${BASE_URL}/admin/stocktransaction/outstock?${params.toString()}`,
       {
         credentials: 'include' // ✅ Required for session/cookie-based auth
       }

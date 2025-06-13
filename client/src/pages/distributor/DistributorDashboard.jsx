@@ -8,7 +8,7 @@ import AllProductList from '../../components/distributor/AllProductList';
 import ProductSlider from '../../components/distributor/slider/ProductSlider';
 import OfferSlider from '../../components/distributor/slider/OfferSlider';
 
-
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const DistributorDashboard = () => {
 
@@ -18,7 +18,7 @@ const DistributorDashboard = () => {
   useEffect(() => {
   const fetchDistributorDashboardData = async () => {
     try {
-      const response = await fetch("http://localhost:3000/distributor/dashboard/data", {
+      const response = await fetch(`${BASE_URL}/distributor/dashboard/data`, {
         method: "GET",
         credentials: "include", // ✅ include cookies (auth/session)
       });
@@ -36,7 +36,7 @@ const DistributorDashboard = () => {
 
 
   const openWhatsApp = () => {
-    const phoneNumber = '918888418736'; // Replace with actual number
+    const phoneNumber = '919156701799'; // Replace with actual number
     const message = 'Hello, I want to place an order.'; // Optional
     const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');

@@ -3,6 +3,8 @@ import './CancelTaskRequests.scss';
 
 const statuses = ['', 'Pending', 'Approved', 'Rejected'];
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const CancelTaskRequests = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -15,7 +17,7 @@ const CancelTaskRequests = () => {
   const fetchRequests = async () => {
     setLoading(true);
     try {
-      const url = new URL('http://localhost:3000/employee/task/cancelrequests');
+      const url = new URL(`${BASE_URL}/employee/task/cancelrequests`);
       url.searchParams.append('page', page);
       url.searchParams.append('limit', limit);
       if (search.trim() !== '') {

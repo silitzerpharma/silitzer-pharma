@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './orders.scss';
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const SORT_OPTIONS = [
   { label: 'Date Asc', value: 'date_asc' },
   { label: 'Date Desc', value: 'date_desc' },
@@ -51,7 +53,7 @@ const Orders = () => {
       if (selectedStatus && selectedStatus !== 'All') params.append('status', selectedStatus);
       if (selectedSort) params.append('sort', selectedSort);
 
-      const url = `http://localhost:3000/distributor/getallorders?${params.toString()}`;
+      const url = `${BASE_URL}/distributor/getallorders?${params.toString()}`;
       const response = await fetch(url, {
         method: 'GET',
         credentials: 'include',

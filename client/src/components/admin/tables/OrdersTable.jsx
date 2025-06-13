@@ -4,6 +4,7 @@ import ViewOrder from "../View/ViewOrder";
 import socket from "../../../store/socket";
 import { Checkbox, FormControlLabel } from "@mui/material";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 import {
   Table,
@@ -59,7 +60,7 @@ useEffect(() => {
   const fetchOrders = async () => {
     try {
       const response = await fetch(
-        `http://localhost:3000/admin/getallorders?page=${page}&limit=${rowsPerPage}&view=${selectedView}&search=${encodeURIComponent(
+        `${BASE_URL}/admin/getallorders?page=${page}&limit=${rowsPerPage}&view=${selectedView}&search=${encodeURIComponent(
           searchTerm
         )}&filterDate=${filterDate}&showPending=${showPending}`,
         {
@@ -170,7 +171,7 @@ useEffect(() => {
     };
     try {
       const response = await fetch(
-        "http://localhost:3000/admin/updateorderstatus",
+        `${BASE_URL}/admin/updateorderstatus`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -201,7 +202,7 @@ useEffect(() => {
     };
     try {
       const response = await fetch(
-        "http://localhost:3000/admin/updateorderpaymentstatus",
+        `${BASE_URL}/admin/updateorderpaymentstatus`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },

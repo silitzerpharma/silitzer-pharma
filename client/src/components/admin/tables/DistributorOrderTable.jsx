@@ -15,6 +15,9 @@ const headCells = [
   { id: 'products', label: 'Products', width: 150 }
 ];
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+
 const DistributorOrderTable = ({ distributorId }) => {
   const [orderData, setOrderData] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState([]);
@@ -40,7 +43,7 @@ const DistributorOrderTable = ({ distributorId }) => {
 const fetchDistributorData = async (page, limit, sortField, sortOrder) => {
   try {
     const res = await fetch(
-      `http://localhost:3000/admin/distributor?id=${distributorId}&page=${page}&limit=${limit}&sortField=${sortField}&sortOrder=${sortOrder}`,
+      `${BASE_URL}/admin/distributor?id=${distributorId}&page=${page}&limit=${limit}&sortField=${sortField}&sortOrder=${sortOrder}`,
       {
         method: "GET",
         credentials: "include", // ✅ Send cookies for authentication

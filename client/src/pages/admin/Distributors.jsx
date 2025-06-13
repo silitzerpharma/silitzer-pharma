@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import DistributorsTable from "../../components/admin/tables/DistributorsTable";
 import AddDistributors from "../../components/admin/form/AddDistributors";
 import "./style/Pages.scss";

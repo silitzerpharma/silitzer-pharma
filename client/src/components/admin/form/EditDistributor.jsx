@@ -1,6 +1,9 @@
 import React from 'react';
 import './editdistributor.scss';
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+
 const EditDistributor = ({ setIsEditing, viewDistributor, setviewDistributor }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -12,7 +15,7 @@ const EditDistributor = ({ setIsEditing, viewDistributor, setviewDistributor }) 
 
   const handleSave = async () => {
     try {
-      const response = await fetch('http://localhost:3000/admin/editdistributor', {
+      const response = await fetch(`${BASE_URL}/admin/editdistributor`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

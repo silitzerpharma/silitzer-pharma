@@ -1,5 +1,8 @@
 import './style/AllProductsList.scss';
 import React, { useState, useEffect } from 'react';
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 import {
   Table,
   TableBody,
@@ -41,7 +44,7 @@ const fetchProducts = async () => {
   setLoading(true);
   try {
     const response = await fetch(
-      `http://localhost:3000/distributor/get-all-product-list?page=${page}&limit=${rowsPerPage}&orderBy=${orderBy}&order=${order}`,
+      `${BASE_URL}/distributor/get-all-product-list?page=${page}&limit=${rowsPerPage}&orderBy=${orderBy}&order=${order}`,
       {
         method: "GET",
         credentials: "include", // ✅ Send cookies (like auth token)

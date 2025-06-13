@@ -8,6 +8,8 @@ import {
   MenuItem,
 } from '@mui/material';
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const priorities = ['Low', 'Medium', 'High'];
 
 const AssignTask = ({ employeeObjectId, onClose }) => {
@@ -112,7 +114,7 @@ const AssignTask = ({ employeeObjectId, onClose }) => {
     }
 
     try {
-      const response = await fetch('http://localhost:3000/admin/employee/assigntask', {
+      const response = await fetch(`${BASE_URL}/admin/employee/assigntask`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

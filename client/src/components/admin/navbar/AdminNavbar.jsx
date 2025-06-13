@@ -14,6 +14,8 @@ import socket from "../../../store/socket";
 import MobileNavbar from "./MobileNavbar";
 import NotificationPanel from "../View/NotificationPanel";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const AdminNavbar = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -49,7 +51,7 @@ const AdminNavbar = () => {
 
 const fetchNotificationsCount = async () => {
   try {
-    const response = await fetch("http://localhost:3000/admin/notifications/count", {
+    const response = await fetch(`${BASE_URL}/admin/notifications/count`, {
       method: "GET",
       credentials: "include", // This includes cookies in the request
       headers: {
@@ -85,7 +87,7 @@ const fetchNotificationsCount = async () => {
   const handleLogout = async () => {
     setAnchorEl(null);
     try {
-      const res = await fetch('http://localhost:3000/auth/logout', {
+      const res = await fetch(`${BASE_URL}/auth/logout`, {
         method: 'POST',
         credentials: 'include' // important for cookies
       });

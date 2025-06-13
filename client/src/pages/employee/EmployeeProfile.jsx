@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import './style/EmployeeProfile.scss';
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const EmployeeProfile = () => {
   const [employee, setEmployee] = useState(null);
   const [editMode, setEditMode] = useState(false);
@@ -12,7 +14,7 @@ const EmployeeProfile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await fetch("http://localhost:3000/employee/profile", {
+        const res = await fetch(`${BASE_URL}/employee/profile`, {
           method: "GET",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
@@ -67,7 +69,7 @@ const handleSubmit = async (e) => {
   }
 
   try {
-    const response = await fetch("http://localhost:3000/employee/profile/update", {
+    const response = await fetch(`${BASE_URL}/employee/profile/update`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

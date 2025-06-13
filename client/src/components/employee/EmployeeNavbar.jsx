@@ -24,6 +24,9 @@ import ListAltIcon from '@mui/icons-material/ListAlt';
 import WorkHistoryIcon from '@mui/icons-material/WorkHistory';
 import PendingActionsIcon from '@mui/icons-material/PendingActions';
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+
 const EmployeeNavbar = ({isActive , setIsActive}) => {
 
   const dispatch = useDispatch();
@@ -35,7 +38,7 @@ const EmployeeNavbar = ({isActive , setIsActive}) => {
   useEffect(() => {
     const checkLogin = async () => {
       try {
-        const res = await fetch('http://localhost:3000/employee/fieldactive', {
+        const res = await fetch(`${BASE_URL}/employee/fieldactive`, {
           method: 'POST',
           credentials: 'include',
         });
@@ -50,7 +53,7 @@ const EmployeeNavbar = ({isActive , setIsActive}) => {
   }, []);
 const handleSignOut = async () => {
     try {
-      const res = await fetch("http://localhost:3000/auth/logout", {
+      const res = await fetch(`${BASE_URL}/auth/logout`, {
         method: "POST",
         credentials: "include",
       });

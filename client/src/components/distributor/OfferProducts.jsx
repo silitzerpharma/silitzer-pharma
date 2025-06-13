@@ -7,6 +7,11 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import { useNavigate } from 'react-router-dom';
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+
+
+
 const OfferProducts = () => {
   const { offerId } = useParams();
   const [products, setProducts] = useState([]);
@@ -23,7 +28,7 @@ useEffect(() => {
   const fetchOfferProducts = async () => {
     try {
       const response = await fetch(
-        `http://localhost:3000/distributor/offer/products?offerId=${offerId}`,
+        `${BASE_URL}/distributor/offer/products?offerId=${offerId}`,
         {
           credentials: "include", // ✅ Include cookies with request
         }

@@ -1,8 +1,10 @@
 import "./viewdistributors.scss";
 import CloseIcon from "@mui/icons-material/Close";
-import { use, useState } from "react";
+import {  useState } from "react";
 import EditDistributor from "../form/EditDistributor";
 import DistributorOrderTable from "../tables/DistributorOrderTable";
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 import {
   Dialog,
@@ -41,7 +43,7 @@ const ViewDistributors = ({ distributor, onClose, refreshDistributorsList }) => 
 
   const handleRemove = async () => {
     try {
-      const response = await fetch("http://localhost:3000/admin/removedistributor", {
+      const response = await fetch(`${BASE_URL}/admin/removedistributor`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -65,7 +67,7 @@ const ViewDistributors = ({ distributor, onClose, refreshDistributorsList }) => 
 
   const handlePasswordSubmit = async () => {
     try {
-      const response = await fetch("http://localhost:3000/auth/verifypassword", {
+      const response = await fetch(`${BASE_URL}/auth/verifypassword`, {
         method: "POST",
          credentials: 'include',
         headers: {

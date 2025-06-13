@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import "./style/TodayOrders.scss";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const TodayOrders = () => {
   const [orders, setOrders] = useState([]);
   const [page, setPage] = useState(1);
@@ -11,7 +13,7 @@ const TodayOrders = () => {
   const fetchOrders = async (page) => {
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:3000/admin/order/today?page=${page}&limit=5`, {
+      const res = await fetch(`${BASE_URL}/admin/order/today?page=${page}&limit=5`, {
         method: "GET",
         credentials: "include",
       });

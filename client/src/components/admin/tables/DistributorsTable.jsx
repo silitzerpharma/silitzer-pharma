@@ -13,6 +13,8 @@ import {
   TableSortLabel
 } from "@mui/material";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const DistributorsTable = () => {
   const [selectedDistributorId, setSelectedDistributorId] = useState(null);
   const [page, setPage] = useState(0);
@@ -31,7 +33,7 @@ const DistributorsTable = () => {
 useEffect(() => {
   const fetchDistributors = async () => {
     try {
-      const url = new URL('http://localhost:3000/admin/getalldistributors');
+      const url = new URL(`${BASE_URL}/admin/getalldistributors`);
       url.searchParams.append('page', page + 1);
       url.searchParams.append('limit', rowsPerPage);
       url.searchParams.append('sortField', orderBy);

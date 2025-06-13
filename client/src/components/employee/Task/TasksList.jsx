@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import "./style/TasksList.scss";
 import HourglassBottomIcon from "@mui/icons-material/HourglassBottom";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const TasksList = ({ isActive }) => {
   const [tasks, setTasks] = useState([]);
   const [showDialog, setShowDialog] = useState(false);
@@ -19,7 +21,7 @@ const TasksList = ({ isActive }) => {
   useEffect(() => {
     const fetchTodayTasks = async () => {
       try {
-        const response = await fetch("http://localhost:3000/employee/task/today", {
+        const response = await fetch(`${BASE_URL}/employee/task/today`, {
           credentials: "include",
         });
         if (!response.ok) {
@@ -76,7 +78,7 @@ const TasksList = ({ isActive }) => {
           };
 
           try {
-            const response = await fetch("http://localhost:3000/employee/task/update-status", {
+            const response = await fetch(`${BASE_URL}/employee/task/update-status`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               credentials: "include",
@@ -105,7 +107,7 @@ const TasksList = ({ isActive }) => {
       );
     } else {
       try {
-        const response = await fetch("http://localhost:3000/employee/task/update-status", {
+        const response = await fetch(`${BASE_URL}/employee/task/update-status`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
@@ -155,7 +157,7 @@ const TasksList = ({ isActive }) => {
 
   const submitCancelRequest = async () => {
     try {
-      const response = await fetch("http://localhost:3000/employee/task/cancel", {
+      const response = await fetch(`${BASE_URL}/employee/task/cancel`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import "./viewproduct.scss";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const ViewProduct = ({ onClose, selectedProduct, refreshProductList }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -22,7 +23,7 @@ const ViewProduct = ({ onClose, selectedProduct, refreshProductList }) => {
   useEffect(() => {
     if (!selectedProduct) return;
 
-    fetch("http://localhost:3000/admin/product/fullinfo", {
+    fetch(`${BASE_URL}/admin/product/fullinfo`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -51,7 +52,7 @@ const ViewProduct = ({ onClose, selectedProduct, refreshProductList }) => {
   const handleRemove = async () => {
     try {
       const response = await fetch(
-        "http://localhost:3000/admin/removeproduct",
+        `${BASE_URL}/admin/removeproduct`,
         {
           method: "DELETE",
           headers: {

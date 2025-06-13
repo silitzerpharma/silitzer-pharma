@@ -13,6 +13,8 @@ import {
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { useState, useEffect } from 'react';
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const formatDate = (dateStr) => {
   if (!dateStr) return '';
   const date = new Date(dateStr);
@@ -39,7 +41,7 @@ const ViewTask = ({ task, onClose, refreshTasksList }) => {
 
   const handleSave = async () => {
     try {
-      const res = await fetch('http://localhost:3000/admin/employee/task/update', {
+      const res = await fetch(`${BASE_URL}/admin/employee/task/update`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -63,7 +65,7 @@ const ViewTask = ({ task, onClose, refreshTasksList }) => {
 
   const handleRemove = async () => {
     try {
-      const res = await fetch('http://localhost:3000/admin/employee/task/remove', {
+      const res = await fetch(`${BASE_URL}/admin/employee/task/remove`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

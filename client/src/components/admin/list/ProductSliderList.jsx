@@ -9,6 +9,9 @@ import {
   Button,
 } from '@mui/material';
 
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const ProductSliderList = () => {
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState('');
@@ -24,7 +27,7 @@ const ProductSliderList = () => {
 
 const fetchSliderList = async () => {
   try {
-    const response = await fetch('http://localhost:3000/admin/get-product-slider', {
+    const response = await fetch(`${BASE_URL}/admin/get-product-slider`, {
       method: "GET",
       credentials: "include", // ✅ Include cookies (auth/session)
     });
@@ -52,7 +55,7 @@ const handleAddProduct = async () => {
 
   try {
     const res = await fetch(
-      `http://localhost:3000/admin/products/check?name=${encodeURIComponent(productInput)}`,
+      `${BASE_URL}/admin/products/check?name=${encodeURIComponent(productInput)}`,
       {
         method: "GET",
         credentials: "include", // ✅ Include cookies for authentication
@@ -90,8 +93,8 @@ const handleSaveSlider = async () => {
   };
 
   const url = editSliderId
-    ? `http://localhost:3000/admin/update-product-slider/${editSliderId}`
-    : `http://localhost:3000/admin/save-product-slider`;
+    ? `${BASE_URL}/admin/update-product-slider/${editSliderId}`
+    : `${BASE_URL}/admin/save-product-slider`;
 
   const method = editSliderId ? 'PUT' : 'POST';
 
@@ -141,7 +144,7 @@ const handleSaveSlider = async () => {
 
   try {
     const res = await fetch(
-      `http://localhost:3000/admin/delete-product-slider/${sliderToDelete._id}`,
+      `${BASE_URL}/admin/delete-product-slider/${sliderToDelete._id}`,
       {
         method: 'DELETE',
         credentials: 'include', // ✅ Include cookies for session/auth

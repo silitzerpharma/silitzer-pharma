@@ -13,6 +13,8 @@ import {
 import { MdLocationPin } from "react-icons/md";
 import "./style/EmployeeWork.scss";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const EmployeeWork = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [workDates, setWorkDates] = useState({});
@@ -39,7 +41,7 @@ const EmployeeWork = () => {
     const fetchMonthDays = async () => {
       try {
         const res = await fetch(
-          `http://localhost:3000/employee/work/month?month=${monthKey}`,
+          `${BASE_URL}/employee/work/month?month=${monthKey}`,
           { method: "GET", credentials: "include" }
         );
         const data = await res.json();
@@ -65,7 +67,7 @@ const EmployeeWork = () => {
     const dayStr = format(day, "yyyy-MM-dd");
 
     try {
-      const res = await fetch(`http://localhost:3000/employee/work/day?day=${dayStr}`, {
+      const res = await fetch(`${BASE_URL}/employee/work/day?day=${dayStr}`, {
         method: "GET",
         credentials: "include",
       });

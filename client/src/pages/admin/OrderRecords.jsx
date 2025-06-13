@@ -13,6 +13,8 @@ import {
   Pagination
 } from "@mui/material";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const formatDateDisplay = (dateStr) => {
   if (!dateStr) return "";
   const d = new Date(dateStr);
@@ -43,7 +45,7 @@ const OrderRecords = () => {
 useEffect(() => {
   const fetchOrders = async () => {
     try {
-      const res = await fetch(`http://localhost:3000/admin/order/records?page=${page}&limit=10&startdate=${startdate}&enddate=${enddate}&status=${statusSearch}&distributor=${distributorsSearch}&product=${productsSearch}`, {
+      const res = await fetch(`${BASE_URL}/admin/order/records?page=${page}&limit=10&startdate=${startdate}&enddate=${enddate}&status=${statusSearch}&distributor=${distributorsSearch}&product=${productsSearch}`, {
         method: "GET",
         credentials: "include", // ✅ include cookies
       });
@@ -78,7 +80,7 @@ const handleDownload = () => {
     product: productsSearch
   });
 
-  const downloadUrl = `http://localhost:3000/admin/order/download-records?${params.toString()}`;
+  const downloadUrl = `${BASE_URL}/admin/order/download-records?${params.toString()}`;
   window.open(downloadUrl, "_blank");
 };
 

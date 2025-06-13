@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
 import "./style/AdminProfile.scss";
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 import {
   TextField,
   Button,
@@ -31,7 +34,7 @@ const AdminProfile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await fetch("http://localhost:3000/admin/profile", {
+        const res = await fetch(`${BASE_URL}/admin/profile`, {
           method: "GET",
           credentials: "include",
         });

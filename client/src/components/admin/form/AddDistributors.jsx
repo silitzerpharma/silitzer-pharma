@@ -1,6 +1,7 @@
 import './adddistributors.scss'
 import React, { useState } from "react";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const AddDistributors = ({handleAddNew , refreshDistributorsList}) => {
   const [name, setName] = useState("");
@@ -27,7 +28,7 @@ const AddDistributors = ({handleAddNew , refreshDistributorsList}) => {
     };
     
         try {
-      const response = await fetch('http://localhost:3000/admin/savedistributor', {
+      const response = await fetch(`${BASE_URL}/admin/savedistributor`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

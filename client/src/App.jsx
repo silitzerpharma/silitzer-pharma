@@ -6,6 +6,11 @@ import { useDispatch } from "react-redux";
 import AppRoutes from "./routes/AppRoutes";
 import { login } from "./store/slices/UserSlice";
 
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+
+
 function App() {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);  // <-- new loading state
@@ -13,7 +18,7 @@ function App() {
   useEffect(() => {
     const checkLogin = async () => {
       try {
-        const res = await fetch('http://localhost:3000/auth/checkuserlogin', {
+        const res = await fetch(`${BASE_URL}/auth/checkuserlogin`, {
           method: 'GET',
           credentials: 'include',
         });

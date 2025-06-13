@@ -4,6 +4,8 @@ import { useDispatch } from "react-redux";
 import { addToCart } from "../../store/slices/cartSlice";
 import "./style/SearchResultsPage.scss";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const SearchResultsPage = () => {
   const dispatch = useDispatch();
   const [searchProducts, setSearchProducts] = useState([]);
@@ -15,7 +17,7 @@ const SearchResultsPage = () => {
   useEffect(() => {
     const fetchSearchResults = async () => {
       try {
-        const response = await fetch("http://localhost:3000/distributor/searchProducts", {
+        const response = await fetch(`${BASE_URL}/distributor/searchProducts`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",

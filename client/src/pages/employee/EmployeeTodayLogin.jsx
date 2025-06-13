@@ -16,6 +16,8 @@ import { NavLink } from "react-router-dom";
 import { MdLocationPin } from "react-icons/md";
 import "./style/EmployeeTodayLogin.scss";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const getMapLinkFromString = (locationString) => {
   if (!locationString) return null;
   return `https://www.google.com/maps?q=${locationString.trim()}`;
@@ -75,7 +77,7 @@ const EmployeeTodayLogin = () => {
   const fetchSession = async () => {
     try {
       setLoading(true);
-      const res = await fetch("http://localhost:3000/employee/todaylogin", {
+      const res = await fetch(`${BASE_URL}/employee/todaylogin`, {
         credentials: "include",
       });
       const data = await res.json();
@@ -96,7 +98,7 @@ const EmployeeTodayLogin = () => {
 
   const sendLiveLocation = async (latitude, longitude) => {
     try {
-      const res = await fetch("http://localhost:3000/employee/livelocation", {
+      const res = await fetch(`${BASE_URL}/employee/livelocation`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -189,7 +191,7 @@ const EmployeeTodayLogin = () => {
     navigator.geolocation.getCurrentPosition(
       async ({ coords: { latitude, longitude } }) => {
         try {
-          const response = await fetch("http://localhost:3000/employee/login", {
+          const response = await fetch(`${BASE_URL}/employee/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
@@ -236,7 +238,7 @@ const EmployeeTodayLogin = () => {
 
       const { latitude, longitude } = await getLocation();
 
-      const response = await fetch("http://localhost:3000/employee/logout", {
+      const response = await fetch(`${BASE_URL}/employee/logout`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

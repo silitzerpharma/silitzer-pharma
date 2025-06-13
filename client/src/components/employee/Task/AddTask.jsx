@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import './style/AddTask.scss'; // Optional for styling
 
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const AddTask = ({isActive}) => {
   const [formData, setFormData] = useState({
     title: '',
@@ -25,7 +28,7 @@ const handleSubmit = async (e) => {
         ...(location && { location }), // include location if available
       };
 
-      const response = await fetch("http://localhost:3000/employee/task/add", {
+      const response = await fetch(`${BASE_URL}/employee/task/add`, {
         method: "POST",
         credentials: 'include',
         headers: {

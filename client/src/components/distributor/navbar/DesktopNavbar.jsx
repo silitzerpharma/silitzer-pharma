@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { logout } from "../../../store/slices/UserSlice";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const DesktopNavbar = () => {
 
  const totalQuantity = useSelector(selectTotalCartQuantity);
@@ -29,7 +30,7 @@ const DesktopNavbar = () => {
 
   const handleLogout = async () => {
     try {
-      const res = await fetch("http://localhost:3000/auth/logout", {
+      const res = await fetch(`${BASE_URL}/auth/logout`, {
         method: "POST",
         credentials: "include",
       });

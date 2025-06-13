@@ -12,6 +12,8 @@ import {
 } from "@mui/material";
 import "./vieworder.scss";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const ViewOrder = ({ order, onBack }) => {
 
 
@@ -24,7 +26,7 @@ const ViewOrder = ({ order, onBack }) => {
 
   const handleConfirmCancel = async () => {
     try {
-      const response = await fetch("http://localhost:3000/admin/cancelorder", {
+      const response = await fetch(`${BASE_URL}/admin/cancelorder`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

@@ -18,6 +18,8 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import "./LeaveRequests.scss";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const LeaveRequests = () => {
   const [open, setOpen] = useState(false);
   const [leaveType, setLeaveType] = useState("");
@@ -36,7 +38,7 @@ const LeaveRequests = () => {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("http://localhost:3000/employee/leaverequest", {
+      const res = await fetch(`${BASE_URL}/employee/leaverequest`, {
         method: "GET",
         credentials: "include",
       });
@@ -93,7 +95,7 @@ const LeaveRequests = () => {
     setSubmitLoading(true);
     setError("");
     try {
-      const res = await fetch("http://localhost:3000/employee/leaverequest", {
+      const res = await fetch(`${BASE_URL}/employee/leaverequest`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

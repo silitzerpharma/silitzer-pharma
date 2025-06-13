@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useMemo } from "react";
 import ViewTask from "./ViewTask";
 
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 import {
   format, isSameMonth, isSameDay,
   startOfMonth, endOfMonth, startOfWeek, endOfWeek,
@@ -19,7 +22,7 @@ function ScheduledTasks() {
 
     try {
       const response = await fetch(
-        `http://localhost:3000/employee/task/month?month=${month}&date=${dateStr}`,
+        `${BASE_URL}/employee/task/month?month=${month}&date=${dateStr}`,
         { method: 'GET', credentials: 'include' }
       );
       const data = await response.json();

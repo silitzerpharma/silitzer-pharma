@@ -8,6 +8,8 @@ import { addToCart } from "../../store/slices/cartSlice";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const ProductDetails = () => {
   const [count, setCount] = useState(1);
   const { productId } = useParams();
@@ -42,7 +44,7 @@ useEffect(() => {
   const fetchProduct = async () => {
     try {
       const res = await fetch(
-        `http://localhost:3000/distributor/product/${productId}`,
+        `${BASE_URL}/distributor/product/${productId}`,
         {
           credentials: "include", // ✅ Ensures cookies (e.g., auth token) are sent
         }

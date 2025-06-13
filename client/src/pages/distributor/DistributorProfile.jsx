@@ -9,6 +9,8 @@ import {
 } from '@mui/material';
 import './distributorprofile.css';
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const DistributorProfile = () => {
   const [profile, setProfile] = useState({});
   const [isEditing, setIsEditing] = useState(false);
@@ -20,7 +22,7 @@ const DistributorProfile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/distributor/profile`, {
+        const response = await fetch(`${BASE_URL}/distributor/profile`, {
           method: 'GET',
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
@@ -47,7 +49,7 @@ const DistributorProfile = () => {
   const toggleEdit = async () => {
     if (isEditing) {
       try {
-        await fetch('http://localhost:3000/distributor/saveprofile', {
+        await fetch(`${BASE_URL}/distributor/saveprofile`, {
           method: 'POST',
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
@@ -67,7 +69,7 @@ const DistributorProfile = () => {
     }
 
     try {
-      const res = await fetch('http://localhost:3000/distributor/savepassword', {
+      const res = await fetch(`${BASE_URL}/distributor/savepassword`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },

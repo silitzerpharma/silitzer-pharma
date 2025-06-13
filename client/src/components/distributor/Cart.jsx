@@ -23,6 +23,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import BackspaceIcon from "@mui/icons-material/Backspace";
 import "./style/cart.scss";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 
 const formatDate = (dateStr) => {
@@ -73,7 +74,7 @@ const Cart = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:3000/distributor/placeorder",
+        `${BASE_URL}/distributor/placeorder`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

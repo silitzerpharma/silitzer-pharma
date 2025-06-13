@@ -7,6 +7,8 @@ import {
   InputLabel, Typography, TextField
 } from "@mui/material";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const StockTable = ({ refreshFlag, refreshProductList }) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -48,7 +50,7 @@ useEffect(() => {
   const fetchProducts = async () => {
     try {
       const res = await fetch(
-        `http://localhost:3000/admin/getstockdata?page=${page}&limit=${rowsPerPage}&sortBy=${orderBy}&order=${order}&search=${searchTerm}`,
+        `${BASE_URL}/admin/getstockdata?page=${page}&limit=${rowsPerPage}&sortBy=${orderBy}&order=${order}&search=${searchTerm}`,
         {
           credentials: 'include' // ✅ Include cookies for session/auth
         }
@@ -80,7 +82,7 @@ useEffect(() => {
 
  const handleSaveStockStatus = async () => {
   try {
-    const res = await fetch('http://localhost:3000/admin/updatestockstatus', {
+    const res = await fetch(`${BASE_URL}/admin/updatestockstatus`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include', // ✅ Important for sending cookies
@@ -114,7 +116,7 @@ const handleSaveStockClick = async (productId) => {
     return;
   }
   try {
-    const res = await fetch('http://localhost:3000/admin/updatestock', {
+    const res = await fetch(`${BASE_URL}/admin/updatestock`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include', // ✅ Ensures cookies (auth) are sent

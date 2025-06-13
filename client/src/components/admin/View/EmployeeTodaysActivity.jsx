@@ -4,6 +4,8 @@ import { format } from "date-fns";
 
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const reverseGeocode = async (lat, lon) => {
   if (!lat || !lon) return null;
   try {
@@ -91,7 +93,7 @@ const EmployeeTodaysActivity = ({ employeeId }) => {
     const fetchTodaysActivity = async () => {
       try {
         const response = await fetch(
-          "http://localhost:3000/admin/employee/todaysactivity",
+          `${BASE_URL}/admin/employee/todaysactivity`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },

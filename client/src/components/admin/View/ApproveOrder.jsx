@@ -16,10 +16,12 @@ const ApproveOrder = ({ order, onBack, refreshProductList }) => {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false);
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 useEffect(() => {
   const fetchPendingOrders = async () => {
     try {
-      const response = await fetch('http://localhost:3000/admin/getorder', {
+      const response = await fetch(`${BASE_URL}/admin/getorder`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include', // ✅ Include cookies/session
@@ -99,7 +101,7 @@ useEffect(() => {
 
     setLoading(true);
     try {
-      await fetch('http://localhost:3000/admin/approveorder', {
+      await fetch(`${BASE_URL}/admin/approveorder`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -129,7 +131,7 @@ useEffect(() => {
   const handleCancelConfirm = async () => {
     setCancelConfirmOpen(false);
     try {
-      await fetch('http://localhost:3000/admin/updateorderstatus', {
+      await fetch(`${BASE_URL}/admin/updateorderstatus`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

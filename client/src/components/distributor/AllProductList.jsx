@@ -8,6 +8,8 @@ import { motion } from "framer-motion";
 import "./allproductlist.scss";
 import { useNavigate } from 'react-router-dom';
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const AllProductList = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,7 +22,7 @@ const AllProductList = () => {
 useEffect(() => {
   const fetchProducts = async () => {
     try {
-      const response = await fetch("http://localhost:3000/distributor/getallproducts", {
+      const response = await fetch(`${BASE_URL}/distributor/getallproducts`, {
         method: "GET",
         credentials: "include", // ✅ Include cookies in request
       });

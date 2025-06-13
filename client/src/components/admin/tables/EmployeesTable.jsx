@@ -25,6 +25,8 @@ import {
   Typography,
 } from "@mui/material";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const EmployeesTable = ({ refreshEmployeesList, refreshFlag }) => {
   const [viewEmployee, setViewEmployee] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
@@ -61,7 +63,7 @@ const EmployeesTable = ({ refreshEmployeesList, refreshFlag }) => {
  const fetchEmployees = async () => {
   try {
     const res = await fetch(
-      `http://localhost:3000/admin/employee/all?search=${search}&page=${page}&limit=${limit}`,
+      `${BASE_URL}/admin/employee/all?search=${search}&page=${page}&limit=${limit}`,
       {
         credentials: 'include', // ✅ Send cookies for session authentication
       }

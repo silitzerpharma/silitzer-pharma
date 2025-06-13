@@ -3,6 +3,8 @@ import ViewProduct from '../View/ViewProduct';
 
 import "./style/Table.scss"
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 import {
   Table,
   TableBody,
@@ -35,7 +37,7 @@ const fetchProducts = async () => {
   try {
     setLoading(true);
     const response = await fetch(
-      `http://localhost:3000/admin/products?page=${page + 1}&limit=${rowsPerPage}&sortField=${orderBy}&sortOrder=${order}&search=${encodeURIComponent(searchTerm)}`,
+      `${BASE_URL}/admin/products?page=${page + 1}&limit=${rowsPerPage}&sortField=${orderBy}&sortOrder=${order}&search=${encodeURIComponent(searchTerm)}`,
       {
         credentials: 'include', // ✅ Include cookies for authentication
       }

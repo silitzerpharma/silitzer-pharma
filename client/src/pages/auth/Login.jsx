@@ -3,6 +3,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { useRef, useState } from "react";
 import './login.css';
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+
 import { MdLocalPharmacy } from "react-icons/md";
 import { Snackbar, Alert } from "@mui/material";
 import { login } from "../../store/slices/UserSlice"; // 🟡 Adjust path as needed
@@ -36,7 +39,7 @@ const Login = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/auth/login", {
+      const response = await fetch(`${BASE_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include", // 🟡 Includes cookies

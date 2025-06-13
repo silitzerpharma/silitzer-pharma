@@ -9,6 +9,10 @@ import React, { useState, useEffect } from "react";
 import PendingActionsIcon from '@mui/icons-material/PendingActions';
 import PostAddIcon from '@mui/icons-material/PostAdd';
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+
+
 const AdminDashboard = () => {
 
 const [adminData , setAdminData] = useState({});
@@ -17,7 +21,7 @@ const [adminData , setAdminData] = useState({});
 useEffect(() => {
   const fetchAdminDashboardData = async () => {
     try {
-      const response = await fetch("http://localhost:3000/admin/getadmindashboarddata", {
+      const response = await fetch(`${BASE_URL}/admin/getadmindashboarddata`, {
         method: "GET",
         credentials: "include", // <- This includes cookies in the request
       });

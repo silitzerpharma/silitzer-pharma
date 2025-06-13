@@ -1,6 +1,8 @@
 import './editproduct.scss';
 import React, { useState } from "react";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const EditProduct = ({ product, setIsEditing, refreshProductDetails }) => {
   const [editedProduct, setEditedProduct] = useState({ ...product });
 
@@ -132,7 +134,7 @@ const EditProduct = ({ product, setIsEditing, refreshProductDetails }) => {
     try {
       const { stock, ...productData } = editedProduct;
 
-      const response = await fetch('http://localhost:3000/admin/editproduct', {
+      const response = await fetch(`${BASE_URL}/admin/editproduct`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

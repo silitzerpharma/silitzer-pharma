@@ -7,6 +7,7 @@ import EmployeeProductSlider from "../../components/employee/product/EmployeePro
 
 import EmployeeFooter from "../../components/employee/EmployeeFooter";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const EmployeeDashboard = () => {
   const [employeeName, setEmployeeName] = useState("");
@@ -15,7 +16,7 @@ const EmployeeDashboard = () => {
   useEffect(() => {
     const fetchEmployeeData = async () => {
       try {
-        const res = await fetch("http://localhost:3000/employee/dashboard", {
+        const res = await fetch(`${BASE_URL}/employee/dashboard`, {
           method: "GET",
           credentials: "include",
         });
