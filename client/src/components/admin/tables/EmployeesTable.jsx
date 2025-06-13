@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import "./style/EmployeesTable.scss";
-import "./style/table.scss";
+import "./style/Table.scss";
 import ViewEmployee from "../View/ViewEmployee";
 import AssignTask from "../form/AssignTask";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
