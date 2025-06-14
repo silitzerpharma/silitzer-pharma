@@ -29,9 +29,8 @@ exports.login = async (req, res) => {
 
   try {
     const token = req.cookies.token;
-    const ip = req.ip;
 
-    const userId = AuthServices.getUserIDByToken(token, ip);
+    const userId = AuthServices.getUserIDByToken(token);
     if (!userId) {
       return res.status(404).json({ message: 'Unauthorized: no employeeId' });
     }
@@ -89,9 +88,9 @@ exports.logout = async (req, res) => {
     }
 
     const token = req.cookies.token;
-    const ip = req.ip;
 
-    const userId = AuthServices.getUserIDByToken(token, ip);
+
+    const userId = AuthServices.getUserIDByToken(token);
     if (!userId) {
       return res.status(401).json({ message: 'Unauthorized: no employeeId' });
     }
@@ -137,13 +136,12 @@ exports.logout = async (req, res) => {
 exports.checkFieldActive = async (req, res) => {
   try {
     const token = req.cookies.token;
-    const ip = req.ip;
 
     if (!token) {
       return res.status(401).json({ message: 'Unauthorized: No token',isActive: false });
     }
 
-    const userId = AuthServices.getUserIDByToken(token, ip);
+    const userId = AuthServices.getUserIDByToken(token);
     if (!userId) {
       return res.status(200).json({ message: 'Unauthorized: Invalid token or IP',isActive: false, });
     }

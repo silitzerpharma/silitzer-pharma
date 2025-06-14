@@ -4,13 +4,12 @@ const AuthServices = require('../services/AuthServices.js');
 exports.protectAdmin = async (req, res, next) => {
   try {
     const token = req.cookies.token;
-    const ip = req.ip;
 
     if (!token) {
       return res.status(401).json({ message: 'No token provided' });
     }
 
-    const userId = AuthServices.getUserIDByToken(token, ip);
+    const userId = AuthServices.getUserIDByToken(token);
     if (!userId) {
       return res.status(401).json({ message: 'Invalid or expired token' });
     }
@@ -33,13 +32,12 @@ exports.protectAdmin = async (req, res, next) => {
 exports.protectEmployee = async (req, res, next) => {
   try {
     const token = req.cookies.token;
-    const ip = req.ip;
 
     if (!token) {
       return res.status(401).json({ message: 'No token provided' });
     }
 
-    const userId = AuthServices.getUserIDByToken(token, ip);
+    const userId = AuthServices.getUserIDByToken(token);
     if (!userId) {
       return res.status(401).json({ message: 'Invalid or expired token' });
     }
@@ -62,13 +60,12 @@ exports.protectEmployee = async (req, res, next) => {
 exports.protectDistributor = async (req, res, next) => {
   try {
     const token = req.cookies.token;
-    const ip = req.ip;
 
     if (!token) {
       return res.status(401).json({ message: 'No token provided' });
     }
 
-    const userId = AuthServices.getUserIDByToken(token, ip);
+    const userId = AuthServices.getUserIDByToken(token);
     if (!userId) {
       return res.status(401).json({ message: 'Invalid or expired token' });
     }

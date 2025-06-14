@@ -29,8 +29,7 @@ exports.getNextEmployeeId = async () => {
 exports.getEmployeeByReq = async (req) => {
  try {
     const token = req.cookies.token;
-    const ip = req.ip;
-    const userId = AuthServices.getUserIDByToken(token, ip);
+    const userId = AuthServices.getUserIDByToken(token);
     if (!userId) {
       return null
     }

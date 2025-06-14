@@ -235,10 +235,8 @@ exports.getAllOrders = async (req, res) => {
   const token = req.cookies.token;
   if (!token) return res.status(400).json({ msg: "User not logged in" });
 
-  const ip = req.ip;
-
   try {
-    const user_id = await getUserIDByToken(token, ip);
+    const user_id = await getUserIDByToken(token);
     const user = await getUserById(user_id);
     if (!user) {
       return res.status(401).json({ msg: "Invalid user or session" });
@@ -319,10 +317,8 @@ exports.getProfile = async (req, res) => {
   const token = req.cookies.token;
   if (!token) return res.status(400).json({ msg: "User not logged in" });
 
-  const ip = req.ip;
-
   try {
-    const user_id = await getUserIDByToken(token, ip);
+    const user_id = await getUserIDByToken(token);
     const user = await getUserById(user_id);
 
     if (!user) {
@@ -362,10 +358,9 @@ exports.saveProfile = async (req, res) => {
   const token = req.cookies.token;
   if (!token) return res.status(400).json({ msg: "User not logged in" });
 
-  const ip = req.ip;
 
   try {
-    const user_id = await getUserIDByToken(token, ip);
+    const user_id = await getUserIDByToken(token);
     const user = await getUserById(user_id);
 
     if (!user) {
@@ -403,7 +398,6 @@ exports.savePassword = async (req, res) => {
   const token = req.cookies.token;
   if (!token) return res.status(400).json({ msg: "User not logged in" });
 
-  const ip = req.ip;
   const { password } = req.body;
 
   if (!password || password.length < 6) {
@@ -411,7 +405,7 @@ exports.savePassword = async (req, res) => {
   }
 
   try {
-    const user_id = await getUserIDByToken(token, ip);
+    const user_id = await getUserIDByToken(token);
     const user = await getUserById(user_id);
 
     if (!user || user.roleModel !== 'Distributor') {
@@ -441,13 +435,6 @@ exports.getProductsOffers = async (req, res) => {
 
     const result = [];
 
-    console.log(idsArray);
-    // for (const productId of idsArray) {
-    //   const offers = await productServices.getProductOffers(productId);
-    //   offers.forEach((offer) => {
-    //     result.push({ productId, ...offer });
-    //   });
-    // }
 
     return res.json(result);
   } catch (error) {

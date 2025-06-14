@@ -22,47 +22,34 @@ exports.checkPassword = async (password, hashedPassword) => {
   }
 }
 
-
-function normalizeIP(ip) {
-  if (!ip) return ip;
-  // IPv4-mapped IPv6 address (e.g. ::ffff:192.168.1.1)
-  if (ip.startsWith('::ffff:')) {
-    return ip.substring(7);
-  }
-  return ip;
-}
-
-
-exports.getTokenByUserId = (userId,ip) => {
+exports.getTokenByUserId = (userId) => {
   if (!userId) {
     throw new Error('User ID is required');
   }
-  const normalizedIp = normalizeIP(ip);
-  const payload = { userId, ip: normalizedIp };
+
+  const payload = { userId };
   const token = jwt.sign(payload, process.env.JWT_SECRET, {
     expiresIn: '12h',
     issuer: 'Silitzer-Pharma',
   });
 
   return token;
-}
+};
 
-exports.getUserIDByToken = (token,ip) => {
+exports.getUserIDByToken = (token) => {
   if (!token) return null;
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET, {
       algorithms: ['HS256'], 
       issuer: 'Silitzer-Pharma', 
     });
-     if (normalizeIP(decoded.ip) !== normalizeIP(ip)) {
-      return null;
-    }
-    return decoded.userId; 
+
+    return decoded.userId;
   } catch (err) {
     console.error("Invalid token:", err.message);
     return null;
   }
-}
+};
 
 exports.getUserById = async (user_id) => {
   try {

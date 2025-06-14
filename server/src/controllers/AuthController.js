@@ -5,9 +5,8 @@ const { getUserIDByToken ,getTokenByUserId ,getUserById } = require('../services
 exports.checkuserlogin = async (req, res) => {
   const token = req.cookies.token;
   if (!token) return res.status(400).json({ msg: "user not login" });
-  const ip = req.ip;
   try {
-    const user_id = await getUserIDByToken(token, ip);
+    const user_id = await getUserIDByToken(token);
     const user = await getUserById(user_id);
     if (!user) { return res.status(401).json({ msg: "Invalid user or session" }); }
     return res.status(200).json({ message: 'Login successful', user: { id: user._id, role: user.role,} });
@@ -18,7 +17,6 @@ exports.checkuserlogin = async (req, res) => {
     return res.status(500).json({ msg: "Server error" });
   }
 };
-
 
 exports.login = async (req, res) => {
   if (!req.body) {
@@ -46,17 +44,15 @@ exports.login = async (req, res) => {
     }
 
     // Create JWT token
-    const ip = req.ip;
-    const token = getTokenByUserId(user._id, ip);
+    const token = getTokenByUserId(user._id);
 
-    // Set cookie
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: false,      // Use true in production with HTTPS
-      sameSite: 'Lax',    //'Strict'
-      maxAge: 12 * 60 * 60 * 1000,  // 12 hours in milliseconds
-      path: '/',
-    });
+res.cookie('token', token, {
+  httpOnly: true,
+  secure: true,               // ✅ true for HTTPS (REQUIRED on Render)
+  sameSite: 'None',           // ✅ allows cross-site cookies (REQUIRED if frontend is on different domain)
+  maxAge: 12 * 60 * 60 * 1000,
+  path: '/',
+});
 
     // Respond with user info
     return res.status(200).json({
@@ -73,14 +69,12 @@ exports.login = async (req, res) => {
   }
 };
 
-
 exports.verifyPassword =async (req, res) => {
   const { password } = req.body;
 if (!password)  return res.status(401).json({ message: 'Invalid password' });
   const token = req.cookies.token;
   if (!token) return res.status(400).json({ msg: "user not login" }); 
-  const ip = req.ip;
-  const user_id = await getUserIDByToken(token, ip);
+  const user_id = await getUserIDByToken(token);
   const user = await getUserById(user_id);
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {return res.status(401).json({ message: 'Invalid credentials' }); }
@@ -92,15 +86,12 @@ if (!password)  return res.status(401).json({ message: 'Invalid password' });
 
 }
 
-
-
-
 exports.logout = async (req,res) =>{
       try {
     res.clearCookie('token', {
       httpOnly: true,
-      sameSite: 'Lax',
-      secure: false, // true if using HTTPS in production
+      sameSite: 'None',
+      secure: true, // true if using HTTPS in production
       path: '/'
     });
     return res.status(200).json({ msg: 'Logged out successfully' });

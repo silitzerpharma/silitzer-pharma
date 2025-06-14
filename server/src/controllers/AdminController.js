@@ -16,13 +16,12 @@ const SocketServices = require('../services/SocketServices')
 exports.getAdminProfile = async (req, res) => {
   try {
     const token = req.cookies.token;
-    const ip = req.ip;
 
     if (!token) {
       return res.status(401).json({ error: "Token is required" });
     }
 
-    const userId = await AuthServices.getUserIDByToken(token, ip);
+    const userId = await AuthServices.getUserIDByToken(token);
 
     if (!userId) {
       return res.status(401).json({ error: "Invalid token or IP" });
@@ -53,13 +52,12 @@ exports.getAdminProfile = async (req, res) => {
 exports.updateAdminProfile = async (req, res) => {
   try {
     const token = req.cookies.token;
-    const ip = req.ip;
 
     if (!token) {
       return res.status(401).json({ message: "Not authenticated" });
     }
 
-    const userId = await AuthServices.getUserIDByToken(token, ip);
+    const userId = await AuthServices.getUserIDByToken(token);
     const { username, name, password, email } = req.body;
 
     if (!username && !name && !password && !email) {
