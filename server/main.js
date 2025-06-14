@@ -67,6 +67,15 @@ async function startServer() {
     app.use('/distributor', AuthMiddleware.protectDistributor, distributorRoutes);
     app.use('/employee', AuthMiddleware.protectEmployee, employeeRoutes);
 
+   app.get('/checkcookies', (req, res) => {
+  res.json({
+    receivedCookies: req.cookies,
+    userAgent: req.headers['user-agent'],
+  });
+});
+   
+   
+   
     // Start server
     const PORT = process.env.PORT || 3000;
     server.listen(PORT, () => {

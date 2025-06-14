@@ -27,7 +27,12 @@ exports.protectAdmin = async (req, res, next) => {
     console.error('Admin auth error:', error);
     return res.status(500).json({ message: 'Server error during admin auth' });
   }
+
 };
+
+
+
+
 
 exports.protectEmployee = async (req, res, next) => {
   try {
@@ -47,7 +52,7 @@ exports.protectEmployee = async (req, res, next) => {
       return res.status(403).json({ message: 'Access denied: Employees only' });
     }
 
-    req.user = user; // Attach user to request if needed
+    req.user = user; 
 
     next();
   } catch (error) {
@@ -55,7 +60,6 @@ exports.protectEmployee = async (req, res, next) => {
     return res.status(500).json({ message: 'Server error during employee auth' });
   }
 };
-
 
 exports.protectDistributor = async (req, res, next) => {
   try {

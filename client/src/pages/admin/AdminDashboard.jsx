@@ -11,7 +11,7 @@ import PostAddIcon from '@mui/icons-material/PostAdd';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-
+import CheckCookies from '../../components/CheckCookies'
 
 const AdminDashboard = () => {
 
@@ -52,8 +52,10 @@ useEffect(() => {
 
   return (
     <div className='AdminDashboard'>
+
+      <CheckCookies/>
      
-     <div className="widgets">
+     {/* <div className="widgets">
       
       <Widgets title={"New Orders"} link={"todayorders"} linktext={"see today orders"} 
       count={adminData.newOrders} icon={ <PostAddIcon className='icon' />} newPercentageChange={adminData.newPercentageChange} />
@@ -71,7 +73,7 @@ useEffect(() => {
      <div className='charts' >
         <Featured OrderStatusData={adminData.OrderStatusSummary} />
         <Chart OrderData={adminData.orderChartData}/>
-     </div>
+     </div> */}
   
     </div>
   )
