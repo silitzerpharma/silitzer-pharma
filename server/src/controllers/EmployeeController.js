@@ -29,6 +29,7 @@ exports.login = async (req, res) => {
 
   try {
     const token = req.cookies.token;
+    const ip = req.ip;
 
     const userId = AuthServices.getUserIDByToken(token);
     if (!userId) {

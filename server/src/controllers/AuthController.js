@@ -48,8 +48,9 @@ exports.login = async (req, res) => {
 
 res.cookie('token', token, {
   httpOnly: true,
-  secure: true,               // ✅ true for HTTPS (REQUIRED on Render)
-  sameSite: 'None',           // ✅ allows cross-site cookies (REQUIRED if frontend is on different domain)
+  secure: true,               
+  sameSite: 'None',   
+   domain: 'silitzerpharma.onrender.com',      
   maxAge: 12 * 60 * 60 * 1000,
   path: '/',
 });

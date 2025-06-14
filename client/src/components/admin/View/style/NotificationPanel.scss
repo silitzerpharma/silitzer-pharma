@@ -1,0 +1,13 @@
+
+.nfc-head{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .nfc-close-btn{
+        background: none;
+        border: none;
+        &:hover{
+            cursor: pointer;
+        }
+    }
+}

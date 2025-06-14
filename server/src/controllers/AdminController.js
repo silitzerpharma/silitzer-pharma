@@ -327,6 +327,7 @@ exports.removeDistributor = async (req, res) => {
 };
 
 exports.editDistributor = async (req, res) => {
+
   const {
     distributorId,
     auth_id,
@@ -343,7 +344,7 @@ exports.editDistributor = async (req, res) => {
   if (!distributorId || !auth_id) {
     return res.status(400).json({ message: 'Missing distributorId or auth_id in request body' });
   }
-
+ 
   const updateDistributorData = {
     name,
     gst_number,
@@ -355,6 +356,7 @@ exports.editDistributor = async (req, res) => {
 
   try {
     // Update distributor details
+    console.log(distributorId)
     const updatedDistributor = await Distributor.findByIdAndUpdate(
       distributorId,
       updateDistributorData,
@@ -385,9 +387,13 @@ exports.editDistributor = async (req, res) => {
 
     res.status(200).json({ distributor: updatedDistributor, auth: updatedAuth });
   } catch (err) {
+    console.log(err.message)
     res.status(500).json({ message: err.message });
   }
 };
+
+
+
 
 exports.getDistributorData = async (req, res) => {
   try {

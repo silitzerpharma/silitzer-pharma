@@ -13,7 +13,11 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
+import './style/NotificationPanel.scss'
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+import CloseIcon from '@mui/icons-material/Close';
 
 const NotificationPanel = ({ onClose }) => {
   const [notifications, setNotifications] = useState([]);
@@ -79,9 +83,15 @@ const NotificationPanel = ({ onClose }) => {
   return (
     <Drawer anchor="right" open onClose={onClose}>
       <Box sx={{ width: 350, p: 2 }}>
-        <Typography variant="h6">Notifications</Typography>
-        <Divider sx={{ my: 1 }} />
+        <Typography variant="h6" className='nfc-head'>Notifications
+          <button onClick={onClose} className='nfc-close-btn' ><CloseIcon/></button>
+        </Typography>
 
+
+
+        
+        <Divider sx={{ my: 1 }} />
+        
         <List>
           {notifications.length === 0 && (
             <Typography variant="body2" color="textSecondary">
