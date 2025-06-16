@@ -188,6 +188,10 @@ exports.getProductDetails = async (req, res) => {
   }
 }
 
+
+
+
+
 exports.removeProduct = async (req, res) => {
   try {
     const { productId } = req.body;

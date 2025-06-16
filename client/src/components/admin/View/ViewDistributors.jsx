@@ -1,11 +1,8 @@
 import "./style/viewdistributors.scss";
 import CloseIcon from "@mui/icons-material/Close";
-import {  useState } from "react";
+import { useState } from "react";
 import EditDistributor from "../form/EditDistributor";
 import DistributorOrderTable from "../tables/DistributorOrderTable";
-
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
 import {
   Dialog,
   DialogTitle,
@@ -16,26 +13,37 @@ import {
   TextField,
 } from "@mui/material";
 
-const ViewDistributors = ({ distributor, onClose, refreshDistributorsList }) => {
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+const ViewDistributors = ({
+  distributor,
+  onClose,
+  refreshDistributorsList,
+  setMsgData,
+}) => {
   const [openConfirm, setOpenConfirm] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
-  const [adminPassword, setAdminPassword] = useState('');
-  const [passwordError, setPasswordError] = useState('');
+  const [adminPassword, setAdminPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordPurpose, setPasswordPurpose] = useState(null); // 'edit' or 'delete'
+  const [confirmBlockOpen, setConfirmBlockOpen] = useState(false);
+  const [blockAction, setBlockAction] = useState("block");
 
+  const [isBlocked, setIsBlocked] = useState(distributor?.isBlock || false);
 
   const [viewDistributor, setviewDistributor] = useState({
-    password: '',
+    password: "",
     auth_id: distributor._id,
-    distributorId:distributor.refId.distributorId,
+    distributorId: distributor.refId.distributorId,
     distributor_Id: distributor.refId._id,
-    username: distributor.username || '',
-    name: distributor.refId.name || '',
-    email: distributor.refId.email || '',
-    phone_number: distributor.refId.phone_number || '',
-    address: distributor.refId.address || '',
-    gst_number: distributor.refId.gst_number || '',
-    drug_license_number: distributor.refId.drug_license_number || '',
+    username: distributor.username || "",
+    name: distributor.refId.name || "",
+    email: distributor.refId.email || "",
+    phone_number: distributor.refId.phone_number || "",
+    address: distributor.refId.address || "",
+    gst_number: distributor.refId.gst_number || "",
+    drug_license_number: distributor.refId.drug_license_number || "",
     date_registered: distributor.refId.date_registered,
   });
 
@@ -48,12 +56,17 @@ const ViewDistributors = ({ distributor, onClose, refreshDistributorsList }) => 
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify({ id: distributor._id }),
       });
 
       if (response.ok) {
-        console.log("Distributor removed successfully");
+        setMsgData({
+          show: true,
+          status: 200,
+          message: "Distributor removed successfully",
+          warnings: [],
+        });
         refreshDistributorsList();
         onClose();
         setOpenConfirm(false);
@@ -69,24 +82,59 @@ const ViewDistributors = ({ distributor, onClose, refreshDistributorsList }) => 
     try {
       const response = await fetch(`${BASE_URL}/auth/verifypassword`, {
         method: "POST",
-         credentials: 'include',
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ password: adminPassword }),
       });
-       
+
       if (response.ok) {
-        setIsEditing(true);
         setPasswordDialogOpen(false);
-        setAdminPassword('');
-        setPasswordError('');
+        setAdminPassword("");
+        setPasswordError("");
+
+        if (passwordPurpose === "edit") {
+          setIsEditing(true);
+        } else if (passwordPurpose === "delete") {
+          setOpenConfirm(true);
+        }
+
+        setPasswordPurpose(null);
       } else {
         setPasswordError("Invalid admin password. Please try again.");
       }
     } catch (error) {
       console.error("Error verifying password:", error);
       setPasswordError("Server error. Please try again later.");
+    }
+  };
+
+  const handleToggleBlock = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/admin/distributor/block`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ id: distributor._id, block: !isBlocked }),
+      });
+
+      if (response.ok) {
+        setIsBlocked(!isBlocked);
+        setMsgData({
+          show: true,
+          status: 200,
+          message: `Distributor ${!isBlocked ? "blocked" : "unblocked"} successfully`,
+          warnings: [],
+        });
+        refreshDistributorsList();
+      } else {
+        console.error("Failed to toggle block status");
+      }
+    } catch (error) {
+      console.error("Error blocking/unblocking distributor:", error);
     }
   };
 
@@ -116,11 +164,10 @@ const ViewDistributors = ({ distributor, onClose, refreshDistributorsList }) => 
                 <span>User Name:</span> {viewDistributor.username}
               </div>
               <div>
-                <span>distributorId:</span>{viewDistributor.distributorId}
+                <span>Distributor ID:</span>
+                {viewDistributor.distributorId}
               </div>
             </div>
-
-
 
             <div className="derails-row">
               <div>
@@ -130,6 +177,7 @@ const ViewDistributors = ({ distributor, onClose, refreshDistributorsList }) => 
                 <span>Phone Number:</span> {viewDistributor.phone_number}
               </div>
             </div>
+
             <div className="derails-row">
               <div>
                 <span>Email:</span> {viewDistributor.email}
@@ -138,14 +186,17 @@ const ViewDistributors = ({ distributor, onClose, refreshDistributorsList }) => 
                 <span>Address:</span> {viewDistributor.address}
               </div>
             </div>
+
             <div className="derails-row">
               <div>
                 <span>GST Number:</span> {viewDistributor.gst_number}
               </div>
               <div>
-                <span>Drug License Number:</span> {viewDistributor.drug_license_number}
+                <span>Drug License Number:</span>{" "}
+                {viewDistributor.drug_license_number}
               </div>
             </div>
+
             <div className="derails-row">
               <div>
                 <span>Date Registered:</span>{" "}
@@ -157,22 +208,41 @@ const ViewDistributors = ({ distributor, onClose, refreshDistributorsList }) => 
                     })
                   : "N/A"}
               </div>
-            
             </div>
           </div>
 
           <div className="fun-btn">
-            <button className="remove" onClick={() => setOpenConfirm(true)}>
+            <button
+              className="remove"
+              onClick={() => {
+                setPasswordPurpose("delete");
+                setPasswordDialogOpen(true);
+              }}
+            >
               Remove
             </button>
-            <button className="edit" onClick={() => setPasswordDialogOpen(true)}>
+            <button
+              className="edit"
+              onClick={() => {
+                setPasswordPurpose("edit");
+                setPasswordDialogOpen(true);
+              }}
+            >
               Edit
+            </button>
+            <button
+              className={`block ${isBlocked ? "unblock" : ""}`}
+              onClick={() => {
+                setBlockAction(isBlocked ? "unblock" : "block");
+                setConfirmBlockOpen(true);
+              }}
+            >
+              {isBlocked ? "Unblock" : "Block"}
             </button>
           </div>
 
           <div>
             <DistributorOrderTable distributorId={viewDistributor.auth_id} />
-
           </div>
         </>
       )}
@@ -182,7 +252,8 @@ const ViewDistributors = ({ distributor, onClose, refreshDistributorsList }) => 
         <DialogTitle>Confirm Removal</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to remove distributor <strong>{distributor.refId.name}</strong>?
+            Are you sure you want to remove distributor{" "}
+            <strong>{distributor.refId.name}</strong>?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -195,12 +266,47 @@ const ViewDistributors = ({ distributor, onClose, refreshDistributorsList }) => 
         </DialogActions>
       </Dialog>
 
+      {/* Confirm Block/Unblock Dialog */}
+      <Dialog open={confirmBlockOpen} onClose={() => setConfirmBlockOpen(false)}>
+        <DialogTitle>Confirm {blockAction === "block" ? "Block" : "Unblock"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to{" "}
+            <strong>{blockAction === "block" ? "block" : "unblock"}</strong>{" "}
+            distributor <strong>{distributor.refId.name}</strong>?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmBlockOpen(false)} color="primary">
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              setConfirmBlockOpen(false);
+              handleToggleBlock();
+            }}
+            color={blockAction === "block" ? "error" : "success"}
+            variant="contained"
+          >
+            Yes, {blockAction === "block" ? "Block" : "Unblock"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       {/* Admin Password Dialog */}
-      <Dialog open={passwordDialogOpen} onClose={() => setPasswordDialogOpen(false)}>
+      <Dialog
+        open={passwordDialogOpen}
+        onClose={() => {
+          setPasswordDialogOpen(false);
+          setAdminPassword("");
+          setPasswordError("");
+          setPasswordPurpose(null);
+        }}
+      >
         <DialogTitle>Enter Admin Password</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Please enter the admin password to enable editing.
+            Please enter the admin password to proceed.
           </DialogContentText>
           <TextField
             autoFocus
@@ -216,10 +322,22 @@ const ViewDistributors = ({ distributor, onClose, refreshDistributorsList }) => 
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setPasswordDialogOpen(false)} color="primary">
+          <Button
+            onClick={() => {
+              setPasswordDialogOpen(false);
+              setAdminPassword("");
+              setPasswordError("");
+              setPasswordPurpose(null);
+            }}
+            color="primary"
+          >
             Cancel
           </Button>
-          <Button onClick={handlePasswordSubmit} color="primary" variant="contained">
+          <Button
+            onClick={handlePasswordSubmit}
+            color="primary"
+            variant="contained"
+          >
             Submit
           </Button>
         </DialogActions>

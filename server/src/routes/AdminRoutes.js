@@ -26,6 +26,9 @@ router.delete('/removedistributor', AdminController.removeDistributor);
 router.put('/editdistributor', AdminController.editDistributor);
 router.get('/getalldistributors', AdminController.getAllDistributors);
 router.get('/distributor', AdminController.getDistributorData);
+router.put('/distributor/block', AdminController.blockDistributor);
+
+
 
        //Employee
 router.post('/employee/add', AdminEmployeeController.addEmployee);   

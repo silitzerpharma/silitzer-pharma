@@ -1,9 +1,16 @@
-import './style/adddistributors.scss'
+import "./style/adddistributors.scss";
 import React, { useState } from "react";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-const AddDistributors = ({handleAddNew , refreshDistributorsList}) => {
+import Loader from "../../common/Loader";
+import PopMsg from "../../common/PopMsg"; // ✅ Import your popup
+
+const AddDistributors = ({
+  handleAddNew,
+  refreshDistributorsList,
+  setMsgData,
+}) => {
   const [name, setName] = useState("");
   const [gstNumber, setGstNumber] = useState("");
   const [address, setAddress] = useState("");
@@ -12,7 +19,8 @@ const AddDistributors = ({handleAddNew , refreshDistributorsList}) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [drugLicenseNumber, setDrugLicenseNumber] = useState("");
-
+  const [loading, setLoading] = useState(false);
+  const [popupMessage, setPopupMessage] = useState(""); // ✅ State for error popup
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,42 +32,48 @@ const AddDistributors = ({handleAddNew , refreshDistributorsList}) => {
       phone,
       username,
       password,
-      drugLicenseNumber
+      drugLicenseNumber,
     };
-    
-        try {
+
+    try {
+      setLoading(true);
       const response = await fetch(`${BASE_URL}/admin/savedistributor`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ distributorDetails }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        alert('distributorDetails add successful!...');
+        setMsgData({
+          show: true,
+          status: 200,
+          message: "distributorDetails add successful!...",
+          warnings: [],
+        });
         refreshDistributorsList();
         handleAddNew();
-    
       } else {
-        alert(data.msg || 'failed to add');
+        setPopupMessage(data.msg || "Failed to add distributor");
       }
     } catch (error) {
-      console.error('Error during fetch:', error);
-      alert('Network error or server not responding.');
+      console.error("Error during fetch:", error);
+      setPopupMessage("Network error or server not responding.");
     } finally {
-      
+      setLoading(false);
     }
-  
-
   };
+
+  if (loading) return <Loader message="Adding Distributor..." />;
 
   return (
     <div className="distributor-form-container">
-      <span className="title">Add Distributor <hr /></span>
+      <span className="title">
+        Add Distributor <hr />
+      </span>
       <form className="distributor-form" onSubmit={handleSubmit}>
-     
         <div className="form-group">
           <label>Username</label>
           <input
@@ -76,10 +90,11 @@ const AddDistributors = ({handleAddNew , refreshDistributorsList}) => {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            required />
+            required
+          />
         </div>
 
-           <div className="form-group">
+        <div className="form-group">
           <label>Name</label>
           <input
             type="text"
@@ -96,8 +111,7 @@ const AddDistributors = ({handleAddNew , refreshDistributorsList}) => {
             onChange={(e) => setPhone(e.target.value)}
           />
         </div>
-       
-        
+
         <div className="form-group">
           <label>Email</label>
           <input
@@ -106,7 +120,6 @@ const AddDistributors = ({handleAddNew , refreshDistributorsList}) => {
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
-
 
         <div className="form-group">
           <label>Drug License Number</label>
@@ -134,11 +147,15 @@ const AddDistributors = ({handleAddNew , refreshDistributorsList}) => {
           />
         </div>
 
-
         <button type="submit">Add Distributor</button>
       </form>
+
+      {/* ✅ PopMsg for showing error */}
+      {popupMessage && (
+        <PopMsg message={popupMessage} onClose={() => setPopupMessage("")} />
+      )}
     </div>
-  )
-}
+  );
+};
 
 export default AddDistributors;

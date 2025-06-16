@@ -46,12 +46,12 @@ exports.login = async (req, res) => {
     // Create JWT token
     const token = getTokenByUserId(user._id);
 
-res.cookie('token', token, {
+res.cookie("token", token, {
   httpOnly: true,
-  secure: true,               
-  sameSite: 'None',        
+  secure: true,
+  sameSite: "None",     // Must be 'None' for cross-origin
+  domain: ".onrender.com", // VERY IMPORTANT
   maxAge: 12 * 60 * 60 * 1000,
-  path: '/',
 });
 
     // Respond with user info

@@ -1,5 +1,5 @@
 import Widgets from '../../components/admin/charts/Widgets'
-import './admindashboard.scss'
+import './style/admindashboard.scss'
 import Featured from '../../components/admin/charts/Featured'
 import Chart from '../../components/admin/charts/Chart'
 import StockWidget from '../../components/admin/charts/StockWidget'

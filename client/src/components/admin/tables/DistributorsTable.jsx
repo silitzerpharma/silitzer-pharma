@@ -13,7 +13,12 @@ import {
   TableSortLabel
 } from "@mui/material";
 
+import Loader from "../../common/Loader";
+import ShowMessage from "../../common/ShowMessage";
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+
 
 const DistributorsTable = () => {
   const [selectedDistributorId, setSelectedDistributorId] = useState(null);
@@ -24,15 +29,16 @@ const DistributorsTable = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [distributorsList, setDistributorsList] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
-
+  const [loading, setLoading] = useState(false);
   const [refreshFlag, setRefreshFlag] = useState(false);
-
+  const [msgData, setMsgData] = useState({ show: false, status: null, message: '', warnings: [],});
 
   const refreshDistributorsList = () => setRefreshFlag((prev) => !prev);
 
 useEffect(() => {
   const fetchDistributors = async () => {
     try {
+      setLoading(true)
       const url = new URL(`${BASE_URL}/admin/getalldistributors`);
       url.searchParams.append('page', page + 1);
       url.searchParams.append('limit', rowsPerPage);
@@ -51,6 +57,9 @@ useEffect(() => {
       setTotalCount(result.totalCount);
     } catch (err) {
       console.error("Error fetching distributors:", err);
+    }
+    finally{
+      setLoading(false);
     }
   };
 
@@ -118,6 +127,10 @@ useEffect(() => {
 
   const selectedDistributor = distributorsList.find(dist => dist._id === selectedDistributorId);
 
+
+  if (loading) return <Loader message="Loading Distributor  data..." />;
+
+
   return (
     <div className="table">
       
@@ -127,6 +140,7 @@ useEffect(() => {
           distributor={selectedDistributor}
           onClose={handleCloseDetails}
           refreshDistributorsList={refreshDistributorsList}
+           setMsgData = {setMsgData}
         />
       ) : (
         <>
@@ -195,6 +209,15 @@ useEffect(() => {
           />
         </>
       )}
+      {msgData.show && (
+        <ShowMessage
+          status={msgData.status}
+          message={msgData.message}
+          warnings={msgData.warnings}
+          onClose={() => setMsgData({ ...msgData, show: false })}
+        />
+      )}
+      
     </div>
   );
 };

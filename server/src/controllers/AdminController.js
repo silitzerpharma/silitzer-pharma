@@ -392,9 +392,6 @@ exports.editDistributor = async (req, res) => {
   }
 };
 
-
-
-
 exports.getDistributorData = async (req, res) => {
   try {
     const distributorId = req.query.id;
@@ -471,6 +468,33 @@ exports.getDistributorData = async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch distributor orders' });
   }
 };
+exports.blockDistributor = async (req, res) => {
+  try {
+    const { id, block } = req.body;
+
+    if (!id || typeof block !== "boolean") {
+      return res.status(400).json({ message: "Missing or invalid parameters" });
+    }
+
+    const updatedUser = await AuthUser.findByIdAndUpdate(
+      id,
+      { isBlock: block },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "Distributor not found" });
+    }
+
+    res.status(200).json({
+      message: `Distributor has been ${block ? "blocked" : "unblocked"} successfully`,
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error("Error in blockDistributor:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 
 
@@ -534,7 +558,6 @@ exports.getAdminNotificationsCount = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
 
 exports.updateAdminNotificationsSeen = async (req, res) => {
   try {
