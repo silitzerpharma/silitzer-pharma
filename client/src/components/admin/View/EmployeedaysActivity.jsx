@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./EmployeeTodaysActivity.scss";
+import "./style/EmployeeTodaysActivity.scss";
 import { format } from "date-fns";
 
 import LocationOnIcon from '@mui/icons-material/LocationOn';
