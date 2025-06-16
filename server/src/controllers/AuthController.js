@@ -50,7 +50,6 @@ res.cookie("token", token, {
   httpOnly: true,
   secure: true,
   sameSite: "None",     // Must be 'None' for cross-origin
-  domain: ".onrender.com", // VERY IMPORTANT
   maxAge: 12 * 60 * 60 * 1000,
 });
 
