@@ -51,13 +51,13 @@ router.get('/employee/worksessions/download', AdminEmployeeController.downloadWo
 
 
       //product
-router.post('/addproduct', AdminProductController.addProduct);
-router.get('/products/check', AdminProductController.productCheck);
-router.post('/product/fullinfo', AdminProductController.getProduct);
-router.delete('/removeproduct', AdminProductController.removeProduct);
+router.post('/product/add', AdminProductController.addProduct);
+router.get('/products/check', AdminProductController.checkProduct);
+router.post('/product/details', AdminProductController.getProductDetails);
+router.delete('/product/remove', AdminProductController.removeProduct);
 router.get('/products', AdminProductController.getAllProducts);
 router.get('/product/orders', AdminProductController.getProductsOrders);
-router.put('/editproduct', AdminController.editProduct);
+router.put('/product/update', AdminProductController.updateProduct);
 
 
 

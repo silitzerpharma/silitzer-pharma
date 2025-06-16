@@ -8,13 +8,16 @@ const taxSchema = new mongoose.Schema({
 const specificationSchema = new mongoose.Schema({
   key: { type: String, required: false },
   value: { type: String, required: false },
-}, { _id: false }); // Don't generate _id for subdocs in arrays
+}, { _id: false });
 
 const productSchema = new mongoose.Schema({
   productName: { type: String, required: true },
   productCode: { type: String, required: true, unique: true },
 
   imageUrl: { type: String, required: false },
+  imageFileId: { type: String, required: false },         // ✅ Added for ImageKit deletion
+  imageDeleteFlag: { type: Boolean, default: false },     // ✅ Optional: Track deletion flag from frontend
+
   productDescription: { type: String, required: false },
   other: { type: String, required: false },
   itemRate: { type: Number, required: false },
@@ -34,13 +37,11 @@ const productSchema = new mongoose.Schema({
   features: [{ type: String }],
   uses: [{ type: String }],
   howToUse: [{ type: String }],
-  specifications: [specificationSchema], // ✅ Changed from array of strings to array of objects
+  specifications: [specificationSchema],
   taxes: [taxSchema],
 
-
   addedDate: { type: Date, default: Date.now },
-
-  isDeleted: { type: Boolean, default: false }
+  isDeleted: { type: Boolean, default: false },
 }, {
   timestamps: true,
 });

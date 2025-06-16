@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import Badge from '@mui/material/Badge';
-import './ViewEmployee.scss';
+import './style/ViewEmployee.scss';
 
 import EmployeeTodaysActivity from "./EmployeeTodaysActivity";
 import TaskTable from "../tables/TaskTable";

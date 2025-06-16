@@ -9,7 +9,7 @@ const Loader = ({ message = 'Loading...', fullPage = true, size = 60 }) => {
       flexDirection="column"
       alignItems="center"
       justifyContent="center"
-      height={fullPage ? '100vh' : '100%'}
+      height={fullPage ? '80vh' : '100%'}
       width="100%"
     >
       {/* <CircularProgress size={size} color="primary" /> */}

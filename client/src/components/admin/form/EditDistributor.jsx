@@ -1,5 +1,5 @@
 import React from 'react';
-import './editdistributor.scss';
+import './style/editdistributor.scss';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 

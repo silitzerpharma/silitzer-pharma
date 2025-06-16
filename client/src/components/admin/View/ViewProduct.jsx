@@ -9,39 +9,63 @@ import {
   DialogActions,
   Button,
 } from "@mui/material";
-import "./viewproduct.scss";
+import "./style/viewproduct.scss";
+
+import ShowMessage from "../../common/ShowMessage";
+import Loader from "../../common/Loader";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-const ViewProduct = ({ onClose, selectedProduct, refreshProductList }) => {
+const ViewProduct = ({ onClose, selectedProduct, refreshProductList ,setMsgDatap }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [product, setProduct] = useState({});
   const [refreshFlag, setRefreshFlag] = useState(false);
   const [openConfirm, setOpenConfirm] = useState(false);
   const [error, setError] = useState(null); // Add missing error state
 
+  const [msgData, setMsgData] = useState({
+    show: false,
+    status: null,
+    message: "",
+    warnings: [],
+  });
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     if (!selectedProduct) return;
 
-    fetch(`${BASE_URL}/admin/product/fullinfo`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      credentials: 'include',
-      body: JSON.stringify({ productId: selectedProduct._id }),
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Network response was not ok");
-        return res.json();
-      })
-      .then((data) => {
+    const fetchProductDetails = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`${BASE_URL}/admin/product/details`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({ productId: selectedProduct._id }),
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          setMsgData({
+            show: true,
+            status: 400,
+            message: data.msg || "Network error or server not responding.",
+            warnings: data.warnings || [],
+          });
+        }
         setProduct(data);
-      })
-      .catch((err) => {
+      } catch (err) {
         setError(err.message);
-      });
+        console.error("Fetch product error:", err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProductDetails();
   }, [refreshFlag, selectedProduct]);
 
   const refreshProductDetails = () => {
@@ -51,30 +75,40 @@ const ViewProduct = ({ onClose, selectedProduct, refreshProductList }) => {
 
   const handleRemove = async () => {
     try {
-      const response = await fetch(
-        `${BASE_URL}/admin/removeproduct`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: 'include',
-          body: JSON.stringify({ productId: selectedProduct._id }),
-        }
-      );
+      const response = await fetch(`${BASE_URL}/admin/product/remove`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ productId: selectedProduct._id }),
+      });
 
       if (response.ok) {
-        console.log("Product removed successfully");
+        setMsgDatap({
+          show: true,
+          status: 200,
+          message: "Product removed successfully",
+          warnings: [],
+        });
+
         setOpenConfirm(false);
         refreshProductList();
         onClose(); // Close view after deletion
       } else {
-        console.error("Failed to remove product");
+        setMsgData({
+          show: true,
+          status: 400,
+          message: "Failed to remove product",
+          warnings:  [],
+        });
       }
     } catch (error) {
       console.error("Error removing product:", error);
     }
   };
+
+  if (loading) return <Loader message="Geting product details..." />;
 
   return (
     <div className="viewproduct-container">
@@ -83,6 +117,7 @@ const ViewProduct = ({ onClose, selectedProduct, refreshProductList }) => {
           setIsEditing={setIsEditing}
           product={product}
           refreshProductDetails={refreshProductDetails}
+          setMsgData={setMsgData}
         />
       ) : (
         <>
@@ -96,9 +131,12 @@ const ViewProduct = ({ onClose, selectedProduct, refreshProductList }) => {
 
           <div className="product-details-div">
             <div className="row-img">
-              <img src={product.imageUrl} alt="product img" />  
+              <img
+                src={product.imageUrl || "/images/default-product.jpg"}
+                alt="product img"
+              />
             </div>
-           
+
             <div className="row-x2">
               <div>
                 <strong>Product Name:</strong> {product.productName}
@@ -239,9 +277,16 @@ const ViewProduct = ({ onClose, selectedProduct, refreshProductList }) => {
             <button onClick={() => setIsEditing(true)}>Edit</button>
             <button onClick={() => setOpenConfirm(true)}>Remove</button>
           </div>
-
-          
         </>
+      )}
+
+      {msgData.show && (
+        <ShowMessage
+          status={msgData.status}
+          message={msgData.message}
+          warnings={msgData.warnings}
+          onClose={() => setMsgData({ ...msgData, show: false })}
+        />
       )}
 
       {/* Confirm Deletion Dialog */}

@@ -1,4 +1,4 @@
-import "./viewdistributors.scss";
+import "./style/viewdistributors.scss";
 import CloseIcon from "@mui/icons-material/Close";
 import {  useState } from "react";
 import EditDistributor from "../form/EditDistributor";

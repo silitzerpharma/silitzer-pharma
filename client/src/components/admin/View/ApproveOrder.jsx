@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import ConfirmationDialog from '../../common/ConfirmationDialog';
 import Loader from '../../common/Loader';
-import './ApproveOrder.scss';
+import './style/ApproveOrder.scss';
 
 const ApproveOrder = ({ order, onBack, refreshProductList }) => {
   const [loading, setLoading] = useState(false);

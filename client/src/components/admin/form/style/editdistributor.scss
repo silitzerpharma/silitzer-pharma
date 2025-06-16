@@ -1,0 +1,71 @@
+
+.edit-distributor {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.25rem;
+}
+
+.form-row label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.form-row input {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.form-row input:focus {
+  border-color: #4f46e5;
+  outline: none;
+}
+
+.edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.edit-actions .save,
+.edit-actions .cancel {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s ease;
+}
+
+.edit-actions .save {
+  background-color: green;
+  color: white;
+}
+
+.edit-actions .save:hover {
+  background-color: rgb(53, 187, 53);
+}
+
+.edit-actions .cancel {
+  background-color: #e5e7eb;
+  color: #111827;
+}
+
+.edit-actions .cancel:hover {
+  background-color: #d1d5db;
+}

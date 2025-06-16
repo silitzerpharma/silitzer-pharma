@@ -472,34 +472,7 @@ exports.getDistributorData = async (req, res) => {
   }
 };
 
-exports.editProduct = async (req, res) => {
-  try {
-    const updatedData = req.body;
 
-    if (!updatedData._id) {
-      return res.status(400).json({ error: 'Product ID is required' });
-    }
-
-    const updatedProduct = await Product.findByIdAndUpdate(
-      updatedData._id,              // ID from client
-      updatedData,                 // New data
-      { new: true, runValidators: true } // Return updated doc, validate fields
-    );
-
-    if (!updatedProduct) {
-      return res.status(404).json({ error: 'Product not found' });
-    }
-
-    return res.status(200).json({
-      message: 'Product updated successfully',
-      product: updatedProduct,
-    });
-
-  } catch (error) {
-    console.error('Edit product error:', error);
-    return res.status(500).json({ error: 'Server error while updating product' });
-  }
-};
 
 exports.getAdminNotifications = async (req, res) => {
   try {

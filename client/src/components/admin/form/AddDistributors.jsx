@@ -1,4 +1,4 @@
-import './adddistributors.scss'
+import './style/adddistributors.scss'
 import React, { useState } from "react";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;

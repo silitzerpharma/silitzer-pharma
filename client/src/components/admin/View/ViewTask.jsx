@@ -1,4 +1,4 @@
-import './ViewTask.scss';
+import './style/ViewTask.scss';
 import {
   Button,
   Dialog,

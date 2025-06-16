@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./AddEmployee.scss"; // External CSS
+import "./style/AddEmployee.scss"; // External CSS
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 

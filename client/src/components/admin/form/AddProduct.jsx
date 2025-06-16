@@ -1,7 +1,10 @@
-import "./addproduct.scss";
+import "./style/addproduct.scss";
 import React, { useState } from "react";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+import Loader from "../../common/Loader";
+import ShowMessage from "../../common/ShowMessage";
 
 const AddProduct = ({ refreshProductList }) => {
   const [productName, setProductName] = useState("");
@@ -26,7 +29,8 @@ const AddProduct = ({ refreshProductList }) => {
   const [specifications, setSpecifications] = useState([{ key: "", value: "" }]);
   const [taxes, setTaxes] = useState([{ name: "", rate: "" }]);
 
-
+  const [loading, setLoading] = useState(false);
+   const [msgData, setMsgData] = useState({ show: false, status: null, message: '', warnings: [],});
 
   const handleChange = (setter, index, value) => {
     setter((prev) => {
@@ -100,76 +104,102 @@ const AddProduct = ({ refreshProductList }) => {
     setTaxes([{ name: "", rate: "" }]);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    let base64Image = "";
-    let imageName = imageFile?.name || "";
+  let base64Image = "";
+  let imageName = imageFile?.name || "";
 
-    if (imageFile) {
-      try {
-        base64Image = await new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.readAsDataURL(imageFile);
-          reader.onload = () => resolve(reader.result.split(",")[1]);
-          reader.onerror = (error) => reject(error);
-        });
-      } catch (err) {
-        console.error("Failed to read image file:", err);
-        alert("Image conversion failed");
-        return;
-      }
-    }
-
-    const productDetails = {
-      productName,
-      productDescription,
-      other,
-      itemRate,
-      batchNumber,
-      expiryDate,
-      manufactureDate,
-      hsnCode,
-      purchaseRate,
-      stock,
-      unitsPerBox,
-      imageUrl: "", // will be updated by backend
-      manufacturer,
-      countryOfOrigin,
-      specifications,
-      uses,
-      advantages,
-      howToUse,
-      features,
-      taxes,
-    };
-
+  if (imageFile) {
     try {
-      const response = await fetch(`${BASE_URL}/admin/addproduct`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          productDetails,
-          imageBase64: base64Image,
-          imageName: imageName,
-        }),
+      base64Image = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(imageFile);
+        reader.onload = () => resolve(reader.result.split(",")[1]);
+        reader.onerror = (error) => reject(error);
       });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        refreshProductList();
-        alert("Product added successfully!");
-        resetForm();
-      } else {
-        alert(data.msg || "Failed to add product");
-      }
-    } catch (error) {
-      console.error("Error during fetch:", error);
-      alert("Network error or server not responding.");
+    } catch (err) {
+      console.error("Failed to read image file:", err);
+      setMsgData({
+        show: true,
+        status: 400,
+        message: "Image conversion failed",
+        warnings: [],
+      });
+      return;
     }
+  }
+
+  const productDetails = {
+    productName,
+    productDescription,
+    other,
+    itemRate,
+    batchNumber,
+    expiryDate,
+    manufactureDate,
+    hsnCode,
+    purchaseRate,
+    stock,
+    unitsPerBox,
+    imageUrl: "",
+    manufacturer,
+    countryOfOrigin,
+    specifications,
+    uses,
+    advantages,
+    howToUse,
+    features,
+    taxes,
   };
+
+  setLoading(true);
+
+  try {
+    const response = await fetch(`${BASE_URL}/admin/product/add`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        productDetails,
+        imageBase64: base64Image,
+        imageName: imageName,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      refreshProductList();
+      resetForm();
+      setMsgData({
+        show: true,
+        status: 200,
+        message: "Product added successfully!",
+        warnings: data.warnings || [],
+      });
+    } else {
+      setMsgData({
+        show: true,
+        status: 400,
+        message: data.msg || "Failed to add product",
+        warnings: data.warnings || [],
+      });
+    }
+  } catch (error) {
+    console.error("Error during fetch:", error);
+    setMsgData({
+      show: true,
+      status: 400,
+      message: "Network error or server not responding.",
+      warnings: [],
+    });
+  } finally {
+    setLoading(false);
+  }
+};
+
+if (loading) return <Loader message="Adding product..." />;
 
   return (
     <div className="addproduct-container">
@@ -311,6 +341,16 @@ const AddProduct = ({ refreshProductList }) => {
 
         <button type="submit">Add Product</button>
       </form>
+
+  {msgData.show && (
+        <ShowMessage
+          status={msgData.status}
+          message={msgData.message}
+          warnings={msgData.warnings}
+          onClose={() => setMsgData({ ...msgData, show: false })}
+        />
+      )}
+
     </div>
   );
 };

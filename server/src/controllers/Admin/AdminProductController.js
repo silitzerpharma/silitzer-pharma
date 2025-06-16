@@ -26,68 +26,49 @@ exports.addProduct = async (req, res) => {
           folder: "products",
         });
         productDetails.imageUrl = uploadResponse.url;
+        productDetails.imageFileId = uploadResponse.fileId; // ✅ Save fileId for future deletion
       } catch (imgErr) {
         console.error("Image upload failed:", imgErr);
         return res.status(500).json({ msg: "Image upload failed" });
       }
     }
 
-    // === Original logic from here ===
+    // === Product code generation ===
     const productCode = await ProductServices.getNextProductCode();
     productDetails.productCode = productCode;
 
+    // === Date validation ===
     if (productDetails.expiryDate) {
       const expiry = new Date(productDetails.expiryDate);
-      if (isNaN(expiry.getTime())) {
-        delete productDetails.expiryDate;
-      } else {
-        productDetails.expiryDate = expiry;
-      }
-    } else {
-      delete productDetails.expiryDate;
+      productDetails.expiryDate = isNaN(expiry.getTime()) ? undefined : expiry;
     }
 
     if (productDetails.manufactureDate) {
       const mfg = new Date(productDetails.manufactureDate);
-      if (isNaN(mfg.getTime())) {
-        delete productDetails.manufactureDate;
-      } else {
-        productDetails.manufactureDate = mfg;
-      }
-    } else {
-      delete productDetails.manufactureDate;
+      productDetails.manufactureDate = isNaN(mfg.getTime()) ? undefined : mfg;
     }
 
+    // === Quantity validation ===
     if (productDetails.quantityPerPackage !== undefined && productDetails.quantityPerPackage !== "") {
       const qty = parseInt(productDetails.quantityPerPackage, 10);
-      if (isNaN(qty) || qty < 1) {
-        delete productDetails.quantityPerPackage;
-      } else {
-        productDetails.quantityPerPackage = qty;
-      }
-    } else {
-      delete productDetails.quantityPerPackage;
+      productDetails.quantityPerPackage = isNaN(qty) || qty < 1 ? undefined : qty;
     }
 
     if (productDetails.unitsPerBox !== undefined && productDetails.unitsPerBox !== "") {
       const units = parseInt(productDetails.unitsPerBox, 10);
-      if (isNaN(units) || units < 0) {
-        delete productDetails.unitsPerBox;
-      } else {
-        productDetails.unitsPerBox = units;
-      }
-    } else {
-      delete productDetails.unitsPerBox;
+      productDetails.unitsPerBox = isNaN(units) || units < 0 ? undefined : units;
     }
 
+    // === Stock logic ===
     const initialStock = parseInt(productDetails.stock, 10) || 0;
-    if (initialStock <= 0) {
-      productDetails.inStock = false;
-    }
+    productDetails.inStock = initialStock > 0;
     delete productDetails.stock;
 
+    // === Save product ===
     const newProduct = new Product(productDetails);
     await newProduct.save();
+
+    const warnings = [];
 
     if (initialStock > 0) {
       const success = await StockServices.updateStock(
@@ -96,11 +77,11 @@ exports.addProduct = async (req, res) => {
         'Initial stock on product creation'
       );
       if (!success) {
-        console.warn('Failed to update stock for product:', newProduct._id);
+        warnings.push("Failed to update stock for product");
       }
     }
 
-    res.status(201).json({ msg: 'Product added successfully', product: newProduct });
+    res.status(200).json({ msg: 'Product added successfully', warnings });
   } catch (error) {
     console.error('Error saving product:', error);
     res.status(500).json({ msg: 'Server error' });
@@ -114,23 +95,96 @@ exports.addProduct = async (req, res) => {
 
 
 
+exports.updateProduct = async (req, res) => {
+  try {
+    const updatedData = req.body;
+
+    if (!updatedData._id) {
+      return res.status(400).json({ msg: "Product ID is required" });
+    }
+
+    const existingProduct = await Product.findById(updatedData._id);
+    if (!existingProduct) {
+      return res.status(404).json({ msg: "Product not found" });
+    }
+
+    // If new image is provided, delete old image if it exists
+    if (updatedData.imageBase64 && updatedData.imageName) {
+      if (existingProduct.imageFileId) {
+        try {
+          await imagekit.deleteFile(existingProduct.imageFileId);
+          console.log("Old image deleted from ImageKit");
+        } catch (imgDelErr) {
+          console.error("Old image deletion failed:", imgDelErr);
+          return res.status(500).json({ msg: "Failed to delete old image" });
+        }
+      }
+
+      try {
+        const uploadResponse = await imagekit.upload({
+          file: updatedData.imageBase64,
+          fileName: updatedData.imageName,
+          folder: "products",
+        });
+        updatedData.imageUrl = uploadResponse.url;
+        updatedData.imageFileId = uploadResponse.fileId;
+      } catch (imgErr) {
+        console.error("Image upload failed:", imgErr);
+        return res.status(500).json({ msg: "Image upload failed" });
+      }
+    }
+
+    // Optional: If user explicitly wants to delete image without uploading new one
+    if (updatedData.imageDeleteFlag && existingProduct.imageFileId) {
+      try {
+        await imagekit.deleteFile(existingProduct.imageFileId);
+        updatedData.imageUrl = "";
+        updatedData.imageFileId = "";
+      } catch (imgDelErr) {
+        console.error("Image deletion failed:", imgDelErr);
+        return res.status(500).json({ msg: "Image deletion failed" });
+      }
+    }
+
+    // Remove frontend-only fields
+    delete updatedData.imageBase64;
+    delete updatedData.imageName;
+    delete updatedData.imageDeleteFlag;
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+      updatedData._id,
+      updatedData,
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedProduct) {
+      return res.status(404).json({ msg: "Product not found after update" });
+    }
+
+    return res.status(200).json({ msg: "Product updated successfully" });
+  } catch (error) {
+    console.error("Edit product error:", error);
+    return res.status(500).json({ error: "Server error while updating product" });
+  }
+};
 
 
-exports.getProduct = async (req, res) => {
+
+exports.getProductDetails = async (req, res) => {
   const { productId } = req.body
   if (!productId) {
-    return res.status(400).json({ error: 'Product ID is required' });
+    return res.status(400).json({ msg: 'Product ID is required' });
   }
   if (!productId) {
-    return res.status(400).json({ error: 'Product ID is required' });
+    return res.status(400).json({ msg: 'Product ID is required' });
   }
   try {
     const product = await Product.findById(productId);
-    if (!product) return res.status(404).json({ error: 'Product not found' });
+    if (!product) return res.status(400).json({ msg: 'Product not found' });
 
-    res.json(product);
+    return    res.status(200).json(product);
   } catch (err) {
-    res.status(500).json({ error: 'Invalid ID or server error' });
+    res.status(400).json({ msg: 'Invalid ID or server error' });
   }
 }
 
@@ -169,7 +223,7 @@ const escapeRegExp = (string) => {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 };
 
-exports.productCheck = async (req, res) => {
+exports.checkProduct = async (req, res) => {
   try {
     const search = req.query.name; // now used for both name or code
 

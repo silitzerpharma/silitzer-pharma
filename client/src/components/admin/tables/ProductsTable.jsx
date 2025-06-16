@@ -5,6 +5,9 @@ import "./style/Table.scss"
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
+import Loader from "../../common/Loader";
+import ShowMessage from "../../common/ShowMessage";
+
 import {
   Table,
   TableBody,
@@ -21,7 +24,10 @@ import {
 const ProductsTable = ({ refreshFlag, refreshProductList }) => {
   const [productsList, setProductsList] = useState([]);
   const [totalProducts, setTotalProducts] = useState(0);
+ 
   const [loading, setLoading] = useState(false);
+  const [msgData, setMsgData] = useState({ show: false, status: null, message: '', warnings: [],});
+
 
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('productName');
@@ -102,6 +108,7 @@ const fetchProducts = async () => {
           onClose={handleCloseDetails}
           selectedProduct={selectedProduct}
           refreshProductList={refreshProductList}
+           setMsgDatap={setMsgData}
         />
       )}
 
@@ -119,9 +126,7 @@ const fetchProducts = async () => {
       </div>
        <TableContainer component={Paper} className="table-container">
           {loading ? (
-            <div style={{ textAlign: 'center', padding: '2rem' }}>
-              <CircularProgress />
-            </div>
+             <Loader message="Adding product..." />
           ) : (
             <>
               <Table aria-label="products table">
@@ -191,6 +196,14 @@ const fetchProducts = async () => {
           )}
         </TableContainer>
       </>)}
+      {msgData.show && (
+        <ShowMessage
+          status={msgData.status}
+          message={msgData.message}
+          warnings={msgData.warnings}
+          onClose={() => setMsgData({ ...msgData, show: false })}
+        />
+      )}
     </div>
   );
 };
