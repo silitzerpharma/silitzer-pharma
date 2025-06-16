@@ -62,6 +62,11 @@ async function startServer() {
     const distributorRoutes = require('./src/routes/DistributorRoutes');
     const employeeRoutes = require('./src/routes/EmployeeRoutes');
 
+
+    app.get("/checkcookies", (req, res) => {
+  res.json({ receivedCookies: req.cookies });
+});
+
     app.use('/auth', authRoutes);
     app.use('/admin', AuthMiddleware.protectAdmin, adminRoutes);
     app.use('/distributor', AuthMiddleware.protectDistributor, distributorRoutes);
