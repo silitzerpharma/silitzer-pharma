@@ -36,3 +36,5 @@ lerna-debug.log*
 
 # Mac system files
 Thumbs.db
+
+/backup

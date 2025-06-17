@@ -24,7 +24,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 
 
-const FRONTEND_ORIGIN = "https://silitzerpharma.onrender.com" ;
+const FRONTEND_ORIGIN = "https://silitzerpharma.onrender.com";
 app.use(cors({
   origin: FRONTEND_ORIGIN,
   credentials: true,
@@ -63,22 +63,14 @@ async function startServer() {
     const employeeRoutes = require('./src/routes/EmployeeRoutes');
 
 
-    app.get("/checkcookies", (req, res) => {
-  res.json({ receivedCookies: req.cookies });
-});
+
 
     app.use('/auth', authRoutes);
     app.use('/admin', AuthMiddleware.protectAdmin, adminRoutes);
     app.use('/distributor', AuthMiddleware.protectDistributor, distributorRoutes);
     app.use('/employee', AuthMiddleware.protectEmployee, employeeRoutes);
 
-   app.get('/checkcookies', (req, res) => {
-  res.json({
-    receivedCookies: req.cookies,
-    userAgent: req.headers['user-agent'],
-  });
-});
-   
+
    
    
     // Start server

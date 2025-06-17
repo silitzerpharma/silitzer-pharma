@@ -8,6 +8,8 @@ router.get('/checkuserlogin', authController.checkuserlogin);
 router.post('/logout', authController.logout);
 router.post('/verifypassword', authController.verifyPassword);
 
+
+
 // Optional: Register, Logout
 // router.post('/logout', authController.logout);
 
