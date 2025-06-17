@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 
 import AppRoutes from "./routes/AppRoutes";
 import { login } from "./store/slices/UserSlice";
-
+import { ToastContainer } from 'react-toastify';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -45,6 +45,7 @@ function App() {
   return (
     <BrowserRouter>
       <AppRoutes />
+      <ToastContainer position="top-center" autoClose={3000} />
     </BrowserRouter>
   );
 }

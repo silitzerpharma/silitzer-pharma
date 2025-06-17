@@ -9,6 +9,7 @@ const AdminOrderController = require ('../controllers/Admin/AdminOrderController
 const AdminProductController = require('../controllers/Admin/AdminProductController')
 const AdminSliderController = require('../controllers/Admin/AdminSliderController')
 const AdminEmployeeController = require('../controllers/Admin/AdminEmployeeController')
+const AdminDistributorController = require('../controllers/Admin/AdminDistributorController')
 
 
         //admin dashboard
@@ -20,13 +21,15 @@ router.get('/notifications/count', AdminController.getAdminNotificationsCount);
 router.post('/notifications/seen', AdminController.updateAdminNotificationsSeen);
 
 
+
+
         //distributor
-router.post('/savedistributor', AdminController.saveDistributor);
-router.delete('/removedistributor', AdminController.removeDistributor);
-router.put('/editdistributor', AdminController.editDistributor);
-router.get('/getalldistributors', AdminController.getAllDistributors);
-router.get('/distributor', AdminController.getDistributorData);
-router.put('/distributor/block', AdminController.blockDistributor);
+router.post('/savedistributor',AdminDistributorController.saveDistributor);
+router.delete('/removedistributor', AdminDistributorController.removeDistributor);
+router.put('/editdistributor', AdminDistributorController.editDistributor);
+router.get('/getalldistributors', AdminDistributorController.getAllDistributors);
+router.get('/distributor', AdminDistributorController.getDistributorData);
+router.put('/distributor/block', AdminDistributorController.blockDistributor);
 
 
 
@@ -85,8 +88,6 @@ router.put('/updatestockstatus', AdminStockController.updateStockStatus);
 router.put('/updatestock', AdminStockController.updateStock);
 router.get('/stocktransaction/instock', AdminStockController.getInStockTransactions);
 router.get('/stocktransaction/outstock', AdminStockController.getOutStockTransactions);
-
-
 router.get('/gettodaystocktransaction', AdminStockController.getTodayStockTransaction);
 router.put('/search-stock-transactions', AdminStockController.searchStockTransactions);
  

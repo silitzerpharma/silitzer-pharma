@@ -1,10 +1,18 @@
 import React from 'react';
 import './style/editdistributor.scss';
 
+import { useState } from 'react';
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
+import Loader from "../../common/Loader";
+import { toast } from 'react-toastify';
 
 const EditDistributor = ({ setIsEditing, viewDistributor, setviewDistributor }) => {
+
+const [loading, setLoading] = useState(false);
+
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setviewDistributor((prev) => ({
@@ -14,6 +22,7 @@ const EditDistributor = ({ setIsEditing, viewDistributor, setviewDistributor }) 
   };
 
   const handleSave = async () => {
+    setLoading(true);
     try {
       const response = await fetch(`${BASE_URL}/admin/editdistributor`, {
         method: 'PUT',
@@ -25,19 +34,21 @@ const EditDistributor = ({ setIsEditing, viewDistributor, setviewDistributor }) 
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update distributor');
+        toast.error('Failed to update distributor');
       }
 
-      const updatedDistributor = await response.json();
-      console.log(updatedDistributor)
-      alert("data update")
+      toast.success("distributor update")
       setviewDistributor(viewDistributor);
       setIsEditing(false);
     } catch (error) {
-      console.error('Error updating distributor:', error);
-      alert('Failed to save changes. Please try again.');
+     toast.error('Failed to save changes. Please try again.');
+    }
+    finally{
+      setLoading(false);
     }
   };
+
+if (loading) return <Loader message="update distributor..." />;
 
   return (
     <div className="edit-distributor">
