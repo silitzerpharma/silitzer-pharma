@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import './orders.scss';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import Loader from "../../common/Loader";
 
 const SORT_OPTIONS = [
   { label: 'Date Asc', value: 'date_asc' },

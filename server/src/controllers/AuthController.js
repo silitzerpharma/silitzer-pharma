@@ -22,8 +22,11 @@ exports.login = async (req, res) => {
   if (!req.body) {
     return res.status(400).json({ msg: "Request body is missing" });
   }
-
+   console.log("req.body->",req.body)
   const { username, password } = req.body;
+   console.log("usernmae->",username);
+   console.log("password->",password);
+
   if (!username || !password) {
     return res.status(400).json({ msg: "All fields (username, password) are required" });
   }

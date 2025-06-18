@@ -131,7 +131,7 @@ const AddOffer = ({ initialOffer, onClose, onSuccess }) => {
 
           <Button variant="outlined" component="label">
             Upload Image
-            <input type="file" accept="image/*" hidden onChange={handleImageChange} />
+            <input type="file" accept="image/*" hidden onChange={handleImageChange} required />
           </Button>
 
           {imagePreview && (

@@ -25,8 +25,8 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 
-
-const FRONTEND_ORIGIN ="https://silitzerpharma.onrender.com";
+//"https://silitzerpharma.onrender.com"
+const FRONTEND_ORIGIN ="http://localhost:5173" ;
 
 app.use(cors({
   origin: FRONTEND_ORIGIN,
