@@ -26,7 +26,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 
 
-const FRONTEND_ORIGIN = "https://silitzerpharma.onrender.com";
+const FRONTEND_ORIGIN ="https://silitzerpharma.onrender.com";
 
 app.use(cors({
   origin: FRONTEND_ORIGIN,

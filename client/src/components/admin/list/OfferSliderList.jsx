@@ -19,7 +19,6 @@ const OfferSliderList = () => {
   const [isApplyToAll, setIsApplyToAll] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Delete confirmation
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [offerToDelete, setOfferToDelete] = useState(null);
 
@@ -78,62 +77,81 @@ const OfferSliderList = () => {
   return (
     <Box sx={{ p: 3 }}>
       <Box sx={{ mb: 2 }}>
-        <Button variant="contained" onClick={() => {
-          setEditingOffer(null);
-          setShowForm(true);
-        }}>
-          Add Offer
-        </Button>
+        {!showForm && (
+          <Button variant="contained" onClick={() => {
+            setEditingOffer(null);
+            setShowForm(true);
+          }}>
+            Add Offer
+          </Button>
+        )}
       </Box>
 
-      {showForm && (
+      {showForm ? (
         <AddOffer
           initialOffer={editingOffer}
           onClose={() => {
             setShowForm(false);
             setEditingOffer(null);
           }}
-          onSuccess={fetchOfferList}
+          onSuccess={() => {
+            fetchOfferList();
+            setShowForm(false);
+          }}
         />
+      ) : (
+        <>
+          <Typography variant="h5" gutterBottom>Offer Slider List</Typography>
+          <Box
+            display="grid"
+            gridTemplateColumns={{
+              xs: "1fr",
+              sm: "1fr 1fr",
+              md: "1fr 1fr 1fr"
+            }}
+            gap={2}
+          >
+            {offerList.map((offer) => (
+              <Card key={offer._id}>
+                <CardMedia component="img" height="160" image={offer.image} alt="Offer" />
+                <CardContent>
+                  <Typography variant="subtitle1" fontWeight="bold">{offer.description}</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Valid Till: {new Date(offer.validTill).toLocaleDateString("en-GB")}
+                  </Typography>
+                  <Box mt={1}>
+                    {offer.applyToAll ? (
+                      <Typography color="success.main" fontWeight="bold">Applies to All Products</Typography>
+                    ) : (
+                      <Button size="small" onClick={() => handleViewProducts(offer)}>View Products</Button>
+                    )}
+                  </Box>
+                  <Box mt={2} display="flex" gap={1}>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      onClick={() => {
+                        setEditingOffer(offer);
+                        setShowForm(true);
+                      }}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      color="error"
+                      onClick={() => promptDelete(offer._id)}
+                    >
+                      Remove
+                    </Button>
+                  </Box>
+                </CardContent>
+              </Card>
+            ))}
+          </Box>
+        </>
       )}
-
-      <Typography variant="h5" gutterBottom>Offer Slider List</Typography>
-
-      <Box
-        display="grid"
-        gridTemplateColumns={{
-          xs: "1fr",
-          sm: "1fr 1fr",
-          md: "1fr 1fr 1fr"
-        }}
-        gap={2}
-      >
-        {offerList.map((offer) => (
-          <Card key={offer._id}>
-            <CardMedia component="img" height="160" image={offer.image} alt="Offer" />
-            <CardContent>
-              <Typography variant="subtitle1" fontWeight="bold">{offer.description}</Typography>
-              <Typography variant="body2" color="text.secondary">
-                Valid Till: {new Date(offer.validTill).toLocaleDateString("en-GB")}
-              </Typography>
-              <Box mt={1}>
-                {offer.applyToAll ? (
-                  <Typography color="success.main" fontWeight="bold">Applies to All Products</Typography>
-                ) : (
-                  <Button size="small" onClick={() => handleViewProducts(offer)}>View Products</Button>
-                )}
-              </Box>
-              <Box mt={2} display="flex" gap={1}>
-                <Button size="small" variant="outlined" onClick={() => {
-                  setEditingOffer(offer);
-                  setShowForm(true);
-                }}>Edit</Button>
-                <Button size="small" variant="outlined" color="error" onClick={() => promptDelete(offer._id)}>Remove</Button>
-              </Box>
-            </CardContent>
-          </Card>
-        ))}
-      </Box>
 
       {/* Product Dialog */}
       <Dialog open={showProductDialog} onClose={() => setShowProductDialog(false)} maxWidth="md" fullWidth>

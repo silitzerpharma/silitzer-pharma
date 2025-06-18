@@ -1,306 +1,221 @@
 import React, { useState, useEffect } from 'react';
-import './ProductSliderList.scss';
 import {
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Button,
+  Box, Button, Card, CardContent, Typography,
+  Dialog, DialogActions, DialogContent, DialogContentText,
+  DialogTitle
 } from '@mui/material';
 
+import SliderForm from '../form/SliderForm';
+import Loader from '../../common/Loader';
+import { toast } from 'react-toastify';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const ProductSliderList = () => {
   const [showForm, setShowForm] = useState(false);
-  const [title, setTitle] = useState('');
-  const [productInput, setProductInput] = useState('');
-  const [products, setProducts] = useState([]);
-  const [error, setError] = useState('');
-  const [sliderList, setSliderList] = useState([]);
   const [editSliderId, setEditSliderId] = useState(null);
+  const [editData, setEditData] = useState(null);
+  const [sliderList, setSliderList] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  // New state for delete confirmation dialog
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [sliderToDelete, setSliderToDelete] = useState(null);
 
-const fetchSliderList = async () => {
-  try {
-    const response = await fetch(`${BASE_URL}/admin/get-product-slider`, {
-      method: "GET",
-      credentials: "include", // ✅ Include cookies (auth/session)
-    });
-
-    const data = await response.json();
-
-    if (Array.isArray(data)) {
-      setSliderList(data);
-    } else {
-      console.error('Expected array but got:', data);
-      setSliderList([]);
+  const fetchSliderList = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${BASE_URL}/admin/get-product-slider`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+      const data = await res.json();
+      setSliderList(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Error fetching sliders:', err);
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    console.error('Error fetching sliders:', err);
-  }
-};
-
+  };
 
   useEffect(() => {
     fetchSliderList();
   }, []);
 
-const handleAddProduct = async () => {
-  if (!productInput.trim()) return;
+  const handleSaveSlider = async (payload) => {
+    const url = editSliderId
+      ? `${BASE_URL}/admin/update-product-slider/${editSliderId}`
+      : `${BASE_URL}/admin/save-product-slider`;
 
-  try {
-    const res = await fetch(
-      `${BASE_URL}/admin/products/check?name=${encodeURIComponent(productInput)}`,
-      {
-        method: "GET",
-        credentials: "include", // ✅ Include cookies for authentication
-      }
-    );
+    const method = editSliderId ? 'PUT' : 'POST';
 
-    const data = await res.json();
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(payload),
+      });
 
-    if (data.available && data.product) {
-      const alreadyExists = products.some(p => p._id === data.product._id);
-      if (!alreadyExists) {
-        setProducts([...products, data.product]);
-        setProductInput('');
-        setError('');
+      if (res.ok) {
+        toast.success(`Slider ${editSliderId ? 'updated' : 'created'} successfully!`);
+        setShowForm(false);
+        setEditSliderId(null);
+        setEditData(null);
+        fetchSliderList();
       } else {
-        setError('Product already added');
+        toast.error(`Failed to ${editSliderId ? 'update' : 'create'} slider`);
       }
-    } else {
-      setError('Product not available');
+    } catch (err) {
+      toast.error('Server error. Please try again.');
     }
-  } catch (err) {
-    setError('Server error while checking product');
-  }
-};
-
-const handleSaveSlider = async () => {
-  if (!title.trim() || products.length === 0) {
-    setError('Please enter a title and add at least one product');
-    return;
-  }
-
-  const payload = {
-    title,
-    products,
   };
-
-  const url = editSliderId
-    ? `${BASE_URL}/admin/update-product-slider/${editSliderId}`
-    : `${BASE_URL}/admin/save-product-slider`;
-
-  const method = editSliderId ? 'PUT' : 'POST';
-
-  try {
-    const res = await fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include', // ✅ Include cookies for session/auth
-      body: JSON.stringify(payload),
-    });
-
-    if (res.ok) {
-      alert(`Slider ${editSliderId ? 'updated' : 'created'} successfully!`);
-      setShowForm(false);
-      setTitle('');
-      setProducts([]);
-      setProductInput('');
-      setError('');
-      setEditSliderId(null);
-      fetchSliderList();
-    } else {
-      setError(`Failed to ${editSliderId ? 'update' : 'create'} slider`);
-    }
-  } catch (err) {
-    setError(`Server error while ${editSliderId ? 'updating' : 'creating'} slider`);
-  }
-};
-
 
   const handleEditSlider = (slider) => {
-    setTitle(slider.title);
-    setProducts(slider.productList || []);
     setEditSliderId(slider._id);
+    setEditData(slider);
     setShowForm(true);
-    setError('');
   };
 
-  // NEW FUNCTIONALITY: open delete confirmation dialog
   const handleRemoveClick = (slider) => {
     setSliderToDelete(slider);
     setDeleteDialogOpen(true);
   };
 
-  // NEW FUNCTIONALITY: confirm delete, call server, refresh list
- const handleConfirmDelete = async () => {
-  if (!sliderToDelete) return;
+  const handleConfirmDelete = async () => {
+    if (!sliderToDelete) return;
+    try {
+      const res = await fetch(
+        `${BASE_URL}/admin/delete-product-slider/${sliderToDelete._id}`,
+        {
+          method: 'DELETE',
+          credentials: 'include',
+        }
+      );
 
-  try {
-    const res = await fetch(
-      `${BASE_URL}/admin/delete-product-slider/${sliderToDelete._id}`,
-      {
-        method: 'DELETE',
-        credentials: 'include', // ✅ Include cookies for session/auth
+      if (res.ok) {
+        toast.success('Slider deleted successfully!');
+        fetchSliderList();
+      } else {
+        toast.error('Failed to delete slider.');
       }
-    );
-
-    if (res.ok) {
-      alert('Slider deleted successfully!');
+    } catch (err) {
+      toast.error('Server error while deleting slider.');
+    } finally {
       setDeleteDialogOpen(false);
       setSliderToDelete(null);
-      fetchSliderList();
-    } else {
-      alert('Failed to delete slider.');
     }
-  } catch (err) {
-    alert('Server error while deleting slider.');
-  }
-};
-
-
-  // NEW FUNCTIONALITY: cancel delete dialog
-  const handleCancelDelete = () => {
-    setDeleteDialogOpen(false);
-    setSliderToDelete(null);
   };
 
+  if (loading) return <Loader message="Loading Product Sliders..." />;
+
   return (
-    <div className="ProductSliderList">
-      <div className="add-btn">
-        <button
-          onClick={() => {
-            setShowForm(true);
-            setEditSliderId(null);
-            setTitle('');
-            setProducts([]);
-            setProductInput('');
-            setError('');
-          }}
-        >
-          Create New Slider
-        </button>
-      </div>
-
-      {showForm && (
-        <div className="slider-form">
-          <div>
-            <label>Slider Title:</label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label>Add Product:</label>
-            <input
-              type="text"
-              value={productInput}
-              onChange={(e) => setProductInput(e.target.value)}
-            />
-            <button onClick={handleAddProduct}>Add Product</button>
-          </div>
-
-          {error && <p className="error">{error}</p>}
-
-          <ul className="product-lists">
-            {products.map((prod) => (
-              <li
-                key={prod._id}
-                style={{ display: 'flex', alignItems: 'center', gap: '10px' }}
-              >
-                {prod.productName}
-                <button
-                  onClick={() => {
-                    setProducts(products.filter((p) => p._id !== prod._id));
-                  }}
-                  style={{ color: 'red', cursor: 'pointer' }}
-                  type="button"
-                >
-                  Remove
-                </button>
-              </li>
-            ))}
-          </ul>
-
-          <button onClick={handleSaveSlider}>
-            {editSliderId ? 'Update Slider' : 'Create Slider'}
-          </button>
-
-          <button
+    <Box sx={{ p: 3 }}>
+      {!showForm && (
+        <Box mb={2}>
+          <Button
+            variant="contained"
             onClick={() => {
-              setShowForm(false);
-              setTitle('');
-              setProducts([]);
-              setProductInput('');
-              setError('');
+              setShowForm(true);
               setEditSliderId(null);
+              setEditData(null);
             }}
-            style={{ marginLeft: '10px' }}
           >
-            Cancel
-          </button>
-        </div>
+            Create New Slider
+          </Button>
+        </Box>
       )}
 
-      <div className="slider-List">
-        <div className="title">Product Slider List</div>
+      {showForm ? (
+        <SliderForm
+          editData={editData}
+          onCancel={() => {
+            setShowForm(false);
+            setEditSliderId(null);
+            setEditData(null);
+          }}
+          onSave={handleSaveSlider}
+        />
+      ) : (
+        <>
+          <Typography variant="h5" gutterBottom>
+            Product Slider List
+          </Typography>
 
-        {!Array.isArray(sliderList) || sliderList.length === 0 ? (
-          <p>No sliders found.</p>
-        ) : (
-          sliderList.map((slider) => (
-            <div className="slider" key={slider._id}>
-              <div className="slider-title">
-                <strong>Title:</strong> {slider.title}
-              </div>
-              <ul className="product-lists">
-                {slider.productList?.map((prod) => (
-                  <li key={prod._id}>{prod.productName}</li>
-                ))}
-              </ul>
-              <div className="slider-actions">
-                <button onClick={() => handleEditSlider(slider)}>Edit</button>
-                <button onClick={() => handleRemoveClick(slider)}>Remove</button>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
+          {sliderList.length === 0 ? (
+            <Typography>No sliders found.</Typography>
+          ) : (
+            <Box
+              display="grid"
+              gridTemplateColumns={{
+                xs: '1fr',
+                sm: '1fr 1fr',
+                md: '1fr 1fr 1fr',
+              }}
+              gap={2}
+            >
+              {sliderList.map((slider) => (
+                <Card key={slider._id}>
+                  <CardContent>
+                    <Typography variant="subtitle1" fontWeight="bold">
+                      {slider.title}
+                    </Typography>
+                    <Box mt={1}>
+                      <Typography variant="body2" fontWeight="bold">
+                        Products:
+                      </Typography>
+                      <ul style={{ margin: 0, paddingLeft: 20 }}>
+                        {slider.productList?.map((prod) => (
+                          <li key={prod._id}>{prod.productName}</li>
+                        ))}
+                      </ul>
+                    </Box>
+                    <Box mt={2} display="flex" gap={1}>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => handleEditSlider(slider)}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        color="error"
+                        onClick={() => handleRemoveClick(slider)}
+                      >
+                        Remove
+                      </Button>
+                    </Box>
+                  </CardContent>
+                </Card>
+              ))}
+            </Box>
+          )}
+        </>
+      )}
 
-      {/* Confirmation Dialog */}
+      {/* Delete Confirmation Dialog */}
       <Dialog
         open={deleteDialogOpen}
-        onClose={handleCancelDelete}
+        onClose={() => setDeleteDialogOpen(false)}
         aria-labelledby="confirm-delete-dialog-title"
-        aria-describedby="confirm-delete-dialog-description"
       >
         <DialogTitle id="confirm-delete-dialog-title">
           Confirm Delete
         </DialogTitle>
         <DialogContent>
-          <DialogContentText id="confirm-delete-dialog-description">
+          <DialogContentText>
             Are you sure you want to delete the slider "{sliderToDelete?.title}"?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancelDelete} color="primary">
-            Cancel
-          </Button>
+          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
           <Button onClick={handleConfirmDelete} color="error" autoFocus>
             Delete
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </Box>
   );
 };
 

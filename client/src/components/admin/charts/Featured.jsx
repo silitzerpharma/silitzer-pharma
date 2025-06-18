@@ -22,16 +22,18 @@ const STATUS_COLORS = {
 };
 
 const Featured = ({ OrderStatusData = [] }) => {
-  // Fallback to default order if needed
   const defaultStatuses = ['Pending', 'Approved', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Hold'];
 
-  const data = defaultStatuses.map(status => {
-    const found = OrderStatusData.find(item => item.status === status);
-    return {
-      name: status,
-      value: found?.count || 0
-    };
-  });
+  // Filter and prepare chart data (exclude statuses with count < 1)
+  const data = defaultStatuses
+    .map(status => {
+      const found = OrderStatusData.find(item => item.status === status);
+      return {
+        name: status,
+        value: found?.count || 0
+      };
+    })
+    .filter(item => item.value >= 1); // Only include if value >= 1
 
   const totalOrders = data.reduce((sum, item) => sum + item.value, 0);
 
