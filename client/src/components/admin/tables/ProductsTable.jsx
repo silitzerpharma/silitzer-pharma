@@ -126,7 +126,7 @@ const fetchProducts = async () => {
       </div>
        <TableContainer component={Paper} className="table-container">
           {loading ? (
-             <Loader message="Adding product..." />
+             <Loader message="Loading products..." />
           ) : (
             <>
               <Table aria-label="products table">

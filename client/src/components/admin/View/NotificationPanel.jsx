@@ -16,6 +16,8 @@ import { motion } from 'framer-motion';
 import './style/NotificationPanel.scss'
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import Loader from "../../common/Loader";
+
 
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -26,7 +28,10 @@ const NotificationPanel = ({ onClose }) => {
   const limit = 10;
   const navigate = useNavigate();
 
+  const [loading, setLoading] = useState(false);
+
   const fetchNotifications = async (pageToLoad = 0) => {
+    setLoading(true);
     try {
       const res = await fetch(`${BASE_URL}/admin/notifications?page=${pageToLoad}&limit=${limit}`, {
         credentials: 'include',
@@ -38,6 +43,9 @@ const NotificationPanel = ({ onClose }) => {
       }
     } catch (err) {
       console.error('Failed to load notifications:', err);
+    }
+    finally{
+      setLoading(false);
     }
   };
 
@@ -79,6 +87,14 @@ const NotificationPanel = ({ onClose }) => {
   useEffect(() => {
     fetchNotifications(page);
   }, [page]);
+
+if (loading) return(
+ <Drawer anchor="right" open onClose={onClose}>
+   <Loader message="Loading notifications..." />;
+
+ </Drawer>
+
+)
 
   return (
     <Drawer anchor="right" open onClose={onClose}>

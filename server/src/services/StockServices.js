@@ -18,14 +18,19 @@ exports.updateStock = async (productId, quantityChange, reason, orderId = null) 
 
     product.stock = newStock;
 
-    // ✅ 3. If orderId is provided, increment totalOrders
+    // ✅ 3. Set inStock = false if stock is less than 1
+    if (newStock < 1) {
+      product.inStock = false;
+    }
+
+    // ✅ 4. If orderId is provided, increment totalOrders
     if (orderId) {
       product.totalOrders = (product.totalOrders || 0) + 1;
     }
 
     await product.save();
 
-    // 4. Log the stock change
+    // 5. Log the stock change
     const transaction = new StockTransaction({
       productId,
       quantityChange,
@@ -41,6 +46,7 @@ exports.updateStock = async (productId, quantityChange, reason, orderId = null) 
     return false;
   }
 };
+
 
 
 

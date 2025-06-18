@@ -12,17 +12,20 @@ import PostAddIcon from '@mui/icons-material/PostAdd';
 
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import Loader from "../../components/common/Loader";
 
-import CheckCookies from '../CheckCookies'
+
 
 const AdminDashboard = () => {
 
 const [adminData , setAdminData] = useState({});
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [loading, setLoading] = useState(false);
 
 useEffect(() => {
   const fetchAdminDashboardData = async () => {
     try {
+      setLoading(true);
       const response = await fetch(`${BASE_URL}/admin/getadmindashboarddata`, {
         method: "GET",
         credentials: "include", // <- This includes cookies in the request
@@ -36,6 +39,9 @@ useEffect(() => {
       setAdminData(data);
     } catch (err) {
       console.error("Error fetching admin dashboard data:", err);
+    }
+    finally{
+      setLoading(false);
     }
   };
 
@@ -52,6 +58,16 @@ useEffect(() => {
     };
   }, []);
 
+
+
+if (loading) return(
+ <div className='AdminDashboard'>
+
+<Loader message="Loading AdminDashboard Data..." />;
+ </div>
+
+) 
+  
   return (
     <div className='AdminDashboard'>
 

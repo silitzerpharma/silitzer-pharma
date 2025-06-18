@@ -1,158 +1,71 @@
 import { useState, useEffect } from "react";
-import "./OfferSliderList.scss";
-
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import IconButton from "@mui/material/IconButton";
+import {
+  Box, Button, Card, CardMedia, CardContent, Typography,
+  Dialog, DialogTitle, DialogContent, IconButton
+} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import AddOffer from "../form/AddOffer";
+import Loader from "../../common/Loader";
+import { toast } from 'react-toastify';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const OfferSliderList = () => {
-  const [showOfferForm, setShowOfferForm] = useState(false);
-  const [editOfferId, setEditOfferId] = useState(null);
-  const [newOffer, setNewOffer] = useState({
-    img: "",
-    description: "",
-    validTill: "",
-    productType: "all",
-  });
   const [offerList, setOfferList] = useState([]);
-  const [productInput, setProductInput] = useState("");
-  const [products, setProducts] = useState([]);
-  const [error, setError] = useState("");
-
+  const [showForm, setShowForm] = useState(false);
+  const [editingOffer, setEditingOffer] = useState(null);
   const [showProductDialog, setShowProductDialog] = useState(false);
   const [selectedOfferProducts, setSelectedOfferProducts] = useState([]);
   const [isApplyToAll, setIsApplyToAll] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    fetchOfferList();
-  }, []);
+  // Delete confirmation
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [offerToDelete, setOfferToDelete] = useState(null);
 
-const fetchOfferList = async () => {
-  try {
-    const response = await fetch(`${BASE_URL}/admin/get-offer-List`, {
-      method: "GET",
-      credentials: "include", // ✅ Send cookies (auth/session token)
-    });
+  useEffect(() => { fetchOfferList(); }, []);
 
-    const data = await response.json();
-    setOfferList(data);
-  } catch (err) {
-    console.error("Error fetching offers:", err);
-  }
-};
-
-
-  const resetForm = () => {
-    setNewOffer({ img: "", description: "", validTill: "", productType: "all" });
-    setEditOfferId(null);
-    setProducts([]);
-    setProductInput("");
-    setShowOfferForm(false);
-    setError("");
-  };
-
-  const handleInputChange = (e) => {
-    setNewOffer({ ...newOffer, [e.target.name]: e.target.value });
-  };
-
-const handleAddProduct = async () => {
-  if (!productInput.trim()) return;
-  try {
-    const res = await fetch(
-      `${BASE_URL}/admin/products/check?name=${encodeURIComponent(productInput)}`,
-      {
-        method: "GET",
-        credentials: "include", // ✅ Include cookies (auth/session)
-      }
-    );
-
-    const data = await res.json();
-
-    if (data.available && data.product) {
-      const alreadyExists = products.some((p) => p._id === data.product._id);
-      if (!alreadyExists) {
-        setProducts([...products, data.product]);
-        setProductInput("");
-        setError("");
-      } else {
-        setError("Product already added");
-      }
-    } else {
-      setError("Product not available");
+  const fetchOfferList = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${BASE_URL}/admin/get-offer-List`, {
+        method: "GET", credentials: "include"
+      });
+      const data = await res.json();
+      setOfferList(data);
+    } catch (err) {
+      console.error("Error fetching offers:", err);
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    setError("Server error while checking product");
-  }
-};
-
-
- const handleAddOrEditOfferSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    const payload = {
-      img: newOffer.img,
-      description: newOffer.description,
-      validTill: newOffer.validTill,
-      products: newOffer.productType === "all" ? [] : products.map((p) => p._id),
-      applyToAll: newOffer.productType === "all",
-    };
-
-    const url = editOfferId
-      ? `${BASE_URL}/admin/edit-offer-slider/${editOfferId}`
-      : `${BASE_URL}/admin/save-offer-slider`;
-
-    const method = editOfferId ? "PUT" : "POST";
-
-    const response = await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      credentials: "include", // ✅ Send cookies (auth/session)
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) throw new Error("Failed to save offer");
-
-    await response.json();
-    fetchOfferList();
-    resetForm();
-  } catch (error) {
-    console.error("Error saving offer:", error.message);
-  }
-};
-
-
-  const handleEdit = (offer) => {
-    setNewOffer({
-      img: offer.image || "",
-      description: offer.description || "",
-      validTill: offer.validTill ? offer.validTill.split("T")[0] : "",
-      productType: offer.applyToAll ? "all" : "custom",
-    });
-    setProducts(offer.products || []);
-    setEditOfferId(offer._id);
-    setShowOfferForm(true);
   };
 
- const handleRemove = async (id) => {
-  if (!window.confirm("Are you sure you want to delete this offer?")) return;
-  try {
-    const response = await fetch(`${BASE_URL}/admin/remove-offer-slider/${id}`, {
-      method: "DELETE",
-      credentials: "include", // ✅ Include cookies (for auth/session)
-    });
+  const promptDelete = (id) => {
+    setOfferToDelete(id);
+    setConfirmDialogOpen(true);
+  };
 
-    if (!response.ok) throw new Error("Failed to delete offer");
-
-    fetchOfferList();
-  } catch (err) {
-    console.error("Error deleting offer:", err.message);
-  }
-};
-
+  const confirmDelete = async () => {
+    if (!offerToDelete) return;
+    try {
+      setLoading(true);
+      const res = await fetch(`${BASE_URL}/admin/remove-offer-slider/${offerToDelete}`, {
+        method: "DELETE", credentials: "include"
+      });
+      if (!res.ok) {
+        toast.error("Failed to delete offer");
+      } else {
+        toast.success("Offer deleted successfully");
+        fetchOfferList();
+      }
+    } catch (err) {
+      toast.error("Error deleting offer");
+    } finally {
+      setLoading(false);
+      setConfirmDialogOpen(false);
+      setOfferToDelete(null);
+    }
+  };
 
   const handleViewProducts = (offer) => {
     setSelectedOfferProducts(offer.products || []);
@@ -160,203 +73,112 @@ const handleAddProduct = async () => {
     setShowProductDialog(true);
   };
 
+  if (loading) return <Loader message="Loading product Offers..." />;
+
   return (
-    <div className="offer-div">
-      <div className="Add-offer">
-        <button
-          onClick={() => {
-            resetForm();
-            setShowOfferForm(true);
+    <Box sx={{ p: 3 }}>
+      <Box sx={{ mb: 2 }}>
+        <Button variant="contained" onClick={() => {
+          setEditingOffer(null);
+          setShowForm(true);
+        }}>
+          Add Offer
+        </Button>
+      </Box>
+
+      {showForm && (
+        <AddOffer
+          initialOffer={editingOffer}
+          onClose={() => {
+            setShowForm(false);
+            setEditingOffer(null);
           }}
-        >
-          {editOfferId ? "Edit Offer" : "Add Offer"}
-        </button>
-      </div>
-
-      {showOfferForm && (
-        <form className="offer-form" onSubmit={handleAddOrEditOfferSubmit}>
-          <input
-            type="text"
-            name="img"
-            placeholder="Image URL"
-            value={newOffer.img}
-            onChange={handleInputChange}
-            required
-          />
-          <textarea
-            name="description"
-            placeholder="Offer Description"
-            value={newOffer.description}
-            onChange={handleInputChange}
-            required
-          />
-          <input
-            type="date"
-            name="validTill"
-            value={newOffer.validTill}
-            onChange={handleInputChange}
-          />
-
-          <div className="product-option">
-            <label>
-              <input
-                type="radio"
-                name="productType"
-                value="all"
-                checked={newOffer.productType === "all"}
-                onChange={handleInputChange}
-              />{" "}
-              All Products
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="productType"
-                value="custom"
-                checked={newOffer.productType === "custom"}
-                onChange={handleInputChange}
-              />{" "}
-              Custom Products
-            </label>
-          </div>
-
-          {newOffer.productType === "custom" && (
-            <>
-              <input
-                type="text"
-                placeholder="Search Product"
-                value={productInput}
-                onChange={(e) => setProductInput(e.target.value)}
-              />
-              <button type="button" onClick={handleAddProduct}>
-                Add Product
-              </button>
-              {error && <p className="error">{error}</p>}
-              <ul className="product-lists">
-                {products.map((prod) => (
-                  <li key={prod._id}>
-                    {prod.productName}
-                    <button
-                      type="button"
-                      onClick={() => setProducts(products.filter((p) => p._id !== prod._id))}
-                    >
-                      Remove
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
-
-          <div className="form-actions">
-            <button type="submit">{editOfferId ? "Update Offer" : "Save Offer"}</button>
-            <button type="button" onClick={resetForm}>
-              Cancel
-            </button>
-          </div>
-        </form>
+          onSuccess={fetchOfferList}
+        />
       )}
 
-      <div className="offer-list">
-        <div className="title">Offer Slider List</div>
-        {offerList.map((offer) => (
-          <div className="offer" key={offer._id}>
-            <div className="offer-img">
-              <img src={offer.image} alt="Offer" />
-            </div>
-            <div className="offer-info">
-              <p className="offer-des">
-                <strong>Description:</strong> {offer.description}
-              </p>
-              <span className="offer-validTill">
-                <strong>Valid Till:</strong>{" "}
-                {(() => {
-                  const d = new Date(offer.validTill);
-                  const day = String(d.getDate()).padStart(2, "0");
-                  const month = String(d.getMonth() + 1).padStart(2, "0");
-                  const year = d.getFullYear();
-                  return `${day}/${month}/${year}`;
-                })()}
-              </span>
+      <Typography variant="h5" gutterBottom>Offer Slider List</Typography>
 
-              {/* Below valid till, conditionally show button or text */}
-              <div style={{ marginTop: "8px" }}>
-                {offer.applyToAll ? (
-                  <span style={{ fontWeight: "bold", color: "#2a7a2a" }}>
-                    Apply to all products
-                  </span>
-                ) : (
-                  <button onClick={() => handleViewProducts(offer)}>Products</button>
-                )}
-              </div>
-            </div>
-
-            <div className="action-btn">
-              <button onClick={() => handleEdit(offer)}>Edit</button>
-              <button onClick={() => handleRemove(offer._id)}>Remove</button>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <Dialog
-        open={showProductDialog}
-        onClose={() => setShowProductDialog(false)}
-        maxWidth="md"
-        fullWidth
+      <Box
+        display="grid"
+        gridTemplateColumns={{
+          xs: "1fr",
+          sm: "1fr 1fr",
+          md: "1fr 1fr 1fr"
+        }}
+        gap={2}
       >
+        {offerList.map((offer) => (
+          <Card key={offer._id}>
+            <CardMedia component="img" height="160" image={offer.image} alt="Offer" />
+            <CardContent>
+              <Typography variant="subtitle1" fontWeight="bold">{offer.description}</Typography>
+              <Typography variant="body2" color="text.secondary">
+                Valid Till: {new Date(offer.validTill).toLocaleDateString("en-GB")}
+              </Typography>
+              <Box mt={1}>
+                {offer.applyToAll ? (
+                  <Typography color="success.main" fontWeight="bold">Applies to All Products</Typography>
+                ) : (
+                  <Button size="small" onClick={() => handleViewProducts(offer)}>View Products</Button>
+                )}
+              </Box>
+              <Box mt={2} display="flex" gap={1}>
+                <Button size="small" variant="outlined" onClick={() => {
+                  setEditingOffer(offer);
+                  setShowForm(true);
+                }}>Edit</Button>
+                <Button size="small" variant="outlined" color="error" onClick={() => promptDelete(offer._id)}>Remove</Button>
+              </Box>
+            </CardContent>
+          </Card>
+        ))}
+      </Box>
+
+      {/* Product Dialog */}
+      <Dialog open={showProductDialog} onClose={() => setShowProductDialog(false)} maxWidth="md" fullWidth>
         <DialogTitle sx={{ m: 0, p: 2 }}>
           Offer Products
           <IconButton
             aria-label="close"
             onClick={() => setShowProductDialog(false)}
-            sx={{
-              position: "absolute",
-              right: 8,
-              top: 8,
-              color: (theme) => theme.palette.grey[500],
-            }}
+            sx={{ position: "absolute", right: 8, top: 8 }}
           >
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-
-        <DialogContent dividers style={{ maxHeight: "400px", overflowY: "auto" }}>
+        <DialogContent dividers sx={{ maxHeight: "400px" }}>
           {isApplyToAll ? (
-            <p>
-              <strong>This offer is applied to all products.</strong>
-            </p>
+            <Typography>This offer is applied to all products.</Typography>
           ) : (
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-                gap: "1rem",
-              }}
+            <Box
+              display="grid"
+              gridTemplateColumns={{ xs: "1fr", sm: "1fr 1fr", md: "1fr 1fr 1fr" }}
+              gap={1}
             >
-              {selectedOfferProducts.map((prod, index) => (
-                <div
-                  key={prod._id || index}
-                  style={{
-                    border: "1px solid #ccc",
-                    borderRadius: "8px",
-                    padding: "10px",
-                    background: "#f9f9f9",
-                  }}
-                >
-                  <p>
-                    <strong>{prod.productName || "Unnamed"}</strong>
-                  </p>
-                  <p style={{ fontSize: "0.9em", color: "#555" }}>
-                    {prod.productCode || "N/A"}
-                  </p>
-                </div>
+              {selectedOfferProducts.map((prod) => (
+                <Box key={prod._id} p={1} border={1} borderRadius={1}>
+                  <Typography fontWeight="bold">{prod.productName}</Typography>
+                  <Typography variant="body2">{prod.productCode}</Typography>
+                </Box>
               ))}
-            </div>
+            </Box>
           )}
         </DialogContent>
       </Dialog>
-    </div>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={confirmDialogOpen} onClose={() => setConfirmDialogOpen(false)}>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to delete this offer?</Typography>
+          <Box mt={2} display="flex" justifyContent="flex-end" gap={1}>
+            <Button onClick={() => setConfirmDialogOpen(false)}>Cancel</Button>
+            <Button variant="contained" color="error" onClick={confirmDelete}>Delete</Button>
+          </Box>
+        </DialogContent>
+      </Dialog>
+    </Box>
   );
 };
 

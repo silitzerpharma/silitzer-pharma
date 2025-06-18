@@ -9,6 +9,8 @@ import Pagination from "@mui/material/Pagination";
 
 import socket from "../../../store/socket";
 
+import Loader from "../../common/Loader";
+
 import {
   Table,
   TableBody,
@@ -43,6 +45,9 @@ const EmployeesTable = ({ refreshEmployeesList, refreshFlag }) => {
   const [taskDialogOpen, setTaskDialogOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  const [loading, setLoading] = useState(false);
+
   const openViewEmployee = () => setViewEmployee((prev) => !prev);
 
   const handleViewEmployee = (employee) => {
@@ -62,6 +67,7 @@ const EmployeesTable = ({ refreshEmployeesList, refreshFlag }) => {
 
  const fetchEmployees = async () => {
   try {
+    setLoading(true);
     const res = await fetch(
       `${BASE_URL}/admin/employee/all?search=${search}&page=${page}&limit=${limit}`,
       {
@@ -87,6 +93,9 @@ const EmployeesTable = ({ refreshEmployeesList, refreshFlag }) => {
     setEmployees(formatted);
   } catch (err) {
     console.error("Failed to fetch employees:", err);
+  }
+  finally{
+    setLoading(false);
   }
 };
 
@@ -131,6 +140,8 @@ const EmployeesTable = ({ refreshEmployeesList, refreshFlag }) => {
       socket.off("updateEmployeeData");
     };
   }, []);
+
+  if (loading) return <Loader message="Loading Employees..." />;
 
   return (
     <>

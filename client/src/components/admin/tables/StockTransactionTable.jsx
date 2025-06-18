@@ -6,6 +6,7 @@ import {
 } from '@mui/material';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import Loader from "../../common/Loader";
 
 const StockTransactionTable = () => {
   const today = new Date();
@@ -23,6 +24,9 @@ const StockTransactionTable = () => {
   const [outPage, setOutPage] = useState(0);
   const [outRowsPerPage, setOutRowsPerPage] = useState(10);
   const [outTotalCount, setOutTotalCount] = useState(0);
+
+
+  const [loading, setLoading] = useState(false);
 
   const handleChangeDate = (e) => setSearchDate(e.target.value);
   const handleChangeProduct = (e) => setSearchProduct(e.target.value);
@@ -62,6 +66,7 @@ const StockTransactionTable = () => {
   // Fetch functions for in-stock and out-stock
  const fetchInStock = async (page = inPage, limit = inRowsPerPage) => {
   try {
+    setLoading(true);
     const params = new URLSearchParams();
     if (searchDate) params.append('date', searchDate);
     if (searchProduct) params.append('query', searchProduct);
@@ -80,11 +85,15 @@ const StockTransactionTable = () => {
   } catch (err) {
     console.error('In-stock fetch error:', err);
   }
+  finally{
+    setLoading(false);
+  }
 };
 
 
 const fetchOutStock = async (page = outPage, limit = outRowsPerPage) => {
   try {
+    setLoading(true);
     const params = new URLSearchParams();
     if (searchDate) params.append('date', searchDate);
     if (searchProduct) params.append('query', searchProduct);
@@ -104,6 +113,9 @@ const fetchOutStock = async (page = outPage, limit = outRowsPerPage) => {
   } catch (err) {
     console.error('Out-stock fetch error:', err);
   }
+  finally{
+    setLoading(false);
+  }
 };
 
 
@@ -112,6 +124,8 @@ const fetchOutStock = async (page = outPage, limit = outRowsPerPage) => {
     fetchInStock();
     fetchOutStock();
   }, []);
+
+if (loading) return <Loader message="Loading StockTransactions..." />;
 
   return (
     <div className="StockTransactionTable">

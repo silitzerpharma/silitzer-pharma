@@ -326,11 +326,9 @@ exports.approveOrder = async (req, res) => {
 exports.updateOrderStatus = async (req, res) => {
   try {
     const { orderId, status } = req.body;
-
     if (!orderId || !status) {
       return res.status(400).json({ msg: 'orderId and status are required' });
     }
-
     // Normalize status to Title Case (e.g., 'approved' -> 'Approved')
     const titleCaseStatus = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
 
@@ -368,6 +366,7 @@ exports.updateOrderStatus = async (req, res) => {
     return res.status(500).json({ msg: 'Internal server error' });
   }
 };
+
 exports.updateOrderPaymentStatus = async (req, res) => {
   try {
     const { orderId, paymentStatus } = req.body;
@@ -679,8 +678,6 @@ exports.getTodayOrders = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
-
-
 exports.getOrderDetails = async (req, res) => {
   try {
     const orderId = req.query.id;

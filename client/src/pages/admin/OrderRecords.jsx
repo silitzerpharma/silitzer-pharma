@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import Loader from "../../components/common/Loader";
 
 const formatDateDisplay = (dateStr) => {
   if (!dateStr) return "";
@@ -37,6 +38,7 @@ const OrderRecords = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
+  const [loading, setLoading] = useState(false);
 
   const handleSearch = () => {
     setPage(1); // reset to first page on new search
@@ -45,6 +47,7 @@ const OrderRecords = () => {
 useEffect(() => {
   const fetchOrders = async () => {
     try {
+      setLoading(true);
       const res = await fetch(`${BASE_URL}/admin/order/records?page=${page}&limit=10&startdate=${startdate}&enddate=${enddate}&status=${statusSearch}&distributor=${distributorsSearch}&product=${productsSearch}`, {
         method: "GET",
         credentials: "include", // ✅ include cookies
@@ -60,6 +63,9 @@ useEffect(() => {
       }
     } catch (err) {
       console.error("Error fetching orders:", err);
+    }
+    finally{
+      setLoading(false);
     }
   };
 
@@ -85,7 +91,14 @@ const handleDownload = () => {
 };
 
 
+if (loading) return(
+ <div className='OrderRecords'>
+      <Loader message="Loading OrderRecords..." />;
 
+ </div>
+
+
+) 
 
   return (
     <div className='OrderRecords'>

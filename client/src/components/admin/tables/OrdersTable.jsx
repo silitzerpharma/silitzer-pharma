@@ -5,6 +5,7 @@ import socket from "../../../store/socket";
 import { Checkbox, FormControlLabel } from "@mui/material";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import Loader from "../../common/Loader";
 
 import {
   Table,
@@ -50,6 +51,10 @@ const OrdersTable = ({ refreshFlag }) => {
   });
   const [filterDate, setFilterDate] = useState("");
   const [showPending, setShowPending] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+const validStatusOptions = ["Processing", "Shipped", "Delivered", "Hold"];
+const selectValue = validStatusOptions.includes(updatedOrderStatus) ? updatedOrderStatus : '';
 
   const handleChangeViewBy = (e) => {
     setSelectedView(e.target.value);
@@ -59,6 +64,7 @@ const OrdersTable = ({ refreshFlag }) => {
 useEffect(() => {
   const fetchOrders = async () => {
     try {
+      setLoading(true);
       const response = await fetch(
         `${BASE_URL}/admin/getallorders?page=${page}&limit=${rowsPerPage}&view=${selectedView}&search=${encodeURIComponent(
           searchTerm
@@ -73,6 +79,9 @@ useEffect(() => {
       setTotalOrders(data.totalCount);
     } catch (err) {
       console.error("Error fetching orders:", err);
+    }
+    finally{
+      setLoading(false);
     }
   };
 
@@ -175,6 +184,7 @@ useEffect(() => {
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
+           credentials: "include",
           body: JSON.stringify(updatedOrder),
         }
       );
@@ -206,6 +216,7 @@ useEffect(() => {
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
+           credentials: "include",
           body: JSON.stringify(updatedOrder),
         }
       );
@@ -225,6 +236,8 @@ useEffect(() => {
     }
     setPaymentStatusDialog(false);
   };
+
+  if (loading) return <Loader message="Loading Orders..." />;
 
   return (
     <div className="table">
@@ -400,18 +413,18 @@ useEffect(() => {
           >
             <DialogTitle>Update Order Status</DialogTitle>
             <DialogContent>
-              <FormControl fullWidth>
-                <InputLabel>Order Status</InputLabel>
-                <Select
-                  value={updatedOrderStatus}
-                  onChange={(e) => setUpdatedOrderStatus(e.target.value)}
-                >
-                  <MenuItem value="Processing">Processing</MenuItem>
-                  <MenuItem value="Shipped">Shipped</MenuItem>
-                  <MenuItem value="Delivered">Delivered</MenuItem>
-                  <MenuItem value="hold">Hold</MenuItem>
-                </Select>
-              </FormControl>
+            <FormControl fullWidth>
+  <InputLabel>Order Status</InputLabel>
+  <Select
+    value={selectValue}
+    onChange={(e) => setUpdatedOrderStatus(e.target.value)}
+  >
+    <MenuItem value="Processing">Processing</MenuItem>
+    <MenuItem value="Shipped">Shipped</MenuItem>
+    <MenuItem value="Delivered">Delivered</MenuItem>
+    <MenuItem value="Hold">Hold</MenuItem>
+  </Select>
+</FormControl>
             </DialogContent>
             <DialogActions>
               <Button

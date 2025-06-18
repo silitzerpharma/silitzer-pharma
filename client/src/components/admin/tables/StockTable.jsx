@@ -8,6 +8,7 @@ import {
 } from "@mui/material";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import Loader from "../../common/Loader";
 
 const StockTable = ({ refreshFlag, refreshProductList }) => {
   const [page, setPage] = useState(0);
@@ -24,6 +25,8 @@ const StockTable = ({ refreshFlag, refreshProductList }) => {
 
   const [editStockId, setEditStockId] = useState(null);
   const [editedStockValue, setEditedStockValue] = useState('');
+
+  const [loading, setLoading] = useState(false);
 
   const handleChangePage = (event, newPage) => setPage(newPage);
   const handleChangeRowsPerPage = (event) => {
@@ -49,6 +52,7 @@ const StockTable = ({ refreshFlag, refreshProductList }) => {
 useEffect(() => {
   const fetchProducts = async () => {
     try {
+      setLoading(true);
       const res = await fetch(
         `${BASE_URL}/admin/getstockdata?page=${page}&limit=${rowsPerPage}&sortBy=${orderBy}&order=${order}&search=${searchTerm}`,
         {
@@ -60,6 +64,9 @@ useEffect(() => {
       setTotalCount(data.totalCount);
     } catch (err) {
       console.error("Error fetching stock data:", err);
+    }
+    finally{
+      setLoading(false);
     }
   };
 
@@ -142,6 +149,7 @@ const handleSaveStockClick = async (productId) => {
 };
 
 
+if (loading) return <Loader message="Loading Stock..." />;
   return (
     <div className="table">
       <div className="table-filter">

@@ -40,6 +40,11 @@ exports.getAllProducts = async (req, res) => {
 };
 
 
+
+
+
+
+
 exports.placeOrder = async (req, res) => {
   try {
     const {
@@ -91,9 +96,6 @@ exports.placeOrder = async (req, res) => {
     return res.status(500).json({ message: 'Server error while placing order' });
   }
 };
-
-
-
 
 exports.getAllProductsList = async (req, res) => {
   try {
