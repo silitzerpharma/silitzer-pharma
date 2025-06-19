@@ -82,6 +82,9 @@ const EmployeedaysActivity = ({ employeeId, day }) => {
   const [sessions, setSessions] = useState([]);
   const [showDialog, setShowDialog] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
+const [completionAddress, setCompletionAddress] = useState(null);
+const [completionLoading, setCompletionLoading] = useState(false);
+
 
   useEffect(() => {
     if (!employeeId || !day) return;

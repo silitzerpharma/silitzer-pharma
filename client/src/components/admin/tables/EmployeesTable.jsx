@@ -46,7 +46,7 @@ const EmployeesTable = ({ refreshEmployeesList, refreshFlag }) => {
   const [selectedTask, setSelectedTask] = useState(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const openViewEmployee = () => setViewEmployee((prev) => !prev);
 
@@ -67,7 +67,6 @@ const EmployeesTable = ({ refreshEmployeesList, refreshFlag }) => {
 
  const fetchEmployees = async () => {
   try {
-    setLoading(true);
     const res = await fetch(
       `${BASE_URL}/admin/employee/all?search=${search}&page=${page}&limit=${limit}`,
       {
