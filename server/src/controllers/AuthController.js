@@ -9,6 +9,10 @@ exports.checkuserlogin = async (req, res) => {
     const user_id = await getUserIDByToken(token);
     const user = await getUserById(user_id);
     if (!user) { return res.status(401).json({ msg: "Invalid user or session" }); }
+
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+   await delay(3500);
+
     return res.status(200).json({ message: 'Login successful', user: { id: user._id, role: user.role,} });
   
   

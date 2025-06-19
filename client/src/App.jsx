@@ -9,7 +9,7 @@ import { ToastContainer } from 'react-toastify';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-
+import Loader from './components/common/Loader';
 
 function App() {
   const dispatch = useDispatch();
@@ -40,7 +40,7 @@ function App() {
     checkLogin();
   }, [dispatch]);
 
-  if (loading) return <div>Loading user info...</div>;  // <-- show loading screen
+  if (loading) return <Loader message="Loading ...." />;
 
   return (
     <BrowserRouter>

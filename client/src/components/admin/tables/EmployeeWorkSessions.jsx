@@ -22,7 +22,7 @@ import { reverseGeocode } from "../../../services/reverseGeocode"; // adjust pat
 import "./style/EmployeeWorkSessions.scss";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
+import Loader from "../../common/Loader";
 
 const EmployeeWorkSessions = ({ employeeId }) => {
   const [sessions, setSessions] = useState([]);
@@ -37,8 +37,11 @@ const EmployeeWorkSessions = ({ employeeId }) => {
 
   const [locationCache, setLocationCache] = useState({});
 
+  const [loading, setLoading] = useState(false);
+
 const fetchSessions = async () => {
   try {
+    setLoading(true);
     let url = `${BASE_URL}/admin/employee/employee-work-sessions?employeeId=${employeeId}&page=${page}&limit=${limit}`;
     if (startDate) url += `&startDate=${startDate}`;
     if (endDate) url += `&endDate=${endDate}`;
@@ -61,6 +64,9 @@ const fetchSessions = async () => {
     }
   } catch (err) {
     console.error("Error fetching sessions:", err);
+  }
+  finally{
+    setLoading(false);
   }
 };
 
@@ -146,7 +152,7 @@ const handleDownload = async () => {
 };
 
 
-
+if (loading) return <Loader message="Loading Employee Work Sessions..." />;
 
   return (
     <div className="employee-work-sessions">

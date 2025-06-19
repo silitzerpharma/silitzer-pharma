@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import Loader from "../../common/Loader";
 
 const reverseGeocode = async (lat, lon) => {
   if (!lat || !lon) return null;
@@ -83,7 +84,7 @@ const EmployeeTodaysActivity = ({ employeeId }) => {
   const [selectedTask, setSelectedTask] = useState(null);
   const [completionAddress, setCompletionAddress] = useState(null);
   const [completionLoading, setCompletionLoading] = useState(false);
-
+  const [loading, setLoading] = useState(false);
 
 
   useEffect(() => {
@@ -91,6 +92,7 @@ const EmployeeTodaysActivity = ({ employeeId }) => {
 
     // Fetch today's tasks and sessions
     const fetchTodaysActivity = async () => {
+      setLoading(true);
       try {
         const response = await fetch(
           `${BASE_URL}/admin/employee/todaysactivity`,
@@ -111,6 +113,9 @@ const EmployeeTodaysActivity = ({ employeeId }) => {
         setSessions(data.sessions || []);
       } catch (error) {
         console.error("Error fetching today's activity:", error);
+      }
+      finally{
+        setLoading(false);
       }
     };
 
@@ -147,6 +152,8 @@ const EmployeeTodaysActivity = ({ employeeId }) => {
     setShowDialog(false);
     setSelectedTask(null);
   };
+
+if (loading) return <Loader message="Loading EmployeeTodaysActivity..." />;
 
   return (
     <div className="EmployeeTodaysActivity">

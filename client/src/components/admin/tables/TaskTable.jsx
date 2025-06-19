@@ -16,6 +16,7 @@ import {
 import ViewTask from "../View/ViewTask";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import Loader from "../../common/Loader";
 
 const formatDate = (dateString) => {
   if (!dateString) return "-";
@@ -27,19 +28,18 @@ const TaskTable = ({ employeeId }) => {
   const [tasks, setTasks] = useState([]);
   const [selectedTask, setSelectedTask] = useState(null);
   const [refreshFlag, setRefreshFlag] = useState(false);
-
   const [searchDate, setSearchDate] = useState("");
   const [searchStatus, setSearchStatus] = useState("");
   const [searchText, setSearchText] = useState("");
-
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const limit = 5;
-
+  const [loading, setLoading] = useState(false);
   const refreshTasksList = () => setRefreshFlag((prev) => !prev);
 
 const fetchTasks = async () => {
   try {
+    setLoading(true);
     const params = new URLSearchParams();
     params.append("employee_id", employeeId);
     params.append("page", currentPage);
@@ -60,6 +60,9 @@ const fetchTasks = async () => {
     setTotalPages(data.totalPages || 1);
   } catch (error) {
     console.error("Error fetching tasks:", error);
+  }
+  finally{
+    setLoading(false);
   }
 };
 
@@ -94,6 +97,8 @@ const fetchTasks = async () => {
     if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
   };
 
+
+if (loading) return <Loader message="Loading Tasks..." />;
   return (
     <div style={{ padding: "1rem" }}>
       <div className="manage-tasks-title">Manage tasks</div>

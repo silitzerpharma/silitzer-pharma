@@ -5,13 +5,14 @@ import React, { Suspense, lazy } from "react";
 // Private Route
 import PrivateRoute from "./PrivateRoute";
 
+import Loader from "../components/common/Loader";
+
 // Layouts
 import DistributorLayout from "../layouts/DistributorLayout";
 import EmployeeLayout from "../layouts/EmployeeLayout";
 import AdminLayout from "../layouts/AdminLayout";
 
-// Fallback loader
-const Loader = () => <div>Loading...</div>;
+
 
 // Lazy-loaded pages
 const DistributorDashboard = lazy(() => import("../pages/distributor/DistributorDashboard"));
@@ -53,7 +54,7 @@ const RoleRedirect = lazy(() => import("../pages/auth/RoleRedirect"));
 
 const AppRoutes = () => {
   return (
-    <Suspense fallback={<Loader />}>
+    <Suspense fallback={<Loader message="Loading..." />}>
       <Routes>
         {/* base Route */}
         <Route path="/" element={<RoleRedirect />} />

@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import Loader from "../../common/Loader";
 
 // Reusable component to display location with reverse geocoding
 const reverseGeocode = async (lat, lon) => {
@@ -84,13 +85,14 @@ const EmployeedaysActivity = ({ employeeId, day }) => {
   const [selectedTask, setSelectedTask] = useState(null);
 const [completionAddress, setCompletionAddress] = useState(null);
 const [completionLoading, setCompletionLoading] = useState(false);
-
+ const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!employeeId || !day) return;
 
     const fetchDaysActivity = async () => {
       try {
+        setLoading(true);
         const response = await fetch(
           `${BASE_URL}/admin/employee/daysactivity`,
           {
@@ -111,6 +113,9 @@ const [completionLoading, setCompletionLoading] = useState(false);
       } catch (error) {
         console.error("Error fetching day's activity:", error);
       }
+      finally{
+        setLoading(false);
+      }
     };
 
     fetchDaysActivity();
@@ -125,6 +130,8 @@ const [completionLoading, setCompletionLoading] = useState(false);
     setShowDialog(false);
     setSelectedTask(null);
   };
+
+  if (loading) return <Loader message="Loading EmployeeTodaysActivity..." />;
 
   return (
     <div className="EmployeeTodaysActivity">
