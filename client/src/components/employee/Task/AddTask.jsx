@@ -3,6 +3,8 @@ import './style/AddTask.scss'; // Optional for styling
 
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import Loader from "../../common/Loader";
+import { toast } from 'react-toastify';
 
 const AddTask = ({isActive}) => {
   const [formData, setFormData] = useState({
@@ -12,7 +14,7 @@ const AddTask = ({isActive}) => {
     address: '',
     notes: '',
   });
-
+const [loading, setLoading] = useState(false);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -23,6 +25,7 @@ const handleSubmit = async (e) => {
 
   const submitData = async (location) => {
     try {
+      setLoading(true)
       const payload = {
         ...formData,
         ...(location && { location }), // include location if available
@@ -40,7 +43,7 @@ const handleSubmit = async (e) => {
       if (!response.ok) throw new Error("Failed to submit task");
 
       const data = await response.json();
-      alert("Task added successfully!");
+      toast.success("Task added successfully!");
       setFormData({
         title: '',
         description: '',
@@ -50,14 +53,17 @@ const handleSubmit = async (e) => {
       });
     } catch (error) {
       console.error("Error submitting task:", error);
-      alert("Error submitting task. Please try again.");
+      toast.error("Error submitting task. Please try again.");
+    }
+    finally{
+      setLoading(false);
     }
   };
 
   // If Completed, get location first
   if (formData.status === "Completed") {
     if (!navigator.geolocation) {
-      alert("Geolocation is not supported by your browser.");
+      toast.error("Geolocation is not supported by your browser.");
       return;
     }
 
@@ -71,7 +77,7 @@ const handleSubmit = async (e) => {
       },
       (error) => {
         console.error("Geolocation error:", error);
-        alert("Could not get your location. Task not added.");
+        toast.error("Could not get your location. Task not added.");
       }
     );
   } else {
@@ -85,6 +91,8 @@ const handleSubmit = async (e) => {
       To add Task You need to Active
     </p>;
   }
+
+  if (loading) return <Loader message="Adding Task..." />;
 
   return (
     <div className="add-task-form">

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import "./style/TasksList.scss";
 import HourglassBottomIcon from "@mui/icons-material/HourglassBottom";
+import Loader from "../../common/Loader";
+import { toast } from 'react-toastify';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-const PendingTasks = () => {
+const PendingTasks = ({ isActive }) => {
   const [tasks, setTasks] = useState([]);
   const [showDialog, setShowDialog] = useState(false);
   const [note, setNote] = useState("");
@@ -15,10 +17,15 @@ const PendingTasks = () => {
   const [cancelReason, setCancelReason] = useState("");
   const [cancelTaskId, setCancelTaskId] = useState("");
 
+  const [loadingTasks, setLoadingTasks] = useState(true);
+  const [loadingStatus, setLoadingStatus] = useState(false);
+  const [cancelLoading, setCancelLoading] = useState(false);
+
   const refreshTaskList = () => setRefreshFlag((prev) => !prev);
 
   useEffect(() => {
     const fetchPendingTasks = async () => {
+      setLoadingTasks(true);
       try {
         const response = await fetch(`${BASE_URL}/employee/task/pending`, {
           credentials: "include",
@@ -30,6 +37,8 @@ const PendingTasks = () => {
         setTasks(data);
       } catch (error) {
         console.error("Error fetching pending tasks:", error);
+      } finally {
+        setLoadingTasks(false);
       }
     };
 
@@ -38,10 +47,8 @@ const PendingTasks = () => {
 
   const handleStatusChange = (task_id, newStatus, oldStatus) => {
     if (newStatus === oldStatus) return;
-
     setUpdateTaskId(task_id);
     setUpdateStatus(newStatus);
-
     if (newStatus === "Complete") {
       setShowDialog(true);
     } else {
@@ -57,15 +64,18 @@ const PendingTasks = () => {
     };
 
     if (!task_id || !status) {
-      alert("Missing status or task ID.");
+      toast.error("Missing status or task ID.");
       resetForm();
       return;
     }
 
+    setLoadingStatus(true);
+
     if (status === "Complete") {
       if (!navigator.geolocation) {
-        alert("Geolocation is not supported by your browser.");
+        toast.error("Geolocation is not supported by your browser.");
         resetForm();
+        setLoadingStatus(false);
         return;
       }
 
@@ -77,66 +87,63 @@ const PendingTasks = () => {
           };
 
           try {
-            const response = await fetch(`${BASE_URL}/employee/task/update-status`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              credentials: "include",
-              body: JSON.stringify({
-                status,
-                location,
-                task_id,
-                note,
-              }),
-            });
+            const response = await fetch(
+              `${BASE_URL}/employee/task/update-status`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({
+                  status,
+                  location,
+                  task_id,
+                  note,
+                }),
+              }
+            );
 
-            if (!response.ok) {
-              throw new Error("Failed to update status.");
-            }
-
+            if (!response.ok) throw new Error("Failed to update status.");
             refreshTaskList();
-            alert("Status updated successfully.");
+            toast.success("Status updated successfully.");
           } catch (error) {
-            alert("Error updating status: " + error.message);
+            toast.error("Error updating status: " + error.message);
           } finally {
             resetForm();
+            setLoadingStatus(false);
           }
         },
         () => {
-          alert("Error getting location. Status not updated.");
+          toast.error("Error getting location. Status not updated.");
           resetForm();
+          setLoadingStatus(false);
         }
       );
     } else {
       try {
-        const response = await fetch(`${BASE_URL}/employee/task/update-status`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({
-            status,
-            task_id,
-          }),
-        });
+        const response = await fetch(
+          `${BASE_URL}/employee/task/update-status`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ status, task_id }),
+          }
+        );
 
-        if (!response.ok) {
-          throw new Error("Failed to update status.");
-        }
-
+        if (!response.ok) throw new Error("Failed to update status.");
         refreshTaskList();
-        alert("Status updated successfully.");
+        toast.success("Status updated successfully.");
       } catch (error) {
-        alert("Error updating status: " + error.message);
+        toast.error("Error updating status: " + error.message);
       } finally {
         resetForm();
+        setLoadingStatus(false);
       }
     }
   };
 
   const handleDialogSubmit = () => {
-    updateTaskStatus({
-      task_id: updateTaskId,
-      status: updateStatus,
-    });
+    updateTaskStatus({ task_id: updateTaskId, status: updateStatus });
     setShowDialog(false);
   };
 
@@ -158,6 +165,7 @@ const PendingTasks = () => {
   };
 
   const submitCancelRequest = async () => {
+    setCancelLoading(true);
     try {
       const response = await fetch(`${BASE_URL}/employee/task/cancel`, {
         method: "POST",
@@ -171,75 +179,103 @@ const PendingTasks = () => {
 
       if (!response.ok) throw new Error("Failed to submit cancel request");
 
-      alert("Cancel request submitted successfully.");
+      toast.success("Cancel request submitted successfully.");
       closeCancelDialog();
       refreshTaskList();
     } catch (err) {
-      alert("Error submitting cancel request: " + err.message);
+      toast.error("Error submitting cancel request: " + err.message);
+    } finally {
+      setCancelLoading(false);
     }
   };
 
   return (
     <div className="tasks-list">
-      {tasks.map((task, index) => (
-        <div key={task.taskId || index} className="task-card">
-          <div className="task-title">{task.title}</div>
-          <div className="task-meta">
-            <span>{task.address || "-"}</span> ·{" "}
+      {loadingTasks ? (
+        <Loader message="Loading pending tasks..." />
+      ) : tasks.length === 0 ? (
+        <div className="no-tasks-message">No pending tasks.</div>
+      ) : (
+        tasks.map((task, index) => (
+          <div key={task.taskId || index} className="task-card">
+            <div className="task-title">{task.title}</div>
+            <div className="task-meta">
+              <span>{task.address || "-"}</span> ·{" "}
+            </div>
+            <div className="task-desc">{task.description}</div>
+
+            <div
+              className={`task-status ${task.status
+                .toLowerCase()
+                .replace(" ", "-")}`}
+            >
+              Status: {task.status}
+              <br />
+              <span>
+                AssignDate:{" "}
+                {new Date(task.assignDate).toLocaleDateString("en-GB")}
+              </span>
+              <span>
+                {" "}
+                StartDate:{" "}
+                {new Date(task.startDate).toLocaleDateString("en-GB")}
+              </span>
+              <br />
+              {(() => {
+                const dueDate = new Date(task.dueDate);
+                const today = new Date();
+                dueDate.setHours(0, 0, 0, 0);
+                today.setHours(0, 0, 0, 0);
+                const isDueToday = dueDate.getTime() === today.getTime();
+
+                return (
+                  <span style={{ color: isDueToday ? "red" : "inherit" }}>
+                    DueDate: {dueDate.toLocaleDateString("en-GB")}
+                    {isDueToday && (
+                      <HourglassBottomIcon
+                        style={{ verticalAlign: "middle", marginLeft: 4 }}
+                      />
+                    )}
+                  </span>
+                );
+              })()}
+            </div>
+
+            <div className="priority-field">
+              <strong>Priority:</strong> {task.priority}
+            </div>
+
+            {isActive && (
+              <select
+                className="status-select"
+                value=""
+                onChange={(e) =>
+                  handleStatusChange(task.taskId, e.target.value, task.status)
+                }
+              >
+                <option value="" disabled>
+                  Update status
+                </option>
+                <option value="Ongoing">Ongoing</option>
+                <option value="Complete">Complete</option>
+              </select>
+            )}
+
+            <button
+              onClick={() => openCancelDialog(task.taskId)}
+              className="cancel-request-button"
+            >
+              Request to Cancel
+            </button>
           </div>
-          <div className="task-desc">{task.description}</div>
+        ))
+      )}
 
-          <div className={`task-status ${task.status.toLowerCase().replace(" ", "-")}`}>
-            Status: {task.status}
-            <br />
-            <span>AssignDate: {new Date(task.assignDate).toLocaleDateString("en-GB")}</span>
-            <span> StartDate: {new Date(task.startDate).toLocaleDateString("en-GB")}</span>
-            <br />
-            {(() => {
-              const dueDate = new Date(task.dueDate);
-              const today = new Date();
-              dueDate.setHours(0, 0, 0, 0);
-              today.setHours(0, 0, 0, 0);
-              const isDueToday = dueDate.getTime() === today.getTime();
-
-              return (
-                <span style={{ color: isDueToday ? "red" : "inherit" }}>
-                  DueDate: {dueDate.toLocaleDateString("en-GB")}
-                  {isDueToday && (
-                    <HourglassBottomIcon
-                      style={{ verticalAlign: "middle", marginLeft: 4 }}
-                    />
-                  )}
-                </span>
-              );
-            })()}
-          </div>
-
-          <div className="priority-field">
-            <strong>Priority:</strong> {task.priority}
-          </div>
-
-          {/* Status update dropdown */}
-          <select
-            className="status-select"
-            value=""
-            onChange={(e) =>
-              handleStatusChange(task.taskId, e.target.value, task.status)
-            }
-          >
-            <option value="" disabled>
-              Update status
-            </option>
-            <option value="Ongoing">Ongoing</option>
-            <option value="Complete">Complete</option>
-          </select>
-
-          {/* Cancel Request Button */}
-          <button onClick={() => openCancelDialog(task.taskId)} className="cancel-request-button">
-            Request to Cancel
-          </button>
+      {loadingStatus && (
+        <div style={{ marginTop: "20px" }}>
+          <Loader message="Updating task status..." fullPage={false} size={40} />
         </div>
-      ))}
+      )}
 
       {showDialog && (
         <div className="modal-overlay">
@@ -264,17 +300,23 @@ const PendingTasks = () => {
       {cancelDialogVisible && (
         <div className="cancel-modal-overlay">
           <div className="cancel-modal-dialog">
-            <h3>Request to Cancel Task</h3>
-            <textarea
-              placeholder="Optional: Enter reason for cancel request"
-              value={cancelReason}
-              onChange={(e) => setCancelReason(e.target.value)}
-              rows={4}
-            />
-            <div className="modal-buttons">
-              <button onClick={closeCancelDialog}>Cancel</button>
-              <button onClick={submitCancelRequest}>Submit Request</button>
-            </div>
+            {cancelLoading ? (
+              <Loader message="Submitting cancel request..." fullPage={false} size={40} />
+            ) : (
+              <>
+                <h3>Request to Cancel Task</h3>
+                <textarea
+                  placeholder="Optional: Enter reason for cancel request"
+                  value={cancelReason}
+                  onChange={(e) => setCancelReason(e.target.value)}
+                  rows={4}
+                />
+                <div className="modal-buttons">
+                  <button onClick={closeCancelDialog}>Cancel</button>
+                  <button onClick={submitCancelRequest}>Submit Request</button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import './style/EmployeeProfile.scss';
+import Loader from "../../components/common/Loader";
+import { toast } from 'react-toastify';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -10,38 +12,39 @@ const EmployeeProfile = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [updateLoading, setUpdateLoading] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
+
+  const fetchProfile = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${BASE_URL}/employee/profile`, {
+        method: "GET",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+
+      const data = await res.json();
+      setEmployee({
+        username: data.username,
+        employeeID: data.EmployeeID,
+        name: data.Name,
+        profilePhoto: data.profilePhotoUrl,
+        email: data.Email,
+        phoneNumber: data.PhoneNumber,
+        address: data.Address,
+        joiningDate: data.JoiningDate?.split("T")[0] || "",
+      });
+    } catch (err) {
+      console.error("Failed to fetch employee profile:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const res = await fetch(`${BASE_URL}/employee/profile`, {
-          method: "GET",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-        });
-
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-
-        const data = await res.json();
-        setEmployee({
-          username: data.username,
-          employeeID: data.EmployeeID,
-          name: data.Name,
-          profilePhoto: data.profilePhotoUrl,
-          email: data.Email,
-          phoneNumber: data.PhoneNumber,
-          address: data.Address,
-          joiningDate: data.JoiningDate?.split("T")[0] || "",
-        });
-      } catch (err) {
-        console.error("Failed to fetch employee profile:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchProfile();
   }, []);
 
@@ -59,62 +62,82 @@ const EmployeeProfile = () => {
     setEmployee((prev) => ({ ...prev, [name]: value }));
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError("");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
 
-  if (password !== confirmPassword) {
-    setError("Passwords do not match.");
-    return;
-  }
-
-  try {
-    const response = await fetch(`${BASE_URL}/employee/profile/update`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include", // important if using cookies/session
-      body: JSON.stringify({
-        name: employee.name,
-        email: employee.email,
-        phoneNumber: employee.phoneNumber,
-        address: employee.address,
-        password: password || undefined, // optional, only include if not empty
-      }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Failed to update profile");
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
     }
 
-    const updatedData = await response.json();
-    alert("Profile updated successfully:");
+    let base64Image = "";
+    if (imageFile) {
+      try {
+        base64Image = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(imageFile);
+          reader.onload = () => resolve(reader.result.split(",")[1]);
+          reader.onerror = (error) => reject(error);
+        });
+      } catch (err) {
+        console.error("Failed to read image file:", err);
+        setError("Image conversion failed");
+        return;
+      }
+    }
 
-    setEditMode(false);
-    setPassword("");
-    setConfirmPassword("");
-  } catch (err) {
-    console.error("Error updating profile:", err);
-    setError(err.message);
-  }
-};
+    try {
+      setUpdateLoading(true);
+      const response = await fetch(`${BASE_URL}/employee/profile/update`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          name: employee.name,
+          email: employee.email,
+          phoneNumber: employee.phoneNumber,
+          address: employee.address,
+          password: password || undefined,
+          profileImage: base64Image || undefined,
+          imageName: imageFile?.name || undefined,
+        }),
+      });
 
+      if (!response.ok) {
+        const errorData = await response.json();
+        toast.error(errorData.message || "Failed to update profile");
+        return;
+      }
 
-  if (loading) {
-    return <div className="employee-profile">Loading profile...</div>;
-  }
+      await fetchProfile(); // ✅ Refresh data after update
+      toast.success("Profile updated successfully");
+      setEditMode(false);
+      setPassword("");
+      setConfirmPassword("");
+      setImageFile(null);
+    } catch (err) {
+      console.error("Error updating profile:", err);
+      toast.error("Something went wrong");
+    } finally {
+      setUpdateLoading(false);
+    }
+  };
 
-  if (!employee) {
-    return <div className="employee-profile">Failed to load profile.</div>;
-  }
+  if (loading) return <Loader message="Loading profile..." />;
+  if (updateLoading) return <Loader message="Updating profile..." />;
+
+  if (!employee) return <div className="employee-profile">Failed to load profile.</div>;
 
   return (
     <div className="employee-profile">
       <div className="photo-container">
         <img
-          src={employee.profilePhoto || "/images/default-profile.jpg"}
+          src={
+            imageFile
+              ? URL.createObjectURL(imageFile)
+              : employee.profilePhoto || "/images/default-profile.jpg"
+          }
           alt={`${employee.name} profile`}
           className="profile-photo"
         />
@@ -174,6 +197,15 @@ const handleSubmit = async (e) => {
               name="address"
               value={employee.address}
               onChange={handleChange}
+            />
+          </label>
+
+          <label>
+            <strong>Profile Image:</strong>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setImageFile(e.target.files[0])}
             />
           </label>
 

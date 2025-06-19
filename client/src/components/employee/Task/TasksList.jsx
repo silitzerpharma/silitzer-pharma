@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "./style/TasksList.scss";
 import HourglassBottomIcon from "@mui/icons-material/HourglassBottom";
+import Loader from "../../common/Loader";
+import { toast } from "react-toastify";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -11,26 +13,29 @@ const TasksList = ({ isActive }) => {
   const [updateTaskId, setUpdateTaskId] = useState("");
   const [updateStatus, setUpdateStatus] = useState("");
   const [refreshFlag, setRefreshFlag] = useState(false);
-
   const [cancelDialogVisible, setCancelDialogVisible] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
   const [cancelTaskId, setCancelTaskId] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [submittingCancel, setSubmittingCancel] = useState(false);
 
   const refreshTaskList = () => setRefreshFlag((prev) => !prev);
 
   useEffect(() => {
     const fetchTodayTasks = async () => {
       try {
+        setLoading(true);
         const response = await fetch(`${BASE_URL}/employee/task/today`, {
           credentials: "include",
         });
-        if (!response.ok) {
-          throw new Error("Failed to fetch tasks");
-        }
+        if (!response.ok) throw new Error("Failed to fetch tasks");
         const data = await response.json();
         setTasks(data);
       } catch (error) {
-        console.error("Error fetching today's tasks:", error);
+        toast.error("Error fetching today's tasks");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -55,17 +60,20 @@ const TasksList = ({ isActive }) => {
       setNote("");
       setUpdateStatus("");
       setUpdateTaskId("");
+      setUpdatingStatus(false);
     };
 
     if (!task_id || !status) {
-      alert("Missing status or task ID.");
+      toast.error("Missing status or task ID.");
       resetForm();
       return;
     }
 
+    setUpdatingStatus(true);
+
     if (status === "Complete") {
       if (!navigator.geolocation) {
-        alert("Geolocation is not supported by your browser.");
+        toast.error("Geolocation is not supported.");
         resetForm();
         return;
       }
@@ -93,15 +101,15 @@ const TasksList = ({ isActive }) => {
             if (!response.ok) throw new Error("Failed to update status.");
 
             refreshTaskList();
-            alert("Status updated successfully.");
+            toast.success("Status updated successfully.");
           } catch (error) {
-            alert("Error updating status: " + error.message);
+            toast.error("Error updating status: " + error.message);
           } finally {
             resetForm();
           }
         },
         () => {
-          alert("Error getting location. Status not updated.");
+          toast.error("Error getting location. Status not updated.");
           resetForm();
         }
       );
@@ -111,18 +119,15 @@ const TasksList = ({ isActive }) => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
-          body: JSON.stringify({
-            status,
-            task_id,
-          }),
+          body: JSON.stringify({ status, task_id }),
         });
 
         if (!response.ok) throw new Error("Failed to update status.");
 
         refreshTaskList();
-        alert("Status updated successfully.");
+        toast.success("Status updated successfully.");
       } catch (error) {
-        alert("Error updating status: " + error.message);
+        toast.error("Error updating status: " + error.message);
       } finally {
         resetForm();
       }
@@ -142,7 +147,6 @@ const TasksList = ({ isActive }) => {
     setNote("");
   };
 
-  // Cancel Request Logic
   const openCancelDialog = (taskId) => {
     setCancelTaskId(taskId);
     setCancelDialogVisible(true);
@@ -156,6 +160,7 @@ const TasksList = ({ isActive }) => {
   };
 
   const submitCancelRequest = async () => {
+    setSubmittingCancel(true);
     try {
       const response = await fetch(`${BASE_URL}/employee/task/cancel`, {
         method: "POST",
@@ -169,13 +174,17 @@ const TasksList = ({ isActive }) => {
 
       if (!response.ok) throw new Error("Failed to submit cancel request");
 
-      alert("Cancel request submitted successfully.");
+      toast.success("Cancel request submitted successfully.");
       closeCancelDialog();
       refreshTaskList();
     } catch (err) {
-      alert("Error submitting cancel request: " + err.message);
+      toast.error("Error submitting cancel request: " + err.message);
+    } finally {
+      setSubmittingCancel(false);
     }
   };
+
+  if (loading || updatingStatus || submittingCancel) return <Loader message="Processing..." />;
 
   return (
     <div className="tasks-list">
@@ -232,7 +241,10 @@ const TasksList = ({ isActive }) => {
                 <option value="Complete">Complete</option>
               </select>
 
-              <button onClick={() => openCancelDialog(task.taskId)} className="cancel-request-button">
+              <button
+                onClick={() => openCancelDialog(task.taskId)}
+                className="cancel-request-button"
+              >
                 Request to Cancel
               </button>
             </>

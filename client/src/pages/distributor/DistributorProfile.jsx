@@ -6,10 +6,15 @@ import {
   DialogActions,
   Button,
   TextField,
+  IconButton,
+  InputAdornment,
 } from '@mui/material';
-import './distributorprofile.css';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import './style/distributorprofile.css';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import Loader from "../../components/common/Loader";
+import { toast } from 'react-toastify';
 
 const DistributorProfile = () => {
   const [profile, setProfile] = useState({});
@@ -18,9 +23,15 @@ const DistributorProfile = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  // show/hide password state
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
+      setLoading(true);
       try {
         const response = await fetch(`${BASE_URL}/distributor/profile`, {
           method: 'GET',
@@ -32,6 +43,8 @@ const DistributorProfile = () => {
         setProfile(data);
       } catch (err) {
         console.error('Error fetching profile:', err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -55,8 +68,10 @@ const DistributorProfile = () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(profile),
         });
+        toast.success('Profile updated successfully');
       } catch (err) {
         console.error('Error saving profile:', err);
+        toast.error('Failed to save profile');
       }
     }
     setIsEditing((prev) => !prev);
@@ -82,7 +97,7 @@ const DistributorProfile = () => {
         setNewPassword('');
         setConfirmPassword('');
         setPasswordError('');
-        alert('Password changed successfully');
+        toast.success('Password changed successfully');
       } else {
         setPasswordError(result.message || 'Failed to update password');
       }
@@ -91,6 +106,8 @@ const DistributorProfile = () => {
       setPasswordError('Server error');
     }
   };
+
+  if (loading) return <Loader message="Loading Profile..." />;
 
   return (
     <div className="profile-container">
@@ -179,21 +196,45 @@ const DistributorProfile = () => {
         <DialogContent>
           <TextField
             label="New Password"
-            type="password"
+            type={showNewPassword ? 'text' : 'password'}
             fullWidth
             margin="dense"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowNewPassword((prev) => !prev)}
+                    edge="end"
+                  >
+                    {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
           <TextField
             label="Confirm Password"
-            type="password"
+            type={showConfirmPassword ? 'text' : 'password'}
             fullWidth
             margin="dense"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             error={!!passwordError}
             helperText={passwordError}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowConfirmPassword((prev) => !prev)}
+                    edge="end"
+                  >
+                    {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
         </DialogContent>
         <DialogActions>

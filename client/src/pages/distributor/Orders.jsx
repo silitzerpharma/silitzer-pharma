@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import './orders.scss';
+import './style/orders.scss';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
+import Loader from "../../components/common/Loader";
 
 const SORT_OPTIONS = [
   { label: 'Date Asc', value: 'date_asc' },
@@ -25,7 +25,7 @@ const Orders = () => {
   const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 5;
   const [expandedIndex, setExpandedIndex] = useState(null);
-
+  const [loading, setLoading] = useState(false);
   // Filters and sorting
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
@@ -44,6 +44,7 @@ const Orders = () => {
   // Fetch orders with filters/sorting applied
   const fetchOrders = useCallback(async () => {
     try {
+      setLoading(true);
       // Build query params
       const params = new URLSearchParams({
         page: currentPage,
@@ -74,6 +75,9 @@ const Orders = () => {
       setOrders([]);
       setTotalPages(1);
     }
+    finally{
+      setLoading(false);
+    }
   }, [currentPage, debouncedQuery, selectedStatus, selectedSort]);
 
   useEffect(() => {
@@ -83,6 +87,14 @@ const Orders = () => {
   const toggleExpand = (index) => {
     setExpandedIndex(expandedIndex === index ? null : index);
   };
+
+if (loading) return (
+  <div className="modern-orders-container">
+         <h2>Orders</h2>
+   <Loader message="Loading Orders..." />;
+  </div>
+
+)
 
   return (
     <div className="modern-orders-container">

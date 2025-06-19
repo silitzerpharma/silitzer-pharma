@@ -31,6 +31,8 @@ const EmployeeRequests = ({ employeeId,refreshEmployeeData }) => {
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
  const fetchRequests = async () => {
   if (!employeeId) return;
 
@@ -38,7 +40,11 @@ const EmployeeRequests = ({ employeeId,refreshEmployeeData }) => {
   setError(null);
 
   try {
-    const res = await fetch(`http://localhost:3000/admin/employee/requests?employeeId=${employeeId}`);
+const res = await fetch(`${BASE_URL}/admin/employee/requests?employeeId=${employeeId}`, {
+  method: 'GET',
+  credentials: 'include', 
+});
+
     if (!res.ok) {
       const errorData = await res.json();
       throw new Error(errorData.message || "Failed to fetch employee requests");
@@ -101,14 +107,14 @@ const handleConfirmAction = async () => {
   let payload = {};
 
   if (pendingType === "cancel") {
-    url = "http://localhost:3000/admin/employee/taskcancelrequest/update";
+    url = `${BASE_URL}/admin/employee/taskcancelrequest/update`;
     payload = {
       requestId: selectedRequest._id,
       action: pendingAction,
     };
     if (pendingAction === "Rejected") payload.rejectionReason = rejectionReason;
   } else if (pendingType === "leave") {
-    url = "http://localhost:3000/admin/employee/leaverequest/update";
+    url = `${BASE_URL}/admin/employee/leaverequest/update`;
     payload = {
       _id: selectedLeave._id,
       action: pendingAction,

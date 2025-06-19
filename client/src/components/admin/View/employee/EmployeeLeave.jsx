@@ -3,6 +3,8 @@ import "./EmployeeLeave.scss";
 
 const PAGE_SIZE = 5;
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const EmployeeLeave = ({ employeeId }) => {
   const [leaveBalance, setLeaveBalance] = useState(null);
   const [leaveRequests, setLeaveRequests] = useState([]);
@@ -25,7 +27,7 @@ const EmployeeLeave = ({ employeeId }) => {
     const fetchLeaveData = async () => {
   setLoading(true);
   try {
-    let url = `http://localhost:3000/admin/employee/leaves?employeeId=${employeeId}&page=${page}&limit=${PAGE_SIZE}`;
+    let url = `${BASE_URL}/admin/employee/leaves?employeeId=${employeeId}&page=${page}&limit=${PAGE_SIZE}`;
 
     if (fromDate) url += `&fromDate=${fromDate}`;
     if (toDate) url += `&toDate=${toDate}`;

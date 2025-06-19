@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import './distributordashboard.scss'
+import './style/distributordashboard.scss'
 
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import { IoIosMail } from "react-icons/io";

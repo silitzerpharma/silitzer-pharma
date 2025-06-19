@@ -16,7 +16,7 @@ const bcrypt = require("bcryptjs");
 const TaskCancelRequest = require("../models/employee/TaskCancelRequest");
 const {startOfMonth, format, addDays  } = require('date-fns');
 const LeaveRequest = require("../models/employee/LeaveRequestModel");
-
+const imagekit = require('../config/imagekit');
 
 
 
@@ -293,6 +293,7 @@ exports.getTodayTasks = async (req, res) => {
   }
 };
 
+
 exports.getPendingTasks = async (req, res) => {
   try {
     const employee = await EmployeeServices.getEmployeeByReq(req);
@@ -300,19 +301,14 @@ exports.getPendingTasks = async (req, res) => {
       return res.status(401).json({ message: 'Unauthorized: No employee' });
     }
 
-    // Set your timezone here, e.g., 'Asia/Kolkata', 'America/New_York', etc.
-    const TIMEZONE = 'UTC';
-
-    // Get local start of today
+    const TIMEZONE = 'UTC'; // You can change to 'Asia/Kolkata', etc.
     const todayLocal = startOfToday();
-
-    // Convert local start of today to UTC date object for querying MongoDB
     const todayUtc = zonedTimeToUtc(todayLocal, TIMEZONE);
 
-    // Query tasks assigned to employee with startDate less than today (UTC)
     const tasks = await Task.find({
       assignedTo: employee._id,
       startDate: { $lt: todayUtc },
+      status: { $nin: ['Cancelled', 'Complete'] }, // ❌ Exclude these statuses
     });
 
     return res.status(200).json(tasks);
@@ -321,6 +317,9 @@ exports.getPendingTasks = async (req, res) => {
     return res.status(500).json({ message: 'Internal Server Error' });
   }
 };
+
+
+
 
 exports.updateTasksStatus = async (req, res) => {
   try {
@@ -569,6 +568,7 @@ exports.getprofile = async (req, res) => {
   }
 };
 
+
 exports.updateProfile = async (req, res) => {
   try {
     const employee = await EmployeeServices.getEmployeeByReq(req);
@@ -577,17 +577,52 @@ exports.updateProfile = async (req, res) => {
       return res.status(401).json({ message: "Unauthorized: No employee" });
     }
 
-    const { name, email, phoneNumber, address, password } = req.body;
+    const {
+      name,
+      email,
+      phoneNumber,
+      address,
+      password,
+      profileImage, // base64 string
+      imageName      // original file name
+    } = req.body;
 
-    // Update employee profile fields
-    employee.Name = name ?? employee.Name;
-    employee.Email = email ?? employee.Email;
-    employee.PhoneNumber = phoneNumber ?? employee.PhoneNumber;
-    employee.Address = address ?? employee.Address;
+    // Update profile fields if provided
+    if (name) employee.Name = name;
+    if (email) employee.Email = email;
+    if (phoneNumber) employee.PhoneNumber = phoneNumber;
+    if (address) employee.Address = address;
+
+    // Handle image update
+    if (profileImage && imageName) {
+      // Remove old image if it exists
+      if (employee.imageFileId) {
+        try {
+          await imagekit.deleteFile(employee.imageFileId);
+        } catch (err) {
+          console.warn("Failed to delete old image from ImageKit:", err.message);
+        }
+      }
+
+      // Upload new image
+      try {
+        const uploadResponse = await imagekit.upload({
+          file: profileImage, // must be base64 without prefix
+          fileName: imageName,
+          folder: "/employee-profiles"
+        });
+
+        employee.profilePhotoUrl = uploadResponse.url;
+        employee.imageFileId = uploadResponse.fileId;
+      } catch (uploadError) {
+        console.error("ImageKit upload failed:", uploadError.message);
+        return res.status(500).json({ message: "Image upload failed" });
+      }
+    }
 
     await employee.save();
 
-    // If password is provided, update it in AuthUser
+    // Handle password update
     if (password) {
       const authUser = await AuthUser.findOne({
         refId: employee._id,
@@ -595,14 +630,11 @@ exports.updateProfile = async (req, res) => {
       });
 
       if (!authUser) {
-        return res
-          .status(404)
-          .json({ message: "AuthUser record not found for employee" });
+        return res.status(404).json({ message: "AuthUser record not found for employee" });
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
       authUser.password = hashedPassword;
-
       await authUser.save();
     }
 
@@ -612,6 +644,9 @@ exports.updateProfile = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+
+
 
 exports.cancelTaskRequest = async (req, res) => {
   try {

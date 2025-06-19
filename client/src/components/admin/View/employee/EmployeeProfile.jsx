@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import './EmployeeProfile.scss';
 
+import { toast } from 'react-toastify';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const EmployeeProfile = ({ employee, username, AuthUser_id, refreshEmployeesList, openViewEmployee }) => {
   const [localEmployee, setLocalEmployee] = useState(employee);
   const [localUsername, setLocalUsername] = useState(username || "");
@@ -18,7 +21,7 @@ const EmployeeProfile = ({ employee, username, AuthUser_id, refreshEmployeesList
 
   const handleEdit = () => {
     if (!localEmployee || !localEmployee._id || !AuthUser_id) {
-      alert("Missing employee IDs");
+     toast.error("Missing employee IDs");
       return;
     }
 
@@ -39,7 +42,7 @@ const EmployeeProfile = ({ employee, username, AuthUser_id, refreshEmployeesList
       JoiningDate: joiningDateISO,
     };
 
-  fetch("http://localhost:3000/admin/employee/update", {
+  fetch(`${BASE_URL}/admin/employee/update`, {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
@@ -60,13 +63,13 @@ const EmployeeProfile = ({ employee, username, AuthUser_id, refreshEmployeesList
         return res.json();
       })
       .then(() => {
-        alert("Employee updated successfully");
+        toast.success("Employee updated successfully");
         setEditMode(false);
         setPassword("");
         refreshEmployeesList();
       })
       .catch((err) => {
-        alert("Update failed: " + err.message);
+        toast.error("Update failed: " + err.message);
       });
   };
 
@@ -77,11 +80,11 @@ const EmployeeProfile = ({ employee, username, AuthUser_id, refreshEmployeesList
 
  const handleRemoveConfirmed = () => {
   if (!localEmployee._id) {
-    alert("Missing employee ID");
+  toast.error("Missing employee ID");
     return;
   }
 
-  fetch("http://localhost:3000/admin/employee/delete", {
+  fetch(`${BASE_URL}/admin/employee/delete`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
@@ -98,14 +101,14 @@ const EmployeeProfile = ({ employee, username, AuthUser_id, refreshEmployeesList
       return res.json();
     })
     .then(() => {
-      alert("Employee deleted successfully.");
+     toast.success("Employee deleted successfully.");
       setShowPasswordDialog(false);
       setConfirmPassword("");
       refreshEmployeesList();
       openViewEmployee();
     })
     .catch((err) => {
-      alert("Error deleting employee: " + err.message);
+      toast.error("Error deleting employee: " + err.message);
     });
 };
 
@@ -116,13 +119,13 @@ const EmployeeProfile = ({ employee, username, AuthUser_id, refreshEmployeesList
 
   const handleBlockToggleConfirmed = () => {
     if (!localEmployee._id) {
-      alert("Missing employee ID");
+      toast.error("Missing employee ID");
       return;
     }
 
     const updatedStatus = !localEmployee.isBlock;
 
-  fetch("http://localhost:3000/admin/employee/block", {
+  fetch(`${BASE_URL}/admin/employee/block`, {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
@@ -139,18 +142,18 @@ const EmployeeProfile = ({ employee, username, AuthUser_id, refreshEmployeesList
       })
       .then(() => {
         setLocalEmployee((prev) => ({ ...prev, isBlock: updatedStatus }));
-        alert(updatedStatus ? "Employee blocked." : "Employee unblocked.");
+      toast.success(updatedStatus ? "Employee blocked." : "Employee unblocked.");
         setShowPasswordDialog(false);
         setConfirmPassword("");
       })
       .catch((err) => {
-        alert("Error updating block status: " + err.message);
+        toast.error("Error updating block status: " + err.message);
       });
   };
 
   const verifyPasswordAndExecute = async () => {
     try {
-      const res = await fetch("http://localhost:3000/auth/verifypassword", {
+      const res = await fetch(`${BASE_URL}/auth/verifypassword`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -165,7 +168,7 @@ const EmployeeProfile = ({ employee, username, AuthUser_id, refreshEmployeesList
       if (confirmAction === "remove") handleRemoveConfirmed();
       else if (confirmAction === "block") handleBlockToggleConfirmed();
     } catch (err) {
-      alert("Invalid password. Action denied.");
+      toast.error("Invalid password. Action denied.");
     }
   };
 

@@ -40,15 +40,15 @@ const EmployeeDashboard = () => {
     return "Good Evening";
   };
 
-  return (
-    <div className="EmployeeDashboard">
+ return (
+  <div className="EmployeeDashboardLayout">
+    <div className="EmployeeDashboardContent">
       <div className="welcome-header">
         <h2>
           {getGreeting()}, {employeeName || "Employee"} 👋
         </h2>
         <p>
-          Welcome to <strong>Silitzer Pharma</strong>. Let’s make today
-          productive!
+          Welcome to <strong>Silitzer Pharma</strong>. Let’s make today productive!
         </p>
         <NavLink to="tasks" className="task-link">
           See today’s assigned tasks and work updates
@@ -60,24 +60,26 @@ const EmployeeDashboard = () => {
           </NavLink>
         </div>
       </div>
+
       <div className="offer-div">
         <OfferSlider offersList={dashboardData.offers} />
       </div>
 
       <div className="emp-product-slider">
-    {(dashboardData.productSliders || []).map((slider) => (
-  <EmployeeProductSlider
-    key={slider._id}
-    title={slider.title}
-    productList={slider.productList}
-  />
-))}
+        {(dashboardData.productSliders || []).map((slider) => (
+          <EmployeeProductSlider
+            key={slider._id}
+            title={slider.title}
+            productList={slider.productList}
+          />
+        ))}
       </div>
-
-
-      <EmployeeFooter/>
     </div>
-  );
+
+    <EmployeeFooter />
+  </div>
+);
+
 };
 
 export default EmployeeDashboard;

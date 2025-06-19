@@ -1,9 +1,16 @@
+
 .footer {
-    margin-top: 2rem;
-    padding: 0;
-   .footer-info{
+  margin-top: auto; // this pushes it to the bottom
+  background: #f9f9f9;
+  padding: 10px;
+  text-align: center;
+
+  .footer-info {
     display: flex;
+    justify-content: center;
     align-items: center;
+    gap: 6px;
     font-size: 0.7rem;
-   }
+    color: #555;
+  }
 }

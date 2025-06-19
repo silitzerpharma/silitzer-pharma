@@ -1,3 +1,20 @@
+.EmployeeDashboardLayout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+
+  .EmployeeDashboardContent {
+    flex: 1; // grows to take up remaining height
+    padding: 16px;
+    margin-top: 3rem;
+  }
+
+  .emp-product-slider {
+    margin-top: 1rem;
+  }
+}
+
+
 .EmployeeDashboard {
     margin-top: 3rem;
   padding: 16px;

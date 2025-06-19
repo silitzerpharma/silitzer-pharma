@@ -12,6 +12,7 @@ const employeeSchema = new mongoose.Schema({
    profilePhotoUrl: { 
     type: String, 
    },
+   imageFileId: { type: String, required: false },
   Email: {
     type: String,
   },
@@ -50,6 +51,7 @@ const employeeSchema = new mongoose.Schema({
    type: Boolean,
     default: false,
   },
+
 }, { timestamps: true });
 
 module.exports = mongoose.model('Employee', employeeSchema);

@@ -14,13 +14,14 @@ import { MdLocationPin } from "react-icons/md";
 import "./style/EmployeeWork.scss";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import Loader from "../../components/common/Loader";
 
 const EmployeeWork = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [workDates, setWorkDates] = useState({});
   const [fetchedMonths, setFetchedMonths] = useState(new Set());
   const [dayData, setDayData] = useState(null);
-
+  const [loading, setLoading] = useState(false);
   const monthStart = startOfMonth(selectedDate);
   const monthEnd = endOfMonth(monthStart);
   const startDate = startOfWeek(monthStart);
@@ -39,6 +40,7 @@ const EmployeeWork = () => {
     if (fetchedMonths.has(monthKey)) return;
 
     const fetchMonthDays = async () => {
+      setLoading(true);
       try {
         const res = await fetch(
           `${BASE_URL}/employee/work/month?month=${monthKey}`,
@@ -56,6 +58,9 @@ const EmployeeWork = () => {
         }
       } catch (err) {
         console.error("Failed to fetch work dates:", err);
+      }
+      finally{
+        setLoading(false);
       }
     };
 
@@ -83,6 +88,8 @@ const EmployeeWork = () => {
   const goToMonth = (n) => {
     setSelectedDate((prev) => addMonths(prev, n));
   };
+
+  if (loading) return <Loader message="Loading employee work..." />;
 
   return (
     <div className="employee-work">

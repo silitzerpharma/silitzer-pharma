@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import "./style/AddEmployee.scss"; // External CSS
 
+import Loader from "../../common/Loader";
+
+import { toast } from 'react-toastify';
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const AddEmployee = ({ openAddEmployeeForm , refreshEmployeesList }) => {
@@ -17,6 +20,8 @@ const AddEmployee = ({ openAddEmployeeForm , refreshEmployeesList }) => {
     Password: "",
   });
 
+  const [loading, setLoading] = useState(false)
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -28,6 +33,7 @@ const AddEmployee = ({ openAddEmployeeForm , refreshEmployeesList }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
       const response = await fetch(`${BASE_URL}/admin/employee/add`, {
         method: "POST",
         headers: {
@@ -40,7 +46,7 @@ const AddEmployee = ({ openAddEmployeeForm , refreshEmployeesList }) => {
       const result = await response.json();
       if (response.ok) {
         refreshEmployeesList();
-        alert("Employee added successfully!");
+        toast.success("Employee added successfully!");
         setFormData({
           EmployeeID: "",
           Name: "",
@@ -54,12 +60,18 @@ const AddEmployee = ({ openAddEmployeeForm , refreshEmployeesList }) => {
           Password: "",
         });
       } else {
-        alert("Error: " + result.error);
+        toast.error("Error: " + result.error);
       }
     } catch (err) {
-      alert("Failed to add employee: " + err.message);
+      toast.error("Failed to add employee: " + err.message);
+    }
+    finally{
+      setLoading(false);
     }
   };
+
+
+if (loading) return <Loader message="Adding employee..." />;
 
   return (
     <div className="employee-container">

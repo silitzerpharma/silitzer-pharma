@@ -30,9 +30,15 @@ const EmployeeProductSlider = ({ title, productList = [] }) => {
       >
         {productList.map((product, index) => (
           <SwiperSlide key={index}>
-            <div className="emp-product-card" onClick={() => handleCardClick(product)}>
+            <div
+              className="emp-product-card"
+              onClick={() => handleCardClick(product)}
+            >
               <div className="top">
-                <img src={product.imageUrl} alt="" />
+                <img
+                  src={product.imageUrl || "/images/default-product.jpg"}
+                  alt={product.productName || "Product"}
+                />
               </div>
               <div className="bottom">
                 <p className="product-name">
@@ -51,7 +57,10 @@ const EmployeeProductSlider = ({ title, productList = [] }) => {
 
       {selectedProduct && (
         <div className="product-detail-overlay">
-          <ProductDetailCard product={selectedProduct} onClose={handleCloseDetail} />
+          <ProductDetailCard
+            product={selectedProduct}
+            onClose={handleCloseDetail}
+          />
         </div>
       )}
     </div>

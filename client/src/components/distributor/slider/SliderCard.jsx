@@ -34,7 +34,14 @@ const SliderCard = ({ product }) => {
   return (
     <div className="slidercard-container"  >
       <div className="slidercard-top" onClick={() => handleProductClick(product._id)}>
-        <img src={product.imageUrl} alt={product.productName || "Product"} />
+        <img
+  src={product.imageUrl || "/images/default-product.jpg"}
+  alt={product.productName || "Product"}
+  onError={(e) => {
+    e.target.onerror = null; // prevents infinite loop
+    e.target.src = "/images/default-product.png";
+  }}
+/>
       </div>
 
       <div className="slidercard-bottom">
