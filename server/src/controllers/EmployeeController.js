@@ -315,38 +315,26 @@ exports.getTodayTasks = async (req, res) => {
       return res.status(401).json({ message: 'Unauthorized: No employee' });
     }
 
-    const TIMEZONE = 'Asia/Kolkata';
+    // Get today's date in ISO string format (e.g., "2025-06-21")
+    const todayDate = new Date().toISOString().substring(0, 10);
 
-    const localStart = startOfToday();       // e.g., 2025-06-21T00:00:00+05:30
-    const localEnd = endOfDay(localStart);   // e.g., 2025-06-21T23:59:59.999+05:30
+    // Fetch all tasks assigned to this employee (optionally limit date range if needed)
+    const tasks = await Task.find({ assignedTo: employee._id }).lean();
 
-    const startDateUtc = zonedTimeToUtc(localStart, TIMEZONE);
-    const endDateUtc = zonedTimeToUtc(localEnd, TIMEZONE);
+    // Filter tasks where either startDate or completionDate match today
+    const todayTasks = tasks.filter(task => {
+      const startDate = task.startDate?.toISOString().substring(0, 10);
+      const completionDate = task.completionDate?.toISOString().substring(0, 10);
+      return startDate === todayDate || completionDate === todayDate;
+    });
 
-    const tasks = await Task.find({
-      assignedTo: employee._id,
-      $or: [
-        {
-          startDate: {
-            $gte: startDateUtc,
-            $lte: endDateUtc,
-          },
-        },
-        {
-          completionDate: {
-            $gte: startDateUtc,
-            $lte: endDateUtc,
-          },
-        },
-      ],
-    }).sort({ createdAt: -1 });
-
-    return res.status(200).json(tasks);
+    return res.status(200).json(todayTasks);
   } catch (error) {
     console.error("Error getting today's tasks:", error);
     return res.status(500).json({ message: 'Internal Server Error' });
   }
 };
+
 
 
 
@@ -468,6 +456,11 @@ exports.getTaskByMonth = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+
+
+
+
 
 exports.getDistributors = async (req, res) => {
   try {
