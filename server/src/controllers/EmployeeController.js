@@ -275,6 +275,39 @@ exports.addTask = async (req, res) => {
   }
 };
 
+// exports.getTodayTasks = async (req, res) => {
+//   try {
+//     const employee = await EmployeeServices.getEmployeeByReq(req);
+//     if (!employee) {
+//       return res.status(401).json({ message: 'Unauthorized: No employee' });
+//     }
+
+//     // Set your actual timezone here, e.g., 'Asia/Kolkata'
+//     const TIMEZONE = 'Asia/Kolkata';
+
+//     // Local start and end of today
+//     const localStart = startOfToday(); // e.g., 2025-06-03T00:00:00.000 in local tz
+//     const localEnd = endOfDay(localStart); // e.g., 2025-06-03T23:59:59.999 in local tz
+
+//     // Convert to UTC for MongoDB query
+//     const startDateUtc = zonedTimeToUtc(localStart, TIMEZONE);
+//     const endDateUtc = zonedTimeToUtc(localEnd, TIMEZONE);
+
+//     const tasks = await Task.find({
+//       assignedTo: employee._id,
+//       startDate: {
+//         $gte: startDateUtc,
+//         $lte: endDateUtc,
+//       },
+//     }).sort({ createdAt: -1 });
+
+//     return res.status(200).json(tasks);
+//   } catch (error) {
+//     console.error('Error getting today\'s tasks:', error);
+//     return res.status(500).json({ message: 'Internal Server Error' });
+//   }
+// };
+
 exports.getTodayTasks = async (req, res) => {
   try {
     const employee = await EmployeeServices.getEmployeeByReq(req);
@@ -282,31 +315,44 @@ exports.getTodayTasks = async (req, res) => {
       return res.status(401).json({ message: 'Unauthorized: No employee' });
     }
 
-    // Set your actual timezone here, e.g., 'Asia/Kolkata'
     const TIMEZONE = 'Asia/Kolkata';
 
-    // Local start and end of today
-    const localStart = startOfToday(); // e.g., 2025-06-03T00:00:00.000 in local tz
-    const localEnd = endOfDay(localStart); // e.g., 2025-06-03T23:59:59.999 in local tz
+    const localStart = startOfToday();       // Today 00:00
+    const localEnd = endOfDay(localStart);   // Today 23:59:59.999
 
-    // Convert to UTC for MongoDB query
     const startDateUtc = zonedTimeToUtc(localStart, TIMEZONE);
     const endDateUtc = zonedTimeToUtc(localEnd, TIMEZONE);
 
     const tasks = await Task.find({
       assignedTo: employee._id,
-      startDate: {
-        $gte: startDateUtc,
-        $lte: endDateUtc,
-      },
+      $or: [
+        {
+          startDate: {
+            $gte: startDateUtc,
+            $lte: endDateUtc,
+          },
+        },
+        {
+          completionDate: {
+            $gte: startDateUtc,
+            $lte: endDateUtc,
+          },
+        },
+      ],
     }).sort({ createdAt: -1 });
 
     return res.status(200).json(tasks);
   } catch (error) {
-    console.error('Error getting today\'s tasks:', error);
+    console.error("Error getting today's tasks:", error);
     return res.status(500).json({ message: 'Internal Server Error' });
   }
 };
+
+
+
+
+
+
 
 exports.getPendingTasks = async (req, res) => {
   try {
@@ -380,12 +426,6 @@ exports.updateTasksStatus = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
-
-
-
-
-
 
 
 exports.getTaskByMonth = async (req, res) => {
