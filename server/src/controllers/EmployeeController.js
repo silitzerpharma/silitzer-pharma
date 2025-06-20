@@ -317,8 +317,8 @@ exports.getTodayTasks = async (req, res) => {
 
     const TIMEZONE = 'Asia/Kolkata';
 
-    const localStart = startOfToday();       // Today 00:00
-    const localEnd = endOfDay(localStart);   // Today 23:59:59.999
+    const localStart = startOfToday();       // e.g., 2025-06-21T00:00:00+05:30
+    const localEnd = endOfDay(localStart);   // e.g., 2025-06-21T23:59:59.999+05:30
 
     const startDateUtc = zonedTimeToUtc(localStart, TIMEZONE);
     const endDateUtc = zonedTimeToUtc(localEnd, TIMEZONE);
