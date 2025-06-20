@@ -16,13 +16,13 @@ import {
   IconButton,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import PlaceIcon from "@mui/icons-material/Place";
 import { format, differenceInMinutes, parseISO } from "date-fns";
-import EmployeedaysActivity from "../View/EmployeedaysActivity"; // adjust path
-import { reverseGeocode } from "../../../services/reverseGeocode"; // adjust path
+import EmployeedaysActivity from "../View/EmployeedaysActivity";
 import "./style/EmployeeWorkSessions.scss";
+import Loader from "../../common/Loader";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-import Loader from "../../common/Loader";
 
 const EmployeeWorkSessions = ({ employeeId }) => {
   const [sessions, setSessions] = useState([]);
@@ -34,65 +34,65 @@ const EmployeeWorkSessions = ({ employeeId }) => {
 
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedDay, setSelectedDay] = useState(null);
-
-  const [locationCache, setLocationCache] = useState({});
-
   const [loading, setLoading] = useState(false);
 
-const fetchSessions = async () => {
-  try {
-    setLoading(true);
-    let url = `${BASE_URL}/admin/employee/employee-work-sessions?employeeId=${employeeId}&page=${page}&limit=${limit}`;
-    if (startDate) url += `&startDate=${startDate}`;
-    if (endDate) url += `&endDate=${endDate}`;
+  const fetchSessions = async () => {
+    try {
+      setLoading(true);
+      let url = `${BASE_URL}/admin/employee/employee-work-sessions?employeeId=${employeeId}&page=${page}&limit=${limit}`;
+      if (startDate) url += `&startDate=${startDate}`;
+      if (endDate) url += `&endDate=${endDate}`;
 
-    const response = await fetch(url, {
-      credentials: 'include', // 👈 Important for sending cookies
-    });
+      const response = await fetch(url, {
+        credentials: "include",
+      });
 
-    const data = await response.json();
-
-    const sessionsData = data.workSessions || [];
-
-    setSessions(sessionsData);
-    setTotalDays(data.totalDays || 0);
-
-    // Fetch location names in parallel
-    for (const session of sessionsData) {
-      if (session.loginLocation) getLocationName(session.loginLocation);
-      if (session.logoutLocation) getLocationName(session.logoutLocation);
+      const data = await response.json();
+      setSessions(data.workSessions || []);
+      setTotalDays(data.totalDays || 0);
+    } catch (err) {
+      console.error("Error fetching sessions:", err);
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    console.error("Error fetching sessions:", err);
-  }
-  finally{
-    setLoading(false);
-  }
-};
-
+  };
 
   useEffect(() => {
     if (employeeId) fetchSessions();
   }, [employeeId, page]);
 
   const handleSearch = () => {
-    setPage(1); // Reset to first page when searching
+    setPage(1);
     fetchSessions();
   };
 
-  const getLocationName = async (location) => {
-    if (!location || !location.latitude || !location.longitude) return;
-    const key = `${location.latitude},${location.longitude}`;
-    if (locationCache[key]) return locationCache[key];
-    const name = await reverseGeocode(location.latitude, location.longitude);
-    setLocationCache((prev) => ({ ...prev, [key]: name }));
-    return name;
-  };
+  const handleDownload = async () => {
+    try {
+      let url = `${BASE_URL}/admin/employee/worksessions/download?employeeId=${employeeId}`;
+      if (startDate) url += `&startDate=${startDate}`;
+      if (endDate) url += `&endDate=${endDate}`;
 
-  const formatLocation = (location) => {
-    if (!location || !location.latitude || !location.longitude) return "N/A";
-    const key = `${location.latitude},${location.longitude}`;
-    return locationCache[key] || `Lat: ${location.latitude}, Lng: ${location.longitude}`;
+      const response = await fetch(url, {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (!response.ok) throw new Error("Failed to download file");
+
+      const blob = await response.blob();
+      const urlBlob = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = urlBlob;
+      a.download = `employee_work_sessions_${employeeId}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(urlBlob);
+    } catch (error) {
+      console.error("Download error:", error);
+      alert("Failed to download session data.");
+    }
   };
 
   const formatDateTime = (dateStr) => {
@@ -120,39 +120,7 @@ const fetchSessions = async () => {
     setSelectedDay(null);
   };
 
-const handleDownload = async () => {
-  try {
-    let url = `${BASE_URL}/admin/employee/worksessions/download?employeeId=${employeeId}`;
-    if (startDate) url += `&startDate=${startDate}`;
-    if (endDate) url += `&endDate=${endDate}`;
-
-    const response = await fetch(url, {
-      method: "GET",
-      credentials: "include", // important for cookies/session
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to download file");
-    }
-
-    const blob = await response.blob();
-    const urlBlob = window.URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = urlBlob;
-    a.download = `employee_work_sessions_${employeeId}.csv`; // or .xlsx depending on your backend
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    window.URL.revokeObjectURL(urlBlob);
-  } catch (error) {
-    console.error("Download error:", error);
-    alert("Failed to download session data.");
-  }
-};
-
-
-if (loading) return <Loader message="Loading Employee Work Sessions..." />;
+  if (loading) return <Loader message="Loading Employee Work Sessions..." />;
 
   return (
     <div className="employee-work-sessions">
@@ -163,17 +131,18 @@ if (loading) return <Loader message="Loading Employee Work Sessions..." />;
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-          />{" "}
-          To{" "}
+          />
+          {" "}To{" "}
           <input
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-          />{" "}
+          />
           <button onClick={handleSearch}>Search</button>
-          <button className="download-btn" onClick={handleDownload}>Download</button>
+          <button className="download-btn" onClick={handleDownload}>
+            Download
+          </button>
         </span>
-
       </Typography>
 
       <TableContainer component={Paper}>
@@ -197,13 +166,37 @@ if (loading) return <Loader message="Loading Employee Work Sessions..." />;
                   onClick={() => handleRowClick(session.date)}
                   style={{ cursor: "pointer" }}
                 >
-                  <TableCell>
-                    {format(parseISO(session.date), "d/M/yyyy")}
-                  </TableCell>
+                  <TableCell>{format(parseISO(session.date), "d/M/yyyy")}</TableCell>
                   <TableCell>{formatDateTime(session.loginTime)}</TableCell>
-                  <TableCell>{formatLocation(session.loginLocation)}</TableCell>
+                  <TableCell>
+                    {session.loginAddress || "N/A"}{" "}
+                    {session.loginLocation?.latitude && session.loginLocation?.longitude && (
+                      <IconButton
+                        size="small"
+                        href={`https://maps.google.com/?q=${session.loginLocation.latitude},${session.loginLocation.longitude}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        sx={{ padding: 0, marginLeft: 1 }}
+                      >
+                        <PlaceIcon fontSize="small" color="primary" />
+                      </IconButton>
+                    )}
+                  </TableCell>
                   <TableCell>{formatDateTime(session.logoutTime)}</TableCell>
-                  <TableCell>{formatLocation(session.logoutLocation)}</TableCell>
+                  <TableCell>
+                    {session.logoutAddress || "N/A"}{" "}
+                    {session.logoutLocation?.latitude && session.logoutLocation?.longitude && (
+                      <IconButton
+                        size="small"
+                        href={`https://maps.google.com/?q=${session.logoutLocation.latitude},${session.logoutLocation.longitude}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        sx={{ padding: 0, marginLeft: 1 }}
+                      >
+                        <PlaceIcon fontSize="small" color="primary" />
+                      </IconButton>
+                    )}
+                  </TableCell>
                   <TableCell>
                     {calculateWorkHours(session.loginTime, session.logoutTime)}
                   </TableCell>

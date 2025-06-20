@@ -30,6 +30,7 @@ const TaskSchema = new Schema({
   dueDate: { type: Date },
 
   completionDate: { type: Date },
+  completionAdreess:{type:String},
   completionLocation: {
     latitude: { type: Number },
     longitude: { type: Number },

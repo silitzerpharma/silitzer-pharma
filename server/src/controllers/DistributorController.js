@@ -39,12 +39,6 @@ exports.getAllProducts = async (req, res) => {
   }
 };
 
-
-
-
-
-
-
 exports.placeOrder = async (req, res) => {
   try {
     const {

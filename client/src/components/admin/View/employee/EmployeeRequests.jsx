@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./EmployeeRequests.scss";
+import "./style/EmployeeRequests.scss";
 import { format } from "date-fns";
 
 import Button from "@mui/material/Button";

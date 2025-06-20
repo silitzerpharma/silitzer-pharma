@@ -1,9 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import {
+  CircularProgress,
+  Alert,
+  Typography,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Box,
+} from "@mui/material";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import ReceiptIcon from "@mui/icons-material/Receipt";
+import PersonIcon from "@mui/icons-material/Person";
+import PaymentsIcon from "@mui/icons-material/Payments";
+import LocalMallIcon from "@mui/icons-material/LocalMall";
 import "./style/ViewOrder.scss";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
 
 const ViewOrder = () => {
   const params = useParams();
@@ -30,20 +45,38 @@ const ViewOrder = () => {
     fetchOrder();
   }, [params.id]);
 
-  if (loading) return <div className="view-order">Loading...</div>;
-  if (error) return <div className="view-order error">Error: {error}</div>;
-  if (!order) return <div className="view-order">No order found.</div>;
+  if (loading) {
+    return (
+      <div className="view-order loading">
+        <CircularProgress />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="view-order error">
+        <Alert severity="error">Error: {error}</Alert>
+      </div>
+    );
+  }
+
+  if (!order) {
+    return <div className="view-order">No order found.</div>;
+  }
 
   return (
     <div className="view-order">
-      <h2>Order Details</h2>
+      <Typography variant="h4" gutterBottom color="primary">
+        <ReceiptIcon sx={{ verticalAlign: "middle", marginRight: "0.5rem" }} />
+        Order Details
+      </Typography>
 
       <section className="section grid-two">
-        <div><strong>Order Number:</strong> {order.orderNumber}</div>
-        <div><strong>Order Date:</strong> {new Date(order.orderDate).toLocaleString()}</div>
-        <div><strong>Status:</strong> {order.status}</div>
-        <div><strong>Payment Status:</strong> {order.paymentStatus}</div>
-        <div><strong>Distributor:</strong> {order.distributor?.username || "N/A"}</div>
+        <div><AccessTimeIcon /> <strong>Order Date:</strong> {new Date(order.orderDate).toLocaleString()}</div>
+        <div><LocalMallIcon /> <strong>Status:</strong> {order.status}</div>
+        <div><PaymentsIcon /> <strong>Payment:</strong> {order.paymentStatus}</div>
+        <div><PersonIcon /> <strong>Distributor:</strong> {order.distributor?.username || "N/A"}</div>
         <div><strong>Subtotal:</strong> ₹{order.subtotal}</div>
         <div><strong>Net Amount:</strong> ₹{order.netAmount}</div>
         <div><strong>Received Amount:</strong> ₹{order.receivedAmount}</div>
@@ -51,32 +84,32 @@ const ViewOrder = () => {
       </section>
 
       <section className="section">
-        <h3>Instructions</h3>
+        <Typography variant="h6">Instructions</Typography>
         <p>{order.orderInstructions || "None"}</p>
       </section>
 
       <section className="section">
-        <h3>Product List</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Product Name</th>
-              <th>Quantity</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Typography variant="h6">Product List</Typography>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Product Name</TableCell>
+              <TableCell>Quantity</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
             {order.productList?.map((item, index) => (
-              <tr key={index}>
-                <td>{item.productId?.productName || "Unnamed Product"}</td>
-                <td>{item.quantity}</td>
-              </tr>
+              <TableRow key={index}>
+                <TableCell>{item.productId?.productName || "Unnamed Product"}</TableCell>
+                <TableCell>{item.quantity}</TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </section>
 
       <section className="section">
-        <h3>Status History</h3>
+        <Typography variant="h6">Status History</Typography>
         <ul>
           {order.statusHistory?.map((entry, index) => (
             <li key={index}>

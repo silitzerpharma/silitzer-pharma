@@ -6,6 +6,7 @@ import './style/ApproveOrder.scss';
 
 const ApproveOrder = ({ order, onBack, refreshProductList }) => {
   const [loading, setLoading] = useState(false);
+  const [orderLoading, setOrderLoading] = useState(false);
   const [orderData, setOrderData] = useState({});
   const [totalPurchaseCost, setTotalPurchaseCost] = useState(0);
   const [subtotal, setSubtotal] = useState(0);
@@ -20,6 +21,7 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 useEffect(() => {
   const fetchPendingOrders = async () => {
+    setOrderLoading(true);
     try {
       const response = await fetch(`${BASE_URL}/admin/getorder`, {
         method: 'POST',
@@ -31,6 +33,9 @@ useEffect(() => {
       setOrderData(data);
     } catch (err) {
       console.error('Error fetching pending orders:', err);
+    }
+    finally{
+      setOrderLoading(false)
     }
   };
 
@@ -144,7 +149,9 @@ useEffect(() => {
     }
   };
 
-  if (loading) return <Loader message={"Please wait, approving order..."} />;
+  if (loading) return <Loader message="Please wait, approving order..." />;
+ if (orderLoading) return <Loader message="Loading Order Details..." />; 
+
 
   return (
     <div className="approve-order">

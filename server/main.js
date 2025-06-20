@@ -26,7 +26,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 
 
-const FRONTEND_ORIGIN ="https://silitzerpharma.onrender.com" ;
+const FRONTEND_ORIGIN ="https://silitzerpharma.onrender.com";
 
 app.use(cors({
   origin: FRONTEND_ORIGIN,
@@ -80,9 +80,10 @@ async function startServer() {
     app.use('/admin', AuthMiddleware.protectAdmin, adminRoutes);
     app.use('/distributor', AuthMiddleware.protectDistributor, distributorRoutes);
     app.use('/employee', AuthMiddleware.protectEmployee, employeeRoutes);
-    app.get("/health", (req, res) => {
-      res.send("OK");
-      });
+
+
+
+
     // Start server
     const PORT = process.env.PORT || 3000;
     server.listen(PORT, () => {

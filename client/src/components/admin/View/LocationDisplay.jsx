@@ -1,52 +1,31 @@
-import React, { useEffect, useState } from "react";
-import { CircularProgress, Tooltip } from "@mui/material";
-import RoomIcon from "@mui/icons-material/Room";
+import React from "react";
+import { Box, IconButton, Typography, Tooltip } from "@mui/material";
+import PlaceIcon from "@mui/icons-material/Place";
 
-const LocationDisplay = ({ location }) => {
-  const [address, setAddress] = useState("");
-  const [loading, setLoading] = useState(false);
+const LocationDisplay = ({ address, latitude, longitude }) => {
+  if (!latitude || !longitude) return <Typography variant="body2">N/A</Typography>;
 
-  useEffect(() => {
-    if (location?.latitude && location?.longitude) {
-      setLoading(true);
-      fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.latitude}&lon=${location.longitude}`
-      )
-        .then((res) => res.json())
-        .then((data) => {
-          if (data?.display_name) {
-            setAddress(data.display_name);
-          } else {
-            setAddress(`Lat: ${location.latitude}, Lng: ${location.longitude}`);
-          }
-        })
-        .catch(() => {
-          setAddress(`Lat: ${location.latitude}, Lng: ${location.longitude}`);
-        })
-        .finally(() => setLoading(false));
-    } else {
-      setAddress("N/A");
-    }
-  }, [location]);
-
-  if (!location?.latitude || !location?.longitude) return <span>N/A</span>;
+  const locationText = address || `Lat: ${latitude}, Lng: ${longitude}`;
+  const mapUrl = `https://maps.google.com/?q=${latitude},${longitude}`;
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-      {loading ? (
-        <span>Loading address...</span>
-      ) : (
-        <Tooltip title={address}>
-          <a
-            href={`https://maps.google.com/?q=${location.latitude},${location.longitude}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <RoomIcon color="primary" />
-          </a>
-        </Tooltip>
-      )}
-    </div>
+    <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
+      <Typography variant="body2" sx={{ wordBreak: "break-word" }}>
+        {locationText}
+      </Typography>
+
+      <Tooltip title="View on Map">
+        <IconButton
+          size="small"
+          href={mapUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          sx={{ padding: 0 }}
+        >
+          <PlaceIcon color="primary" />
+        </IconButton>
+      </Tooltip>
+    </Box>
   );
 };
 

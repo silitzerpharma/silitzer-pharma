@@ -3,22 +3,21 @@ const Order = require('../models/OrderModel');
 const AuthServices = require('../services/AuthServices')
 const LoginSession = require('../models/employee/LoginSessionModel');
 const Employee = require('../models/EmployeeModel');
-const Product =require('../models/ProductModel');
+const Product = require('../models/ProductModel');
 const ProductOffer = require("../models/ProductOfferModel");
 const ProductSlider = require("../models/ProductSliderModel")
 const EmployeeServices = require('../services/EmployeeServices');
 const TaskServices = require('../services/TaskServices');
 const Task = require('../models/employee/TaskModel');
-const { startOfToday,endOfDay } = require('date-fns');
+const { startOfToday, endOfDay } = require('date-fns');
 const { zonedTimeToUtc } = require('date-fns-tz');
-const { endOfMonth,startOfDay } = require('date-fns');
+const { endOfMonth, startOfDay } = require('date-fns');
 const bcrypt = require("bcryptjs");
 const TaskCancelRequest = require("../models/employee/TaskCancelRequest");
-const {startOfMonth, format, addDays  } = require('date-fns');
+const { format, addDays } = require('date-fns');
 const LeaveRequest = require("../models/employee/LeaveRequestModel");
 const imagekit = require('../config/imagekit');
-
-
+const LocationService = require('../services/LocationServices')
 
 exports.login = async (req, res) => {
   const { latitude, longitude, deviceInfo } = req.body;
@@ -51,6 +50,13 @@ exports.login = async (req, res) => {
       return res.json({ message: 'Employee already active' });
     }
 
+    const address = await LocationService.getAddressFromLatLng(latitude, longitude)
+      .catch((err) => {
+        console.warn("Failed to fetch address:", err.message || err);
+        return "Unknown"; // fallback
+      });
+
+
     // Create and save login session
     const newSession = new LoginSession({
       employeeId,
@@ -60,7 +66,8 @@ exports.login = async (req, res) => {
       },
       deviceInfo: deviceInfo || 'Unknown Device',
       ipAddress: ip,
-      sessionId: `${employeeId}-${Date.now()}`
+      sessionId: `${employeeId}-${Date.now()}`,
+      loginAddress: address
     });
 
     await newSession.save();
@@ -90,7 +97,6 @@ exports.logout = async (req, res) => {
 
     const token = req.cookies.token;
 
-
     const userId = AuthServices.getUserIDByToken(token);
     if (!userId) {
       return res.status(401).json({ message: 'Unauthorized: no employeeId' });
@@ -116,9 +122,18 @@ exports.logout = async (req, res) => {
       return res.status(404).json({ message: 'Login session not found' });
     }
 
+    // Get logout address with fallback
+    let logoutAddress = 'Unknown';
+    try {
+      logoutAddress = await LocationService.getAddressFromLatLng(latitude, longitude);
+    } catch (error) {
+      console.warn('Reverse geocoding failed during logout:', error?.message || error);
+    }
+
     // Update the login session with logout details
     session.logoutTime = new Date();
     session.logoutLocation = { latitude, longitude };
+    session.logoutAddress = logoutAddress;
     await session.save();
 
     // Update employee state
@@ -139,28 +154,28 @@ exports.checkFieldActive = async (req, res) => {
     const token = req.cookies.token;
 
     if (!token) {
-      return res.status(401).json({ message: 'Unauthorized: No token',isActive: false });
+      return res.status(401).json({ message: 'Unauthorized: No token', isActive: false });
     }
 
     const userId = AuthServices.getUserIDByToken(token);
     if (!userId) {
-      return res.status(200).json({ message: 'Unauthorized: Invalid token or IP',isActive: false, });
+      return res.status(200).json({ message: 'Unauthorized: Invalid token or IP', isActive: false, });
     }
 
     const authUser = await AuthUser.findById(userId);
     if (!authUser || authUser.role !== 'employee' || authUser.roleModel !== 'Employee') {
-      return res.status(200).json({ message: 'Forbidden: Only employees allowed',isActive: false });
+      return res.status(200).json({ message: 'Forbidden: Only employees allowed', isActive: false });
     }
 
     const employeeId = authUser.refId;
     const employee = await Employee.findById(employeeId);
 
     if (!employee) {
-      return res.status(200).json({ message: 'Employee not found',isActive: false });
+      return res.status(200).json({ message: 'Employee not found', isActive: false });
     }
 
     if (employee.IsActive && employee.CurrentLogin) {
-      return res.status(200).json({ message: 'Employee is currently active',isActive: true});
+      return res.status(200).json({ message: 'Employee is currently active', isActive: true });
     }
 
     return res.status(200).json({
@@ -293,7 +308,6 @@ exports.getTodayTasks = async (req, res) => {
   }
 };
 
-
 exports.getPendingTasks = async (req, res) => {
   try {
     const employee = await EmployeeServices.getEmployeeByReq(req);
@@ -318,9 +332,6 @@ exports.getPendingTasks = async (req, res) => {
   }
 };
 
-
-
-
 exports.updateTasksStatus = async (req, res) => {
   try {
     const { status, location, task_id } = req.body;
@@ -338,7 +349,6 @@ exports.updateTasksStatus = async (req, res) => {
     if (status === 'Complete') {
       // Set the completion date
       task.completionDate = new Date();
-
       // Ensure location is provided and valid
       if (location && location.latitude && location.longitude) {
         task.completionLocation = {
@@ -348,8 +358,14 @@ exports.updateTasksStatus = async (req, res) => {
       } else {
         return res.status(400).json({ message: "Location required for completion" });
       }
-    }
+     const address = await LocationService.getAddressFromLatLng(location.latitude , location.longitude)
+      .catch((err) => {
+        console.warn("Failed to fetch address:", err.message || err);
+        return "Unknown"; // fallback
+      });
+     task.completionAdreess=address
 
+    }
     // Optional: Update statusHistory if tracking status changes manually
     task.statusHistory.push({
       status: task.status,
@@ -358,13 +374,19 @@ exports.updateTasksStatus = async (req, res) => {
 
     // Save the task
     await task.save();
-
     return res.json({ message: "Task status updated successfully" });
   } catch (error) {
     console.error("Error updating task status:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+
+
+
+
+
+
 
 exports.getTaskByMonth = async (req, res) => {
   try {
@@ -568,7 +590,6 @@ exports.getprofile = async (req, res) => {
   }
 };
 
-
 exports.updateProfile = async (req, res) => {
   try {
     const employee = await EmployeeServices.getEmployeeByReq(req);
@@ -644,9 +665,6 @@ exports.updateProfile = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
-
-
-
 
 exports.cancelTaskRequest = async (req, res) => {
   try {
@@ -803,7 +821,6 @@ exports.getEmployeeWorkByDay = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
 
 exports.saveEmployeeLeaveRequest = async (req, res) => {
   try {
@@ -986,8 +1003,8 @@ exports.saveLiveLocation = async (req, res) => {
     };
 
     await employee.save();
-   
-   EmployeeServices.updateEmployeeDataSocket(req)
+
+    EmployeeServices.updateEmployeeDataSocket(req)
 
     return res.json({ message: "Live location saved successfully" });
   } catch (error) {

@@ -1,4 +1,4 @@
-import './StockTransactionTable.scss';
+import './style/StockTransactionTable.scss';
 import React, { useState, useEffect } from 'react';
 import {
   Table, TableBody, TableCell, TableContainer, TableHead,

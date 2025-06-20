@@ -10,9 +10,6 @@ exports.checkuserlogin = async (req, res) => {
     const user = await getUserById(user_id);
     if (!user) { return res.status(401).json({ msg: "Invalid user or session" }); }
 
-  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-   await delay(3500);
-
     return res.status(200).json({ message: 'Login successful', user: { id: user._id, role: user.role,} });
   
   
@@ -28,7 +25,6 @@ exports.login = async (req, res) => {
   }
 
   const { username, password } = req.body;
-
   if (!username || !password) {
     return res.status(400).json({ msg: "All fields (username, password) are required" });
   }

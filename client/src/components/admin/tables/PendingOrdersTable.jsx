@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
-import "./PendingOrdersTable.scss";
+import "./style/PendingOrdersTable.scss";
 import "./style/Table.scss";
 import socket from "../../../store/socket";
+
+import Loader from "../../common/Loader";
 
 import {
   Table,
@@ -117,9 +119,9 @@ const fetchPendingOrders = async () => {
       {!showViewOrder ? (
         <>
           {loading ? (
-            <div className="loading-spinner">
-              <CircularProgress />
-            </div>
+         
+             <Loader message="Loading Pending Orders..." />
+          
           ) : (
             <TableContainer component={Paper} className="table-container">
               <Table aria-label="orders table">

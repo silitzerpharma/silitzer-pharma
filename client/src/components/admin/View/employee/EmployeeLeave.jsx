@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "./EmployeeLeave.scss";
+import "./style/EmployeeLeave.scss";
 
 const PAGE_SIZE = 5;
 

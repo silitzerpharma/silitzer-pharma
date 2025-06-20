@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './EmployeeProfile.scss';
+import './style/EmployeeProfile.scss';
 
 import { toast } from 'react-toastify';
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;

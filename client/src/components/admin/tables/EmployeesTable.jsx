@@ -1,14 +1,12 @@
 import { useState, useEffect } from "react";
 import "./style/EmployeesTable.scss";
 import "./style/Table.scss";
+
 import ViewEmployee from "../View/ViewEmployee";
-import AssignTask from "../form/AssignTask";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
-import IconButton from "@mui/material/IconButton";
 import Pagination from "@mui/material/Pagination";
 
 import socket from "../../../store/socket";
-
 import Loader from "../../common/Loader";
 
 import {
@@ -21,11 +19,12 @@ import {
   Paper,
   Switch,
   Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  Typography,
 } from "@mui/material";
+
+// Dialogs
+import AssignTaskDialog from "../View/employee/AssignTaskDialog";
+import LoginInfoDialog from "../View/employee/LoginInfoDialog";
+import TaskDetailsDialog from "../View/employee/TaskDetailsDialog";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -45,7 +44,6 @@ const EmployeesTable = ({ refreshEmployeesList, refreshFlag }) => {
   const [taskDialogOpen, setTaskDialogOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-
   const [loading, setLoading] = useState(true);
 
   const openViewEmployee = () => setViewEmployee((prev) => !prev);
@@ -65,39 +63,34 @@ const EmployeesTable = ({ refreshEmployeesList, refreshFlag }) => {
     setLoginInfoOpen(true);
   };
 
- const fetchEmployees = async () => {
-  try {
-    const res = await fetch(
-      `${BASE_URL}/admin/employee/all?search=${search}&page=${page}&limit=${limit}`,
-      {
-        credentials: 'include', // ✅ Send cookies for session authentication
-      }
-    );
+  const fetchEmployees = async () => {
+    try {
+      const res = await fetch(
+        `${BASE_URL}/admin/employee/all?search=${search}&page=${page}&limit=${limit}`,
+        { credentials: "include" }
+      );
+      const data = await res.json();
+      setTotal(data.total || 0);
 
-    const data = await res.json();
-    setTotal(data.total || 0);
-    
-    const formatted = data.employees.map((emp) => ({
-      employeeID: emp.EmployeeID || "-",
-      name: emp.username || "-",
-      isActive: emp.IsActive ?? false,
-      location: "-", // default value
-      task: emp.task || null,
-      employee_id: emp.employee_id,
-      employeeObjectId: emp.EmployeeObjectId,
-      todayLogin: emp.todayLogin || null,
-      lastLocation: emp.liveLocation,
-    }));
+      const formatted = data.employees.map((emp) => ({
+        employeeID: emp.EmployeeID || "-",
+        name: emp.username || "-",
+        isActive: emp.IsActive ?? false,
+        location: "-",
+        task: emp.task || null,
+        employee_id: emp.employee_id,
+        employeeObjectId: emp.EmployeeObjectId,
+        todayLogin: emp.todayLogin || null,
+        lastLocation: emp.liveLocation,
+      }));
 
-    setEmployees(formatted);
-  } catch (err) {
-    console.error("Failed to fetch employees:", err);
-  }
-  finally{
-    setLoading(false);
-  }
-};
-
+      setEmployees(formatted);
+    } catch (err) {
+      console.error("Failed to fetch employees:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchEmployees();
@@ -107,37 +100,16 @@ const EmployeesTable = ({ refreshEmployeesList, refreshFlag }) => {
     setPage(1);
   }, [search]);
 
- useEffect(() => {
-  const fetchAddress = async ({ latitude, longitude }, setAddress) => {
-    try {
-      if (!latitude || !longitude) return;
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
-      );
-      const data = await res.json();
-      setAddress(data.display_name || "Unknown location");
-    } catch (err) {
-      console.error("Failed to fetch address:", err);
-      setAddress("Failed to load location");
-    }
-  };
-
-  if (loginInfo?.loginLocation) {
-    fetchAddress(loginInfo.loginLocation, setLoginAddress);
-  }
-
-  if (loginInfo?.logoutLocation) {
-    fetchAddress(loginInfo.logoutLocation, setLogoutAddress);
-  }
-}, [loginInfo]);
+  useEffect(() => {
+    setLoginAddress(loginInfo?.loginAddress || "Unknown");
+    setLogoutAddress(loginInfo?.logoutAddress || "Unknown");
+  }, [loginInfo]);
 
   useEffect(() => {
     socket.on("updateEmployeeData", () => {
       setRefreshTrigger((prev) => prev + 1);
     });
-    return () => {
-      socket.off("updateEmployeeData");
-    };
+    return () => socket.off("updateEmployeeData");
   }, []);
 
   if (loading) return <Loader message="Loading Employees..." />;
@@ -220,13 +192,13 @@ const EmployeesTable = ({ refreshEmployeesList, refreshFlag }) => {
                           <LocationOnIcon fontSize="small" />
                           {employee.lastLocation?.timestamp
                             ? new Date(
-                              employee.lastLocation.timestamp
-                            ).toLocaleString("en-US", {
-                              weekday: "long",
-                              hour: "numeric",
-                              minute: "2-digit",
-                              hour12: true,
-                            })
+                                employee.lastLocation.timestamp
+                              ).toLocaleString("en-US", {
+                                weekday: "long",
+                                hour: "numeric",
+                                minute: "2-digit",
+                                hour12: true,
+                              })
                             : "-"}
                         </a>
                       ) : (
@@ -273,13 +245,7 @@ const EmployeesTable = ({ refreshEmployeesList, refreshFlag }) => {
               </TableBody>
             </Table>
           </TableContainer>
-          <div
-            style={{
-              marginTop: "1rem",
-              display: "flex",
-              justifyContent: "center",
-            }}
-          >
+          <div style={{ marginTop: "1rem", display: "flex", justifyContent: "center" }}>
             <Pagination
               count={Math.ceil(total / limit)}
               page={page}
@@ -290,157 +256,26 @@ const EmployeesTable = ({ refreshEmployeesList, refreshFlag }) => {
         </div>
       )}
 
-      {/* Assign Task Dialog */}
-      {selectedEmployee && (
-        <Dialog
-          open={assignTaskOpen}
-          onClose={() => setAssignTaskOpen(false)}
-          maxWidth="sm"
-          fullWidth
-        >
-          <AssignTask
-            employeeObjectId={selectedEmployee.employeeObjectId}
-            onClose={() => setAssignTaskOpen(false)}
-          />
-        </Dialog>
-      )}
+      {/* Dialogs */}
+      <AssignTaskDialog
+        open={assignTaskOpen}
+        onClose={() => setAssignTaskOpen(false)}
+        employeeObjectId={selectedEmployee?.employeeObjectId}
+      />
 
-      {/* Login Info Dialog */}
-      <Dialog
+      <LoginInfoDialog
         open={loginInfoOpen}
         onClose={() => setLoginInfoOpen(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>Today's Login Info</DialogTitle>
-        <DialogContent dividers>
-          {loginInfo ? (
-            <>
-              <Typography>
-                <strong>Login Time:</strong>{" "}
-                {new Date(loginInfo.loginTime).toLocaleString()}
-              </Typography>
-              <Typography>
-                <strong>Logout Time:</strong>{" "}
-                {loginInfo.logoutTime
-                  ? new Date(loginInfo.logoutTime).toLocaleString()
-                  : "-"}
-              </Typography>
-              <Typography>
-                <strong>Login Location:</strong>{" "}
-                {loginInfo.loginLocation?.latitude &&
-                  loginInfo.loginLocation?.longitude ? (
-                  <>
-                    {loginAddress ||
-                      `Lat: ${loginInfo.loginLocation.latitude}, Long: ${loginInfo.loginLocation.longitude}`}
-                    <IconButton
-                      onClick={() => {
-                        const { latitude, longitude } = loginInfo.loginLocation;
-                        window.open(
-                          `https://www.google.com/maps?q=${latitude},${longitude}`,
-                          "_blank"
-                        );
-                      }}
-                      size="small"
-                      color="primary"
-                    >
-                      <LocationOnIcon />
-                    </IconButton>
-                  </>
-                ) : (
-                  " -"
-                )}
-              </Typography>
-              <Typography>
-                <strong>Logout Location:</strong>{" "}
-                {loginInfo.logoutLocation?.latitude &&
-                  loginInfo.logoutLocation?.longitude ? (
-                  <>
-                    {logoutAddress ||
-                      `Lat: ${loginInfo.logoutLocation.latitude}, Long: ${loginInfo.logoutLocation.longitude}`}
-                    <IconButton
-                      onClick={() => {
-                        const { latitude, longitude } =
-                          loginInfo.logoutLocation;
-                        window.open(
-                          `https://www.google.com/maps?q=${latitude},${longitude}`,
-                          "_blank"
-                        );
-                      }}
-                      size="small"
-                      color="secondary"
-                    >
-                      <LocationOnIcon />
-                    </IconButton>
-                  </>
-                ) : (
-                  " -"
-                )}
-              </Typography>
-            </>
-          ) : (
-            <Typography>No login info available.</Typography>
-          )}
-        </DialogContent>
-      </Dialog>
+        loginInfo={loginInfo}
+        loginAddress={loginAddress}
+        logoutAddress={logoutAddress}
+      />
 
-      {/* Task Details Dialog */}
-      <Dialog
+      <TaskDetailsDialog
         open={taskDialogOpen}
         onClose={() => setTaskDialogOpen(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <div className="task-details-dialog">
-          <DialogTitle>Current Task Details</DialogTitle>
-          <DialogContent dividers>
-            {selectedTask ? (
-              <>
-                <div className="task-field">
-                  <strong>Title:</strong> <span>{selectedTask.title}</span>
-                </div>
-                <div className="task-field">
-                  <strong>Description:</strong>{" "}
-                  <span>{selectedTask.description || "-"}</span>
-                </div>
-                <div className="task-field">
-                  <strong>Status:</strong> <span>{selectedTask.status}</span>
-                </div>
-                <div className="task-field">
-                  <strong>Priority:</strong>{" "}
-                  <span>{selectedTask.priority}</span>
-                </div>
-                <div className="task-field">
-                  <strong>Start Date:</strong>{" "}
-                  <span>
-                    {selectedTask.startDate
-                      ? new Date(selectedTask.startDate).toLocaleString()
-                      : "-"}
-                  </span>
-                </div>
-                <div className="task-field">
-                  <strong>Due Date:</strong>{" "}
-                  <span>
-                    {selectedTask.dueDate
-                      ? new Date(selectedTask.dueDate).toLocaleString()
-                      : "-"}
-                  </span>
-                </div>
-                <div className="task-field">
-                  <strong>Address:</strong>{" "}
-                  <span>{selectedTask.address || "-"}</span>
-                </div>
-                <div className="task-field">
-                  <strong>Notes:</strong>{" "}
-                  <span>{selectedTask.notes || "-"}</span>
-                </div>
-              </>
-            ) : (
-              <Typography>No task data available.</Typography>
-            )}
-          </DialogContent>
-        </div>
-      </Dialog>
+        task={selectedTask}
+      />
     </>
   );
 };

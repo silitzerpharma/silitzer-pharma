@@ -613,7 +613,7 @@ exports.getEmployeeTodaysActivity = async (req, res) => {
     }).sort({ loginTime: 1 });
 
     return res.json({ tasks, sessions });
-
+   
   } catch (error) {
     console.error('Error fetching employee tasks or sessions for today:', error);
     return res.status(500).json({ error: 'Server error' });

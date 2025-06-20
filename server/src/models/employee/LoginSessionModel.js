@@ -11,11 +11,13 @@ const loginSessionSchema = new Schema({
     latitude: { type: Number, required: true },
     longitude: { type: Number, required: true }
   },
-
   logoutLocation: {
     latitude: { type: Number },
     longitude: { type: Number }
   },
+
+  loginAddress:{ type:String },
+  logoutAddress:{type:String},
 
   deviceInfo: { type: String },
   ipAddress: { type: String },
