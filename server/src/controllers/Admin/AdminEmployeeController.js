@@ -584,45 +584,6 @@ exports.removeEmployeeTask = async (req, res) => {
   }
 };
 
-// exports.getEmployeeTodaysActivity = async (req, res) => {
-//   try {
-//     const { employeeId } = req.body;
-
-//     if (!employeeId) {
-//       return res.status(400).json({ error: 'employeeId is required' });
-//     }
-
-//     const startOfToday = new Date();
-//     startOfToday.setHours(0, 0, 0, 0);
-
-//     const endOfToday = new Date();
-//     endOfToday.setHours(23, 59, 59, 999);
-
-//     const tasks = await Task.find({
-//       assignedTo: employeeId,
-//       $or: [
-//         {
-//           dueDate: { $gte: startOfToday, $lte: endOfToday }
-//         },
-//         {
-//           assignDate: { $gte: startOfToday, $lte: endOfToday },
-//           startDate: { $gte: startOfToday, $lte: endOfToday }
-//         }
-//       ]
-//     }).sort({ dueDate: 1 });
-
-//     const sessions = await LoginSession.find({
-//       employeeId,
-//       loginTime: { $gte: startOfToday, $lte: endOfToday }
-//     }).sort({ loginTime: 1 });
-
-//     return res.json({ tasks, sessions });
-   
-//   } catch (error) {
-//     console.error('Error fetching employee tasks or sessions for today:', error);
-//     return res.status(500).json({ error: 'Server error' });
-//   }
-// };
 
 
 
@@ -672,6 +633,7 @@ exports.getEmployeeTodaysActivity = async (req, res) => {
 exports.getEmployeedaysActivity = async (req, res) => {
   try {
     const { employeeId, day } = req.body;
+
     if (!employeeId || !day) {
       return res.status(400).json({ error: 'employeeId and day are required' });
     }
@@ -681,36 +643,39 @@ exports.getEmployeedaysActivity = async (req, res) => {
       return res.status(400).json({ error: 'Invalid day format' });
     }
 
-    // Start and end of the given day
-    const startOfDay = new Date(date);
-    startOfDay.setHours(0, 0, 0, 0);
+    const timeZone = 'Asia/Kolkata'; // IST
 
-    const endOfDay = new Date(date);
-    endOfDay.setHours(23, 59, 59, 999);
+    // Get the start and end of the day in IST
+    const startIST = startOfDay(date, { timeZone });
+    const endIST = endOfDay(date, { timeZone });
+
+    // Convert to UTC for querying MongoDB
+    const startUTC = zonedTimeToUtc(startIST, timeZone);
+    const endUTC = zonedTimeToUtc(endIST, timeZone);
 
     const tasks = await Task.find({
       assignedTo: employeeId,
       dueDate: {
-        $gte: startOfDay,
-        $lte: endOfDay
+        $gte: startUTC,
+        $lte: endUTC
       }
     }).sort({ dueDate: 1 });
 
     const sessions = await LoginSession.find({
       employeeId,
       loginTime: {
-        $gte: startOfDay,
-        $lte: endOfDay
+        $gte: startUTC,
+        $lte: endUTC
       }
     }).sort({ loginTime: 1 });
 
     return res.json({ tasks, sessions });
+
   } catch (error) {
     console.error('Error fetching employee tasks or sessions for the day:', error);
     return res.status(500).json({ error: 'Server error' });
   }
 };
-
 exports.getEmployeeWorkSessions = async (req, res) => {
   try {
     const { employeeId, page = 1, limit = 10, startDate, endDate } = req.query;
