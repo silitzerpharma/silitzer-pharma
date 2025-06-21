@@ -794,6 +794,7 @@ exports.getEmployeeWorkSessions = async (req, res) => {
 
     const pageNum = parseInt(page, 10);
     const limitNum = parseInt(limit, 10);
+
     if (isNaN(pageNum) || pageNum < 1 || isNaN(limitNum) || limitNum < 1) {
       return res.status(400).json({ error: 'Invalid pagination parameters' });
     }
@@ -803,58 +804,54 @@ exports.getEmployeeWorkSessions = async (req, res) => {
       return res.status(404).json({ error: 'Employee not found' });
     }
 
-    // Convert provided local dates to zoned Date objects
-    const fromLocal = startDate ? new Date(startDate) : employee.JoiningDate;
-    const toLocal = endDate ? new Date(endDate) : subDays(new Date(), 1);
+    // ✅ Convert startDate and endDate to IST then to UTC range
+    const istFrom = startDate ? new Date(startDate) : employee.JoiningDate;
+    const istTo = endDate ? new Date(endDate) : subDays(new Date(), 1);
 
-    const fromStartIST = startOfDay(fromLocal);
-    const toEndIST = endOfDay(toLocal);
+    const istStart = startOfDay(istFrom, { timeZone: TIMEZONE });
+    const istEnd = endOfDay(istTo, { timeZone: TIMEZONE });
 
-    // Convert to UTC to fetch from DB
-    const fromStartUTC = zonedTimeToUtc(fromStartIST, TIMEZONE);
-    const toEndUTC = zonedTimeToUtc(toEndIST, TIMEZONE);
+    const startDateUTC = zonedTimeToUtc(istStart, TIMEZONE);
+    const endDateUTC = zonedTimeToUtc(istEnd, TIMEZONE);
 
-    // Fetch all sessions in the given UTC range
+    // Get all IST-based days between range
+    const allDaysUTC = eachDayOfInterval({ start: startDateUTC, end: endDateUTC });
+
+    // Fetch all login sessions in UTC range
     const sessions = await LoginSession.find({
       employeeId: employee._id,
-      loginTime: { $gte: fromStartUTC, $lte: toEndUTC },
-    }).sort({ loginTime: 1 }).lean();
+      loginTime: { $gte: startDateUTC, $lte: endDateUTC },
+    })
+      .sort({ loginTime: 1 })
+      .lean();
 
-    // Group sessions by IST date
+    // ✅ Group sessions by IST date
     const sessionsByDate = {};
     sessions.forEach((session) => {
-      const loginIST = utcToZonedTime(new Date(session.loginTime), TIMEZONE);
-      const dateStr = format(loginIST, 'yyyy-MM-dd', { timeZone: TIMEZONE });
-
-      if (!sessionsByDate[dateStr]) {
-        sessionsByDate[dateStr] = [];
-      }
-      sessionsByDate[dateStr].push(session);
+      const istDate = format(utcToZonedTime(session.loginTime, TIMEZONE), 'yyyy-MM-dd');
+      if (!sessionsByDate[istDate]) sessionsByDate[istDate] = [];
+      sessionsByDate[istDate].push(session);
     });
 
-    // Create list of dates in the local range
-    const localDays = eachDayOfInterval({ start: fromStartIST, end: toEndIST });
-    const localDayStrings = localDays.map((day) =>
-      format(day, 'yyyy-MM-dd', { timeZone: TIMEZONE })
-    );
+    // ✅ Create all IST local date strings (reversed for latest-first pagination)
+    const allLocalDates = allDaysUTC.map((utcDay) =>
+      format(utcToZonedTime(utcDay, TIMEZONE), 'yyyy-MM-dd')
+    ).reverse();
 
-    // Reverse order to show latest first
-    const reversedDays = localDayStrings.reverse();
+    const totalDays = allLocalDates.length;
+    const pagedDates = allLocalDates.slice((pageNum - 1) * limitNum, pageNum * limitNum);
 
-    // Paginate
-    const pagedDays = reversedDays.slice((pageNum - 1) * limitNum, pageNum * limitNum);
-
-    // Prepare work sessions summary
-    const workSessions = pagedDays.map((dateStr) => {
+    const workSessions = pagedDates.map((dateStr) => {
       const daySessions = sessionsByDate[dateStr] || [];
-
       if (daySessions.length === 0) {
         return {
           date: dateStr,
           loginTime: null,
           loginLocation: null,
+          loginAddress: null,
           logoutTime: null,
           logoutLocation: null,
+          logoutAddress: null,
         };
       }
 
@@ -864,15 +861,17 @@ exports.getEmployeeWorkSessions = async (req, res) => {
       return {
         date: dateStr,
         loginTime: first.loginTime,
-        loginLocation: first.loginLocation,
+        loginLocation: first.loginLocation || null,
+        loginAddress: first.loginAddress || null,
         logoutTime: last.logoutTime || null,
         logoutLocation: last.logoutLocation || null,
+        logoutAddress: last.logoutAddress || null,
       };
     });
 
     return res.json({
       employeeId,
-      totalDays: localDayStrings.length,
+      totalDays,
       page: pageNum,
       limit: limitNum,
       workSessions,
@@ -882,6 +881,10 @@ exports.getEmployeeWorkSessions = async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 };
+
+
+
+
 
 exports.getEmployeeLeave = async (req, res) => {
   try {
