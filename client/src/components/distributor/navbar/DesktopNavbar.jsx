@@ -150,9 +150,3 @@ const DesktopNavbar = () => {
 
 export default DesktopNavbar;
 
-// <div class="navbar__actions">
-//   <div class="navbar__order">Order</div>
-//   <div class="navbar__order">Cart</div>
-//   <div class="navbar__profile">Profile</div>
-//   <div class="navbar__profile">Logout</div>
-// </div>

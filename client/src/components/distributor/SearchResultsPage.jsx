@@ -69,16 +69,16 @@ const SearchResultsPage = () => {
             {searchProducts.map((product) => (
               <li key={product._id} className="search-product-card">
                 <div className="img" onClick={() => handleProductClick(product._id)}>
-                  <img src={product.imageUrl || "/placeholder.png"} alt={product.productName} />
+                  <img src={product.imageUrl || "/images/default-product.jpg"} alt={product.productName} />
                 </div>
 
                 <div className="details">
                   <div className="title" onClick={() => handleProductClick(product._id)}>
                     {product.productName}
                   </div>
-                  <div className="units-per-box">
-                    Units per box: <strong>{product.unitsPerBox || "N/A"}</strong>
-                  </div>
+                  {product.unitsPerBox > 0 && (
+  <p className="units-info">Units per Box: {product.unitsPerBox}</p>
+)}
                   <div
                     className={`stock-status ${product.inStock ? "in-stock" : "out-of-stock"}`}
                   >

@@ -9,6 +9,8 @@ const imagekit = require('../../config/imagekit');
 
 
 
+
+
 exports.addProduct = async (req, res) => {
   try {
     const { productDetails, imageBase64, imageName } = req.body;
@@ -17,7 +19,7 @@ exports.addProduct = async (req, res) => {
       return res.status(400).json({ msg: 'Product name is required' });
     }
 
-    // Upload image to ImageKit (optional)
+    // === Upload image to ImageKit (optional) ===
     if (imageBase64 && imageName) {
       try {
         const uploadResponse = await imagekit.upload({
@@ -26,7 +28,7 @@ exports.addProduct = async (req, res) => {
           folder: "products",
         });
         productDetails.imageUrl = uploadResponse.url;
-        productDetails.imageFileId = uploadResponse.fileId; // ✅ Save fileId for future deletion
+        productDetails.imageFileId = uploadResponse.fileId;
       } catch (imgErr) {
         console.error("Image upload failed:", imgErr);
         return res.status(500).json({ msg: "Image upload failed" });
@@ -48,21 +50,18 @@ exports.addProduct = async (req, res) => {
       productDetails.manufactureDate = isNaN(mfg.getTime()) ? undefined : mfg;
     }
 
-    // === Quantity validation ===
-    if (productDetails.quantityPerPackage !== undefined && productDetails.quantityPerPackage !== "") {
-      const qty = parseInt(productDetails.quantityPerPackage, 10);
-      productDetails.quantityPerPackage = isNaN(qty) || qty < 1 ? undefined : qty;
-    }
+ 
 
     if (productDetails.unitsPerBox !== undefined && productDetails.unitsPerBox !== "") {
       const units = parseInt(productDetails.unitsPerBox, 10);
       productDetails.unitsPerBox = isNaN(units) || units < 0 ? undefined : units;
     }
 
+
     // === Stock logic ===
     const initialStock = parseInt(productDetails.stock, 10) || 0;
-    productDetails.inStock = initialStock > 0;
-    delete productDetails.stock;
+    productDetails.stock = initialStock; // ✅ Don't delete — needed for schema and pre-save logic
+    productDetails.inStock = initialStock > 0; // ✅ Ensure inStock is true if stock > 0
 
     // === Save product ===
     const newProduct = new Product(productDetails);
@@ -70,16 +69,6 @@ exports.addProduct = async (req, res) => {
 
     const warnings = [];
 
-    if (initialStock > 0) {
-      const success = await StockServices.updateStock(
-        newProduct._id,
-        initialStock,
-        'Initial stock on product creation'
-      );
-      if (!success) {
-        warnings.push("Failed to update stock for product");
-      }
-    }
 
     res.status(200).json({ msg: 'Product added successfully', warnings });
   } catch (error) {
@@ -87,8 +76,6 @@ exports.addProduct = async (req, res) => {
     res.status(500).json({ msg: 'Server error' });
   }
 };
-
-
 
 
 

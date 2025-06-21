@@ -20,7 +20,7 @@ exports.getAllProducts = async (req, res) => {
     // Step 1: Fetch products (only needed fields)
     const products = await Product.find(
       { isDeleted: false },
-      '_id productName inStock imageUrl'
+      '_id productName inStock imageUrl unitsPerBox'
     ).sort({ inStock: -1 }).lean(); // Use lean for performance
 
     // Step 2: Add offers to each product
@@ -202,7 +202,7 @@ exports.getDashboardData = async (req, res) => {
 
     // Fetch sliders with basic product info
     let sliders = await ProductSlider.find()
-      .populate('productList', '_id productName inStock imageUrl')
+      .populate('productList', '_id productName inStock imageUrl unitsPerBox')
       .lean();
 
     // Enrich each product with its applicable offers using the helper

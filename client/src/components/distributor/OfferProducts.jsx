@@ -105,7 +105,10 @@ useEffect(() => {
               <h3 className="product-name" title={product.productName}
                 onClick={() => handleProductClick(product._id)}
               >{product.productName}</h3>
-              <p className="units-info">Units per Box: {product.unitsPerBox}</p>
+             {product.unitsPerBox !== undefined && product.unitsPerBox !== null && product.unitsPerBox !== '' && (
+  <p className="units-info">Units per Box: {product.unitsPerBox}</p>
+)}
+
               <div className={`stock ${product.inStock ? 'in' : 'out'}`}>
                 {product.inStock ? 'In Stock' : 'Out of Stock'}
               </div>

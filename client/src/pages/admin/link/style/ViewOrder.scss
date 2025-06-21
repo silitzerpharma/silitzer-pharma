@@ -1,5 +1,5 @@
 .view-order {
-  padding: 1.5rem;
+  padding: 1rem 5rem;
   font-family: 'Segoe UI', sans-serif;
 
   h2, .MuiTypography-h4 {
@@ -20,11 +20,10 @@
   }
 
   .section {
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
 
     h3, .MuiTypography-h6 {
       font-size: 1.3rem;
-      margin-bottom: 0.8rem;
       color: #333;
     }
 
@@ -65,7 +64,6 @@
   .grid-two {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1rem;
 
     @media (max-width: 768px) {
       grid-template-columns: 1fr;

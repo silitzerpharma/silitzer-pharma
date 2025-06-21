@@ -12,10 +12,13 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
+  DialogActions,
   Typography,
   Snackbar,
   Alert,
   CircularProgress,
+  Button,
+  Divider,
 } from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import ArrowCircleRightIcon from "@mui/icons-material/ArrowCircleRight";
@@ -24,7 +27,6 @@ import BackspaceIcon from "@mui/icons-material/Backspace";
 import "./style/cart.scss";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
 
 const formatDate = (dateStr) => {
   if (!dateStr) return "";
@@ -44,20 +46,23 @@ const Cart = () => {
   const [message, setMessage] = useState(null);
   const [orderInstructions, setOrderInstructions] = useState("");
   const [openSuccessDialog, setOpenSuccessDialog] = useState(false);
+  const [openPreviewDialog, setOpenPreviewDialog] = useState(false);
   const [loading, setLoading] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [quantities, setQuantities] = useState({});
+
+  useEffect(() => {
+    const initial = {};
+    cart.forEach(item => {
+      initial[item._id] = String(item.quantity);
+    });
+    setQuantities(initial);
+  }, [cart]);
 
   const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
 
-  const handlePlaceOrder = async () => {
-    if (cart.length === 0) {
-      setMessage({
-        type: "error",
-        text: "Cart is empty. Add some products first.",
-      });
-      return;
-    }
-
+  const handleConfirmOrder = async () => {
+    setOpenPreviewDialog(false);
     setLoading(true);
 
     const productList = cart.map(({ _id, productName, quantity }) => ({
@@ -73,19 +78,16 @@ const Cart = () => {
     };
 
     try {
-      const response = await fetch(
-        `${BASE_URL}/distributor/placeorder`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ payload }),
-        }
-      );
+      const response = await fetch(`${BASE_URL}/distributor/placeorder`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ payload }),
+      });
 
       if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
 
-      const data = await response.json();
+      await response.json();
 
       dispatch(clearCart());
       setOrderInstructions("");
@@ -102,8 +104,21 @@ const Cart = () => {
     }
   };
 
- const handleProductClick = (productId) => {
+  const handleProductClick = (productId) => {
     navigate(`/distributor/product/${productId}`);
+  };
+
+  const handleQuantityInput = (id, value) => {
+    if (/^\d*$/.test(value)) {
+      setQuantities(prev => ({ ...prev, [id]: value }));
+      const num = parseInt(value, 10);
+      if (!isNaN(num) && num > 0) {
+        dispatch({
+          type: "cart/setQuantity",
+          payload: { productId: id, quantity: num },
+        });
+      }
+    }
   };
 
   return (
@@ -125,10 +140,7 @@ const Cart = () => {
             </div>
 
             {message && (
-              <div
-                className={`message ${message.type}`}
-                style={{ margin: "10px 0" }}
-              >
+              <div className={`message ${message.type}`} style={{ margin: "10px 0" }}>
                 {message.text}
               </div>
             )}
@@ -141,65 +153,47 @@ const Cart = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
               >
-              <div className="left" onClick={() => handleProductClick(product._id)}>
-  {product.image ? (
-    <img src={product.image} alt={product.productName} />
-  ) : (
-    <div className="no-image-placeholder">No Image</div>
-  )}
-</div>
+                <div className="left" onClick={() => handleProductClick(product._id)}>
+                  <img
+                    src={product.imageUrl || "/images/default-product.jpg"}
+                    alt={product.productName || "Product"}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "/images/default-product.png";
+                    }}
+                  />
+                </div>
 
                 <div className="right">
-                  <div className="cart-product-name"
-                  onClick={() => handleProductClick(product._id)}
-                  >{product.productName}</div>
+                  <div className="cart-product-name" onClick={() => handleProductClick(product._id)}>
+                    {product.productName}
+                  </div>
 
-                  {product.offers && product.offers.length > 0 && (
-                    <div className="product-offers">
-                      <strong>Offers:</strong>
-                      <ul>
-                        {product.offers.map((offer, i) => (
-                          <li key={i}>
-                            {offer.description}
-                            {offer.validTill && (
-                              <span
-                                style={{ fontSize: "0.85em", color: "#777" }}
-                              >
-                                {" "}
-                                (Valid till: {formatDate(offer.validTill)})
-                              </span>
-                            )}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                  {product.unitsPerBox > 0 && (
+                    <p className="units-info">Units per Box: {product.unitsPerBox}</p>
                   )}
 
                   <div className="inde">
                     <div className="qty-input">
                       <button
                         className="btn-decrease"
-                        onClick={() => dispatch(decreaseQuantity(product._id))}
+                        onClick={() => {
+                          if (product.quantity > 1) {
+                            dispatch(decreaseQuantity(product._id));
+                          }
+                        }}
                       >
                         -
                       </button>
+
                       <input
                         type="number"
                         min="1"
-                        value={product.quantity}
-                        onChange={(e) => {
-                          const val = parseInt(e.target.value, 10);
-                          if (isNaN(val) || val < 1) return;
-                          const diff = val - product.quantity;
-                          if (diff > 0) {
-                            for (let i = 0; i < diff; i++)
-                              dispatch(increaseQuantity(product._id));
-                          } else {
-                            for (let i = 0; i < -diff; i++)
-                              dispatch(decreaseQuantity(product._id));
-                          }
-                        }}
+                        value={quantities[product._id] || ""}
+                        onChange={(e) => handleQuantityInput(product._id, e.target.value)}
+                        placeholder="Qty 1"
                       />
+
                       <button
                         className="btn-increase"
                         onClick={() => dispatch(increaseQuantity(product._id))}
@@ -237,7 +231,7 @@ const Cart = () => {
               </p>
             </div>
             <div className="place-order-btn">
-              <button onClick={handlePlaceOrder} disabled={loading}>
+              <button onClick={() => setOpenPreviewDialog(true)} disabled={loading}>
                 {loading ? (
                   <CircularProgress size={22} style={{ color: "white" }} />
                 ) : (
@@ -255,11 +249,34 @@ const Cart = () => {
         </>
       )}
 
-      {/* ✅ Success Dialog */}
-      <Dialog
-        open={openSuccessDialog}
-        onClose={() => setOpenSuccessDialog(false)}
-      >
+      <Dialog open={openPreviewDialog} onClose={() => setOpenPreviewDialog(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Order Preview</DialogTitle>
+        <DialogContent dividers>
+          {cart.map((item) => (
+            <div key={item._id} style={{ display: "flex", gap: 12, marginBottom: 16 }}>
+              <img
+                src={item.imageUrl || "/images/default-product.jpg"}
+                alt={item.productName}
+                style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 6 }}
+              />
+              <div>
+                <Typography variant="subtitle1">{item.productName}</Typography>
+                <Typography variant="body2">Quantity: {item.quantity}</Typography>
+              </div>
+            </div>
+          ))}
+          <Divider sx={{ my: 2 }} />
+          <Typography variant="body2" color="text.secondary">
+            Instructions: {orderInstructions || "None"}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenPreviewDialog(false)}>Cancel</Button>
+          <Button variant="contained" onClick={handleConfirmOrder}>Confirm & Place Order</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={openSuccessDialog} onClose={() => setOpenSuccessDialog(false)}>
         <DialogTitle>
           <Typography
             variant="h6"
@@ -272,8 +289,7 @@ const Cart = () => {
         </DialogTitle>
         <DialogContent>
           <Typography variant="body1">
-            Thank you for your order. You can continue shopping or check your
-            orders.
+            Thank you for your order. You can continue shopping or check your orders.
           </Typography>
           <div style={{ marginTop: "16px", textAlign: "right" }}>
             <button
@@ -286,7 +302,6 @@ const Cart = () => {
         </DialogContent>
       </Dialog>
 
-      {/* ✅ Snackbar Toast */}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={4000}
