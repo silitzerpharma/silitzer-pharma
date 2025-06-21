@@ -678,6 +678,112 @@ exports.getEmployeedaysActivity = async (req, res) => {
     return res.status(500).json({ error: 'Server error' });
   }
 };
+
+
+
+// exports.getEmployeeWorkSessions = async (req, res) => {
+//   try {
+//     const { employeeId, page = 1, limit = 10, startDate, endDate } = req.query;
+
+//     if (!employeeId) {
+//       return res.status(400).json({ error: 'employeeId is required' });
+//     }
+
+//     const pageNum = parseInt(page, 10);
+//     const limitNum = parseInt(limit, 10);
+//     if (isNaN(pageNum) || pageNum < 1 || isNaN(limitNum) || limitNum < 1) {
+//       return res.status(400).json({ error: 'Invalid pagination parameters' });
+//     }
+
+//     const employee = await Employee.findById(employeeId);
+//     if (!employee) {
+//       return res.status(404).json({ error: 'Employee not found' });
+//     }
+
+//     // Date range logic
+//     const fromDate = startDate ? new Date(startDate) : employee.JoiningDate;
+//     const toDate = endDate ? new Date(endDate) : subDays(new Date(), 1);
+
+//     const startDateUTC = startOfDay(fromDate);
+//     const endDateUTC = endOfDay(toDate);
+
+//     // Get all days between selected range
+//     const allDaysUTC = eachDayOfInterval({ start: startDateUTC, end: endDateUTC });
+
+//     // Fetch all sessions in range
+//     const sessions = await LoginSession.find({
+//       employeeId: employee._id,
+//       loginTime: { $gte: startDateUTC, $lte: endDateUTC },
+//     })
+//       .sort({ loginTime: 1 })
+//       .lean();
+
+//     // Group by local date
+//     const sessionsByDate = {};
+//     sessions.forEach((session) => {
+//       const zonedLogin = utcToZonedTime(new Date(session.loginTime), TIMEZONE);
+//       const localDateStr = format(zonedLogin, 'yyyy-MM-dd', { timeZone: TIMEZONE });
+
+//       if (!sessionsByDate[localDateStr]) {
+//         sessionsByDate[localDateStr] = [];
+//       }
+//       sessionsByDate[localDateStr].push(session);
+//     });
+
+//     // Map UTC days to local date strings
+//     const allLocalDates = allDaysUTC.map((day) => {
+//       const zonedDay = utcToZonedTime(day, TIMEZONE);
+//       return format(zonedDay, 'yyyy-MM-dd', { timeZone: TIMEZONE });
+//     });
+
+//     // Reverse for latest first
+//     const reversedLocalDates = allLocalDates.slice().reverse();
+
+//     // Pagination
+//     const startIndex = (pageNum - 1) * limitNum;
+//     const endIndex = startIndex + limitNum;
+//     const pagedLocalDates = reversedLocalDates.slice(startIndex, endIndex);
+
+//     // Build response
+//     const workSessions = pagedLocalDates.map((dateStr) => {
+//       const daySessions = sessionsByDate[dateStr] || [];
+
+//       if (daySessions.length === 0) {
+//         return {
+//           date: dateStr,
+//           loginTime: null,
+//           loginLocation: null,
+//           logoutTime: null,
+//           logoutLocation: null,
+//         };
+//       }
+
+//       const firstSession = daySessions[0];
+//       const lastSession = daySessions[daySessions.length - 1];
+
+//       return {
+//         date: dateStr,
+//         loginTime: firstSession.loginTime,
+//         loginLocation: firstSession.loginLocation,
+//         logoutTime: lastSession.logoutTime || null,
+//         logoutLocation: lastSession.logoutLocation || null,
+//       };
+//     });
+
+//     return res.json({
+//       employeeId,
+//       totalDays: allLocalDates.length,
+//       page: pageNum,
+//       limit: limitNum,
+//       workSessions,
+//     });
+//   } catch (error) {
+//     console.error("Error fetching work sessions:", error);
+//     return res.status(500).json({ error: "Internal server error" });
+//   }
+// };
+
+
 exports.getEmployeeWorkSessions = async (req, res) => {
   try {
     const { employeeId, page = 1, limit = 10, startDate, endDate } = req.query;
@@ -697,17 +803,17 @@ exports.getEmployeeWorkSessions = async (req, res) => {
       return res.status(404).json({ error: 'Employee not found' });
     }
 
-    // Date range logic
-    const fromDate = startDate ? new Date(startDate) : employee.JoiningDate;
-    const toDate = endDate ? new Date(endDate) : subDays(new Date(), 1);
+    // Convert provided dates to UTC using IST boundaries
+    const fromDateLocal = startDate ? new Date(startDate) : employee.JoiningDate;
+    const toDateLocal = endDate ? new Date(endDate) : subDays(new Date(), 1);
 
-    const startDateUTC = startOfDay(fromDate);
-    const endDateUTC = endOfDay(toDate);
+    const startDateUTC = zonedTimeToUtc(startOfDay(fromDateLocal), TIMEZONE);
+    const endDateUTC = zonedTimeToUtc(endOfDay(toDateLocal), TIMEZONE);
 
-    // Get all days between selected range
-    const allDaysUTC = eachDayOfInterval({ start: startDateUTC, end: endDateUTC });
+    // Get all local days in the range
+    const localDays = eachDayOfInterval({ start: fromDateLocal, end: toDateLocal });
 
-    // Fetch all sessions in range
+    // Fetch all sessions in UTC but within local IST day bounds
     const sessions = await LoginSession.find({
       employeeId: employee._id,
       loginTime: { $gte: startDateUTC, $lte: endDateUTC },
@@ -715,10 +821,10 @@ exports.getEmployeeWorkSessions = async (req, res) => {
       .sort({ loginTime: 1 })
       .lean();
 
-    // Group by local date
+    // Group sessions by IST local date
     const sessionsByDate = {};
     sessions.forEach((session) => {
-      const zonedLogin = utcToZonedTime(new Date(session.loginTime), TIMEZONE);
+      const zonedLogin = utcToZonedTime(session.loginTime, TIMEZONE);
       const localDateStr = format(zonedLogin, 'yyyy-MM-dd', { timeZone: TIMEZONE });
 
       if (!sessionsByDate[localDateStr]) {
@@ -727,21 +833,17 @@ exports.getEmployeeWorkSessions = async (req, res) => {
       sessionsByDate[localDateStr].push(session);
     });
 
-    // Map UTC days to local date strings
-    const allLocalDates = allDaysUTC.map((day) => {
-      const zonedDay = utcToZonedTime(day, TIMEZONE);
-      return format(zonedDay, 'yyyy-MM-dd', { timeZone: TIMEZONE });
-    });
+    // Reverse the list to show most recent days first
+    const reversedLocalDates = localDays
+      .map((day) => format(day, 'yyyy-MM-dd'))
+      .reverse();
 
-    // Reverse for latest first
-    const reversedLocalDates = allLocalDates.slice().reverse();
-
-    // Pagination
+    // Pagination logic
     const startIndex = (pageNum - 1) * limitNum;
     const endIndex = startIndex + limitNum;
     const pagedLocalDates = reversedLocalDates.slice(startIndex, endIndex);
 
-    // Build response
+    // Build paginated work session list
     const workSessions = pagedLocalDates.map((dateStr) => {
       const daySessions = sessionsByDate[dateStr] || [];
 
@@ -769,14 +871,14 @@ exports.getEmployeeWorkSessions = async (req, res) => {
 
     return res.json({
       employeeId,
-      totalDays: allLocalDates.length,
+      totalDays: localDays.length,
       page: pageNum,
       limit: limitNum,
       workSessions,
     });
   } catch (error) {
-    console.error("Error fetching work sessions:", error);
-    return res.status(500).json({ error: "Internal server error" });
+    console.error('Error fetching work sessions:', error);
+    return res.status(500).json({ error: 'Internal server error' });
   }
 };
 
