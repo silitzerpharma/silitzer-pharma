@@ -19,6 +19,10 @@ const TaskServices = require('../../services/TaskServices')
 const { startOfToday, endOfToday,  startOfDay, endOfDay ,subDays, eachDayOfInterval, isSameDay} = require('date-fns');
 const { utcToZonedTime,format } = require('date-fns-tz');
 const TIMEZONE = 'Asia/Kolkata';
+const { zonedTimeToUtc } = require('date-fns-tz');
+const timeZone = 'Asia/Kolkata'; // IST timezone
+
+
 
 exports.addEmployee = async (req, res) => {
   const employeeDetails = req.body.employeeDetails;
@@ -580,6 +584,48 @@ exports.removeEmployeeTask = async (req, res) => {
   }
 };
 
+// exports.getEmployeeTodaysActivity = async (req, res) => {
+//   try {
+//     const { employeeId } = req.body;
+
+//     if (!employeeId) {
+//       return res.status(400).json({ error: 'employeeId is required' });
+//     }
+
+//     const startOfToday = new Date();
+//     startOfToday.setHours(0, 0, 0, 0);
+
+//     const endOfToday = new Date();
+//     endOfToday.setHours(23, 59, 59, 999);
+
+//     const tasks = await Task.find({
+//       assignedTo: employeeId,
+//       $or: [
+//         {
+//           dueDate: { $gte: startOfToday, $lte: endOfToday }
+//         },
+//         {
+//           assignDate: { $gte: startOfToday, $lte: endOfToday },
+//           startDate: { $gte: startOfToday, $lte: endOfToday }
+//         }
+//       ]
+//     }).sort({ dueDate: 1 });
+
+//     const sessions = await LoginSession.find({
+//       employeeId,
+//       loginTime: { $gte: startOfToday, $lte: endOfToday }
+//     }).sort({ loginTime: 1 });
+
+//     return res.json({ tasks, sessions });
+   
+//   } catch (error) {
+//     console.error('Error fetching employee tasks or sessions for today:', error);
+//     return res.status(500).json({ error: 'Server error' });
+//   }
+// };
+
+
+
 exports.getEmployeeTodaysActivity = async (req, res) => {
   try {
     const { employeeId } = req.body;
@@ -588,37 +634,40 @@ exports.getEmployeeTodaysActivity = async (req, res) => {
       return res.status(400).json({ error: 'employeeId is required' });
     }
 
-    const startOfToday = new Date();
-    startOfToday.setHours(0, 0, 0, 0);
+    const now = new Date();
+    const istStart = startOfDay(now, { timeZone });
+    const istEnd = endOfDay(now, { timeZone });
 
-    const endOfToday = new Date();
-    endOfToday.setHours(23, 59, 59, 999);
+    const startOfTodayUTC = zonedTimeToUtc(istStart, timeZone);
+    const endOfTodayUTC = zonedTimeToUtc(istEnd, timeZone);
 
     const tasks = await Task.find({
       assignedTo: employeeId,
       $or: [
         {
-          dueDate: { $gte: startOfToday, $lte: endOfToday }
+          dueDate: { $gte: startOfTodayUTC, $lte: endOfTodayUTC }
         },
         {
-          assignDate: { $gte: startOfToday, $lte: endOfToday },
-          startDate: { $gte: startOfToday, $lte: endOfToday }
+          assignDate: { $gte: startOfTodayUTC, $lte: endOfTodayUTC },
+          startDate: { $gte: startOfTodayUTC, $lte: endOfTodayUTC }
         }
       ]
     }).sort({ dueDate: 1 });
 
     const sessions = await LoginSession.find({
       employeeId,
-      loginTime: { $gte: startOfToday, $lte: endOfToday }
+      loginTime: { $gte: startOfTodayUTC, $lte: endOfTodayUTC }
     }).sort({ loginTime: 1 });
 
     return res.json({ tasks, sessions });
-   
+
   } catch (error) {
     console.error('Error fetching employee tasks or sessions for today:', error);
     return res.status(500).json({ error: 'Server error' });
   }
 };
+
+
 
 exports.getEmployeedaysActivity = async (req, res) => {
   try {
