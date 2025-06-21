@@ -803,48 +803,49 @@ exports.getEmployeeWorkSessions = async (req, res) => {
       return res.status(404).json({ error: 'Employee not found' });
     }
 
-    // Convert provided dates to UTC using IST boundaries
-    const fromDateLocal = startDate ? new Date(startDate) : employee.JoiningDate;
-    const toDateLocal = endDate ? new Date(endDate) : subDays(new Date(), 1);
+    // Convert provided local dates to zoned Date objects
+    const fromLocal = startDate ? new Date(startDate) : employee.JoiningDate;
+    const toLocal = endDate ? new Date(endDate) : subDays(new Date(), 1);
 
-    const startDateUTC = zonedTimeToUtc(startOfDay(fromDateLocal), TIMEZONE);
-    const endDateUTC = zonedTimeToUtc(endOfDay(toDateLocal), TIMEZONE);
+    const fromStartIST = startOfDay(fromLocal);
+    const toEndIST = endOfDay(toLocal);
 
-    // Get all local days in the range
-    const localDays = eachDayOfInterval({ start: fromDateLocal, end: toDateLocal });
+    // Convert to UTC to fetch from DB
+    const fromStartUTC = zonedTimeToUtc(fromStartIST, TIMEZONE);
+    const toEndUTC = zonedTimeToUtc(toEndIST, TIMEZONE);
 
-    // Fetch all sessions in UTC but within local IST day bounds
+    // Fetch all sessions in the given UTC range
     const sessions = await LoginSession.find({
       employeeId: employee._id,
-      loginTime: { $gte: startDateUTC, $lte: endDateUTC },
-    })
-      .sort({ loginTime: 1 })
-      .lean();
+      loginTime: { $gte: fromStartUTC, $lte: toEndUTC },
+    }).sort({ loginTime: 1 }).lean();
 
-    // Group sessions by IST local date
+    // Group sessions by IST date
     const sessionsByDate = {};
     sessions.forEach((session) => {
-      const zonedLogin = utcToZonedTime(session.loginTime, TIMEZONE);
-      const localDateStr = format(zonedLogin, 'yyyy-MM-dd', { timeZone: TIMEZONE });
+      const loginIST = utcToZonedTime(new Date(session.loginTime), TIMEZONE);
+      const dateStr = format(loginIST, 'yyyy-MM-dd', { timeZone: TIMEZONE });
 
-      if (!sessionsByDate[localDateStr]) {
-        sessionsByDate[localDateStr] = [];
+      if (!sessionsByDate[dateStr]) {
+        sessionsByDate[dateStr] = [];
       }
-      sessionsByDate[localDateStr].push(session);
+      sessionsByDate[dateStr].push(session);
     });
 
-    // Reverse the list to show most recent days first
-    const reversedLocalDates = localDays
-      .map((day) => format(day, 'yyyy-MM-dd'))
-      .reverse();
+    // Create list of dates in the local range
+    const localDays = eachDayOfInterval({ start: fromStartIST, end: toEndIST });
+    const localDayStrings = localDays.map((day) =>
+      format(day, 'yyyy-MM-dd', { timeZone: TIMEZONE })
+    );
 
-    // Pagination logic
-    const startIndex = (pageNum - 1) * limitNum;
-    const endIndex = startIndex + limitNum;
-    const pagedLocalDates = reversedLocalDates.slice(startIndex, endIndex);
+    // Reverse order to show latest first
+    const reversedDays = localDayStrings.reverse();
 
-    // Build paginated work session list
-    const workSessions = pagedLocalDates.map((dateStr) => {
+    // Paginate
+    const pagedDays = reversedDays.slice((pageNum - 1) * limitNum, pageNum * limitNum);
+
+    // Prepare work sessions summary
+    const workSessions = pagedDays.map((dateStr) => {
       const daySessions = sessionsByDate[dateStr] || [];
 
       if (daySessions.length === 0) {
@@ -857,28 +858,28 @@ exports.getEmployeeWorkSessions = async (req, res) => {
         };
       }
 
-      const firstSession = daySessions[0];
-      const lastSession = daySessions[daySessions.length - 1];
+      const first = daySessions[0];
+      const last = daySessions[daySessions.length - 1];
 
       return {
         date: dateStr,
-        loginTime: firstSession.loginTime,
-        loginLocation: firstSession.loginLocation,
-        logoutTime: lastSession.logoutTime || null,
-        logoutLocation: lastSession.logoutLocation || null,
+        loginTime: first.loginTime,
+        loginLocation: first.loginLocation,
+        logoutTime: last.logoutTime || null,
+        logoutLocation: last.logoutLocation || null,
       };
     });
 
     return res.json({
       employeeId,
-      totalDays: localDays.length,
+      totalDays: localDayStrings.length,
       page: pageNum,
       limit: limitNum,
       workSessions,
     });
   } catch (error) {
-    console.error('Error fetching work sessions:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    console.error("Error fetching work sessions:", error);
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 
