@@ -592,12 +592,16 @@ exports.getEmployeeTodaysActivity = async (req, res) => {
     const { employeeId } = req.body;
 
     if (!employeeId) {
-      return res.status(400).json({ error: 'employeeId is required' });
+      return res.status(400).json({ error: "employeeId is required" });
     }
 
+    const timeZone = "Asia/Kolkata";
+
     const now = new Date();
-    const istStart = startOfDay(now, { timeZone });
-    const istEnd = endOfDay(now, { timeZone });
+    const zonedNow = utcToZonedTime(now, timeZone); // Convert current UTC time to IST
+
+    const istStart = startOfDay(zonedNow);
+    const istEnd = endOfDay(zonedNow);
 
     const startOfTodayUTC = zonedTimeToUtc(istStart, timeZone);
     const endOfTodayUTC = zonedTimeToUtc(istEnd, timeZone);
@@ -605,28 +609,26 @@ exports.getEmployeeTodaysActivity = async (req, res) => {
     const tasks = await Task.find({
       assignedTo: employeeId,
       $or: [
-        {
-          dueDate: { $gte: startOfTodayUTC, $lte: endOfTodayUTC }
-        },
-        {
-          assignDate: { $gte: startOfTodayUTC, $lte: endOfTodayUTC },
-          startDate: { $gte: startOfTodayUTC, $lte: endOfTodayUTC }
-        }
-      ]
+        { dueDate: { $gte: startOfTodayUTC, $lte: endOfTodayUTC } },
+        { assignDate: { $gte: startOfTodayUTC, $lte: endOfTodayUTC } },
+        { startDate: { $gte: startOfTodayUTC, $lte: endOfTodayUTC } },
+      ],
     }).sort({ dueDate: 1 });
 
     const sessions = await LoginSession.find({
       employeeId,
-      loginTime: { $gte: startOfTodayUTC, $lte: endOfTodayUTC }
+      loginTime: { $gte: startOfTodayUTC, $lte: endOfTodayUTC },
     }).sort({ loginTime: 1 });
 
     return res.json({ tasks, sessions });
 
   } catch (error) {
-    console.error('Error fetching employee tasks or sessions for today:', error);
-    return res.status(500).json({ error: 'Server error' });
+    console.error("Error fetching employee tasks or sessions for today:", error);
+    return res.status(500).json({ error: "Server error" });
   }
 };
+
+
 
 
 

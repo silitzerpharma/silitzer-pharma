@@ -1,55 +1,25 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Box,
   Typography,
   Button,
   Divider,
-  Paper,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogContentText,
   DialogActions,
 } from "@mui/material";
-import { NavLink, useOutletContext } from "react-router-dom";
-import { MdLocationPin } from "react-icons/md";
+import { useOutletContext } from "react-router-dom";
 import { toast } from "react-toastify";
 import Loader from "../../components/common/Loader";
+import TodaysLoginSession from "../../components/employee/TodaysLoginSession"; // ✅ New component
 import "./style/EmployeeTodayLogin.scss";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-const getMapLink = (lat, lng) => `https://www.google.com/maps?q=${lat},${lng}`;
-
-const SessionLocation = ({ label, location }) => {
-  if (!location?.latitude || !location?.longitude) return null;
-  return (
-    <Typography variant="body2" color="textSecondary" gutterBottom>
-      <strong>{label}:</strong>{" "}
-      <a
-        href={getMapLink(location.latitude, location.longitude)}
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{ textDecoration: "none", color: "inherit" }}
-      >
-        <MdLocationPin style={{ color: "red", verticalAlign: "middle" }} />
-        {" " + location.latitude + "," + location.longitude}
-      </a>
-    </Typography>
-  );
-};
-
-const getDuration = (start, end) => {
-  if (!start) return "—";
-  const diff = new Date(end || Date.now()) - new Date(start);
-  if (diff < 0) return "—";
-  const s = Math.floor(diff / 1000);
-  return `${String(Math.floor(s / 3600)).padStart(2, "0")}:${String(Math.floor((s % 3600) / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
-};
-
 const EmployeeTodayLogin = () => {
-  const [sessions, setSessions] = useState([]);
-  const { isActive, setIsActive, setLocationError } = useOutletContext(); // ✅ include locationError setter
+  const { isActive, setIsActive, setLocationError } = useOutletContext();
   const [loading, setLoading] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
@@ -61,7 +31,7 @@ const EmployeeTodayLogin = () => {
   const latestLocation = useRef(null);
 
   useEffect(() => {
-    fetchSession();
+    fetchLoginStatus();
     return stopLiveLocation;
   }, []);
 
@@ -73,7 +43,7 @@ const EmployeeTodayLogin = () => {
           clearInterval(interval);
           setGeoDialogOpen(false);
           toast.error("Failed to get location: timeout");
-          setLocationError(true); // ✅ set error
+          setLocationError(true);
         }
         return prev - 1;
       });
@@ -81,7 +51,7 @@ const EmployeeTodayLogin = () => {
     return () => clearInterval(interval);
   }, [geoDialogOpen]);
 
-  const fetchSession = async () => {
+  const fetchLoginStatus = async () => {
     try {
       setLoading(true);
       const res = await fetch(`${BASE_URL}/employee/todaylogin`, {
@@ -89,10 +59,9 @@ const EmployeeTodayLogin = () => {
       });
       const data = await res.json();
       setIsActive(data.isActive);
-      setSessions(data.allSessions || []);
       if (data.isActive) startLiveLocation();
     } catch {
-      toast.error("Failed to fetch session info.");
+      toast.error("Failed to check login status.");
     } finally {
       setLoading(false);
     }
@@ -102,11 +71,11 @@ const EmployeeTodayLogin = () => {
     new Promise((resolve, reject) => {
       navigator.geolocation.getCurrentPosition(
         ({ coords }) => {
-          setLocationError(false); // ✅ clear error on success
+          setLocationError(false);
           resolve(coords);
         },
         (err) => {
-          setLocationError(true); // ✅ set error on failure
+          setLocationError(true);
           reject(new Error("Location error: " + err.message));
         },
         { enableHighAccuracy: true, timeout: 15000 }
@@ -132,11 +101,11 @@ const EmployeeTodayLogin = () => {
       ({ coords }) => {
         latestLocation.current = coords;
         sendLiveLocation(coords.latitude, coords.longitude);
-        setLocationError(false); // ✅ clear error
+        setLocationError(false);
       },
       (err) => {
         console.error("watchPosition error:", err.message);
-        setLocationError(true); // ✅ set error
+        setLocationError(true);
       },
       { enableHighAccuracy: true, maximumAge: 10000 }
     );
@@ -182,7 +151,7 @@ const EmployeeTodayLogin = () => {
         toast.success("Logout successful.");
       }
 
-      await fetchSession();
+      await fetchLoginStatus();
     } catch (err) {
       setGeoDialogOpen(false);
       toast.error(err.message || "Something went wrong.");
@@ -216,29 +185,8 @@ const EmployeeTodayLogin = () => {
 
       <Divider sx={{ my: 2 }} />
 
-      {sessions.length === 0 ? (
-        <Typography variant="body2" color="textSecondary">No login sessions for today.</Typography>
-      ) : (
-        sessions.map((s, i) => {
-          const active = isActive && i === 0 && !s.logoutTime;
-          return (
-            <Paper key={i} variant="outlined" sx={{ p: 2, mb: 2, bgcolor: active ? "#e0ffe0" : undefined }}>
-              <Typography variant="subtitle1" fontWeight={active ? "bold" : "normal"}>
-                Session #{sessions.length - i} {active && "(Active)"}
-              </Typography>
-              <Typography variant="body2">Login Time: {s.loginTime ? new Date(s.loginTime).toLocaleTimeString() : "—"}</Typography>
-              <SessionLocation label="Login Location" location={s.loginLocation} />
-              <Typography variant="body2">Logout Time: {s.logoutTime ? new Date(s.logoutTime).toLocaleTimeString() : "—"}</Typography>
-              <SessionLocation label="Logout Location" location={s.logoutLocation} />
-              <Typography variant="body2">Duration: {getDuration(s.loginTime, s.logoutTime)}</Typography>
-            </Paper>
-          );
-        })
-      )}
-
-      <NavLink to="/employee/tasks" className="nav-link" style={{ marginTop: 16, display: "inline-block" }}>
-        👉 See Today’s Tasks
-      </NavLink>
+      {/* ✅ New component to render session details */}
+      <TodaysLoginSession />
 
       {/* Confirm Dialog */}
       <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
