@@ -5,7 +5,7 @@ import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import Skeleton from "@mui/material/Skeleton";
 import { motion } from "framer-motion";
-import "./style/Allproductlist.scss";
+import "./style/allproductlist.scss";
 import { useNavigate } from "react-router-dom";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
