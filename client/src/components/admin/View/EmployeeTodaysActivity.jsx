@@ -28,9 +28,11 @@ const LocationDisplay = ({ address, lat, lon }) => {
 
 const EmployeeTodaysActivity = ({ employeeId }) => {
   const [tasks, setTasks] = useState([]);
+  const [pendingTasks, setPendingTasks] = useState([]);
   const [sessions, setSessions] = useState([]);
   const [selectedTask, setSelectedTask] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("today"); // "today" | "pending"
 
   useEffect(() => {
     if (!employeeId) return;
@@ -49,6 +51,7 @@ const EmployeeTodaysActivity = ({ employeeId }) => {
 
         const data = await res.json();
         setTasks(data.tasks || []);
+        setPendingTasks(data.pendingTasks || []);
         setSessions(data.sessions || []);
       } catch (err) {
         console.error("Error fetching today's activity:", err);
@@ -60,15 +63,12 @@ const EmployeeTodaysActivity = ({ employeeId }) => {
     fetchTodaysActivity();
   }, [employeeId]);
 
-  const handleClick = (task) => {
-    setSelectedTask(task);
-  };
-
-  const handleClose = () => {
-    setSelectedTask(null);
-  };
+  const handleClick = (task) => setSelectedTask(task);
+  const handleClose = () => setSelectedTask(null);
 
   if (loading) return <Loader message="Loading EmployeeTodaysActivity..." />;
+
+  const displayedTasks = activeTab === "today" ? tasks : pendingTasks;
 
   return (
     <div className="EmployeeTodaysActivity">
@@ -76,10 +76,28 @@ const EmployeeTodaysActivity = ({ employeeId }) => {
 
       <div className="EmployeeTodaysActivity-row">
         <div className="row-col-left">
-          <div className="row-title">Today's Tasks</div>
+          <div className="row-title">Tasks</div>
+
+          <div className="task-tabs">
+            <button
+              className={`task-tab ${activeTab === "today" ? "active" : ""}`}
+              onClick={() => setActiveTab("today")}
+            >
+              Today's Tasks
+            </button>
+            <button
+              className={`task-tab ${activeTab === "pending" ? "active" : ""}`}
+              onClick={() => setActiveTab("pending")}
+            >
+              Pending Tasks
+            </button>
+          </div>
+
           <ul className="emp-task-list">
-            {tasks.length === 0 && <li>No tasks for today</li>}
-            {tasks.map((task) => (
+            {displayedTasks.length === 0 && (
+              <li>{activeTab === "today" ? "No tasks for today" : "No pending tasks"}</li>
+            )}
+            {displayedTasks.map((task) => (
               <li key={task._id} onClick={() => handleClick(task)} style={{ cursor: "pointer" }}>
                 <div><strong>Title:</strong> {task.title}</div>
                 <div><strong>Status:</strong> {task.status}</div>

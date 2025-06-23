@@ -29,6 +29,12 @@ const dispatch = useDispatch();
     }
   };
 
+  const handleSearch = () => {
+    if (searchQuery.trim() !== "") {
+      navigate(`search?query=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
   // Close profile menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -118,7 +124,7 @@ const dispatch = useDispatch();
 
       <div className="mobile-nav-2">
         <div className="search-input-container">
-          <FiSearch className="search-icon" />
+          <FiSearch className="search-icon" onClick={handleSearch} />
           <input
             type="text"
             placeholder="What are you looking for?"

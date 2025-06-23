@@ -1,137 +1,4 @@
-// .order-table-container {
-//   margin: 5rem auto;
-//   padding: 20px;
-//   max-width: 1000px;
-//   background: #fff;
-//   border-radius: 10px;
-//   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-// }
 
-// .order-table {
-//   width: 100%;
-//   border-collapse: collapse;
-//   margin-top: 20px;
-// }
-
-// .order-table th,
-// .order-table td {
-//   padding: 12px 15px;
-//   text-align: left;
-//   border-bottom: 1px solid #ddd;
-// }
-
-// .order-table th {
-//   background-color: #f4f4f4;
-//   font-weight: 600;
-//   color: #333;
-// }
-
-// .order-row {
-//   cursor: pointer;
-//   transition: background-color 0.3s ease;
-// }
-
-// .order-row:hover {
-//   background-color: #f9f9f9;
-// }
-
-// .product-details-row td {
-//   background-color: #f0f8ff;
-//   padding: 15px;
-// }
-
-// .product-details {
-//   padding: 10px;
-//   font-size: 14px;
-//   color: #333;
-// }
-
-// .product-details ul {
-//   margin-top: 10px;
-//   padding-left: 20px;
-// }
-
-// .product-details li {
-//   line-height: 1.6;
-// }
-
-// .paid {
-//   color: green;
-//   font-weight: bold;
-// }
-
-// .pending {
-//   color: orange;
-//   font-weight: bold;
-// }
-
-// .status {
-//   font-weight: bold;
-//   text-transform: capitalize;
-// }
-
-// .status.processing {
-//   color: #007bff;
-// }
-
-// .status.shipped {
-//   color: #17a2b8;
-// }
-
-// .status.delivered {
-//   color: #28a745;
-// }
-
-// @media (max-width: 768px) {
-//   .order-table-container {
-//     padding: 10px;
-//   }
-
-//   .order-table th,
-//   .order-table td {
-//     font-size: 12px;
-//     padding: 8px 10px;
-//   }
-
-//   .order-table th {
-//     font-size: 13px;
-//   }
-
-//   .product-details {
-//     font-size: 12px;
-//     padding: 8px;
-//   }
-
-//   .product-details li {
-//     line-height: 1.4;
-//   }
-
-//   h2 {
-//     font-size: 18px;
-//     margin-bottom: 10px;
-//   }
-
-//   .status,
-//   .paid,
-//   .pending {
-//     font-size: 12px;
-//   }
-// }
-// @media (max-width: 480px) {
-//   .order-table th,
-//   .order-table td {
-//     font-size: 11px;
-//     padding: 6px 8px;
-//   }
-
-//   .product-details {
-//     font-size: 11px;
-//   }
-
-//   h2 {
-//     font-size: 16px;
-//   }
-// }
 
 .modern-orders-container {
   max-width: 900px;
@@ -198,8 +65,14 @@
       padding: 0.2rem 0.6rem;
       border-radius: 12px;
       font-size: 0.85rem;
-      color: #fff;
+      color:#fff;
 
+      &.approved{
+        background-color: rgb(14, 163, 14);
+      }
+      &.pending{
+       background-color: #e9e6d3;
+      }
       &.processing {
         background-color: #007bff;
       }
@@ -207,7 +80,7 @@
         background-color: #17a2b8;
       }
       &.delivered {
-        background-color: #28a745;
+        background-color: darkgreen;
       }
       &.cancelled {
         background-color: #dc3545;

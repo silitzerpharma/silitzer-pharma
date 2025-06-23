@@ -2,6 +2,10 @@ import { Outlet } from "react-router-dom";
 import EmployeeNavbar from "../components/employee/EmployeeNavbar";
 import { useState, useEffect } from "react";
 
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+
 const EmployeeLayout = () => {
   const [isActive, setIsActive] = useState(false);
   const [locationError, setLocationError] = useState(false); // ✅ NEW STATE
@@ -9,7 +13,7 @@ const EmployeeLayout = () => {
   useEffect(() => {
     const checkLogin = async () => {
       try {
-        const res = await fetch("http://localhost:3000/employee/fieldactive", {
+        const res = await fetch(`${BASE_URL}/employee/fieldactive`, {
           method: "POST",
           credentials: "include",
         });

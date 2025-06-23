@@ -583,10 +583,6 @@ exports.removeEmployeeTask = async (req, res) => {
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
-
-
-
-
 exports.getEmployeeTodaysActivity = async (req, res) => {
   try {
     const { employeeId } = req.body;
@@ -596,9 +592,8 @@ exports.getEmployeeTodaysActivity = async (req, res) => {
     }
 
     const timeZone = "Asia/Kolkata";
-
     const now = new Date();
-    const zonedNow = utcToZonedTime(now, timeZone); // Convert current UTC time to IST
+    const zonedNow = utcToZonedTime(now, timeZone);
 
     const istStart = startOfDay(zonedNow);
     const istEnd = endOfDay(zonedNow);
@@ -606,30 +601,31 @@ exports.getEmployeeTodaysActivity = async (req, res) => {
     const startOfTodayUTC = zonedTimeToUtc(istStart, timeZone);
     const endOfTodayUTC = zonedTimeToUtc(istEnd, timeZone);
 
+    // 🔹 Filter out Complete & Cancelled
+    const excludedStatuses = ["Complete", "Cancelled"];
+
     const tasks = await Task.find({
       assignedTo: employeeId,
-      $or: [
-        { dueDate: { $gte: startOfTodayUTC, $lte: endOfTodayUTC } },
-        { assignDate: { $gte: startOfTodayUTC, $lte: endOfTodayUTC } },
-        { startDate: { $gte: startOfTodayUTC, $lte: endOfTodayUTC } },
-      ],
+      startDate: { $gte: startOfTodayUTC, $lte: endOfTodayUTC },
     }).sort({ dueDate: 1 });
+
+    const pendingTasks = await Task.find({
+      assignedTo: employeeId,
+      startDate: { $lt: startOfTodayUTC },
+      status: { $nin: excludedStatuses },
+    }).sort({ startDate: 1 });
 
     const sessions = await LoginSession.find({
       employeeId,
       loginTime: { $gte: startOfTodayUTC, $lte: endOfTodayUTC },
     }).sort({ loginTime: 1 });
 
-    return res.json({ tasks, sessions });
-
+    return res.json({ tasks, pendingTasks, sessions });
   } catch (error) {
     console.error("Error fetching employee tasks or sessions for today:", error);
     return res.status(500).json({ error: "Server error" });
   }
 };
-
-
-
 
 
 exports.getEmployeedaysActivity = async (req, res) => {
@@ -648,8 +644,8 @@ exports.getEmployeedaysActivity = async (req, res) => {
     const timeZone = 'Asia/Kolkata'; // IST
 
     // Get the start and end of the day in IST
-    const startIST = startOfDay(date, { timeZone });
-    const endIST = endOfDay(date, { timeZone });
+    const startIST = startOfDay(date);
+    const endIST = endOfDay(date);
 
     // Convert to UTC for querying MongoDB
     const startUTC = zonedTimeToUtc(startIST, timeZone);
@@ -657,11 +653,11 @@ exports.getEmployeedaysActivity = async (req, res) => {
 
     const tasks = await Task.find({
       assignedTo: employeeId,
-      dueDate: {
+      completionDate: {
         $gte: startUTC,
         $lte: endUTC
       }
-    }).sort({ dueDate: 1 });
+    }).sort({ completionDate: 1 });
 
     const sessions = await LoginSession.find({
       employeeId,
@@ -681,107 +677,9 @@ exports.getEmployeedaysActivity = async (req, res) => {
 
 
 
-// exports.getEmployeeWorkSessions = async (req, res) => {
-//   try {
-//     const { employeeId, page = 1, limit = 10, startDate, endDate } = req.query;
 
-//     if (!employeeId) {
-//       return res.status(400).json({ error: 'employeeId is required' });
-//     }
 
-//     const pageNum = parseInt(page, 10);
-//     const limitNum = parseInt(limit, 10);
-//     if (isNaN(pageNum) || pageNum < 1 || isNaN(limitNum) || limitNum < 1) {
-//       return res.status(400).json({ error: 'Invalid pagination parameters' });
-//     }
 
-//     const employee = await Employee.findById(employeeId);
-//     if (!employee) {
-//       return res.status(404).json({ error: 'Employee not found' });
-//     }
-
-//     // Date range logic
-//     const fromDate = startDate ? new Date(startDate) : employee.JoiningDate;
-//     const toDate = endDate ? new Date(endDate) : subDays(new Date(), 1);
-
-//     const startDateUTC = startOfDay(fromDate);
-//     const endDateUTC = endOfDay(toDate);
-
-//     // Get all days between selected range
-//     const allDaysUTC = eachDayOfInterval({ start: startDateUTC, end: endDateUTC });
-
-//     // Fetch all sessions in range
-//     const sessions = await LoginSession.find({
-//       employeeId: employee._id,
-//       loginTime: { $gte: startDateUTC, $lte: endDateUTC },
-//     })
-//       .sort({ loginTime: 1 })
-//       .lean();
-
-//     // Group by local date
-//     const sessionsByDate = {};
-//     sessions.forEach((session) => {
-//       const zonedLogin = utcToZonedTime(new Date(session.loginTime), TIMEZONE);
-//       const localDateStr = format(zonedLogin, 'yyyy-MM-dd', { timeZone: TIMEZONE });
-
-//       if (!sessionsByDate[localDateStr]) {
-//         sessionsByDate[localDateStr] = [];
-//       }
-//       sessionsByDate[localDateStr].push(session);
-//     });
-
-//     // Map UTC days to local date strings
-//     const allLocalDates = allDaysUTC.map((day) => {
-//       const zonedDay = utcToZonedTime(day, TIMEZONE);
-//       return format(zonedDay, 'yyyy-MM-dd', { timeZone: TIMEZONE });
-//     });
-
-//     // Reverse for latest first
-//     const reversedLocalDates = allLocalDates.slice().reverse();
-
-//     // Pagination
-//     const startIndex = (pageNum - 1) * limitNum;
-//     const endIndex = startIndex + limitNum;
-//     const pagedLocalDates = reversedLocalDates.slice(startIndex, endIndex);
-
-//     // Build response
-//     const workSessions = pagedLocalDates.map((dateStr) => {
-//       const daySessions = sessionsByDate[dateStr] || [];
-
-//       if (daySessions.length === 0) {
-//         return {
-//           date: dateStr,
-//           loginTime: null,
-//           loginLocation: null,
-//           logoutTime: null,
-//           logoutLocation: null,
-//         };
-//       }
-
-//       const firstSession = daySessions[0];
-//       const lastSession = daySessions[daySessions.length - 1];
-
-//       return {
-//         date: dateStr,
-//         loginTime: firstSession.loginTime,
-//         loginLocation: firstSession.loginLocation,
-//         logoutTime: lastSession.logoutTime || null,
-//         logoutLocation: lastSession.logoutLocation || null,
-//       };
-//     });
-
-//     return res.json({
-//       employeeId,
-//       totalDays: allLocalDates.length,
-//       page: pageNum,
-//       limit: limitNum,
-//       workSessions,
-//     });
-//   } catch (error) {
-//     console.error("Error fetching work sessions:", error);
-//     return res.status(500).json({ error: "Internal server error" });
-//   }
-// };
 
 
 exports.getEmployeeWorkSessions = async (req, res) => {
@@ -881,10 +779,6 @@ exports.getEmployeeWorkSessions = async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 };
-
-
-
-
 
 exports.getEmployeeLeave = async (req, res) => {
   try {

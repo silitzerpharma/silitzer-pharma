@@ -26,18 +26,44 @@
     }
 
     .center {
-      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
 
-      input {
+      .search-container {
+        position: relative;
         width: 100%;
-        padding: clamp(0.6rem, 1vw, 0.7rem);
-        margin-top: clamp(0.75rem, 1vw, 1rem);
-        border: none;
-        border-radius: 0.5rem;
-        border-left: 0.3125rem solid yellow;
-        border-top: 0.1875rem solid rgb(35, 165, 165);
-        border-right: 0.3125rem solid green;
-        border-bottom: 0.1875rem solid red;
+        max-width: 400px;
+
+        input {
+          width: 100%;
+          padding: 0.6rem 2.5rem 0.6rem 1rem; // extra right padding for icon
+          border-radius: 0.5rem;
+          font-size: 1rem;
+          outline: none;
+          border: none;
+          border-left: 0.3125rem solid yellow;
+          border-top: 0.1875rem solid rgb(35, 165, 165);
+          border-right: 0.3125rem solid green;
+          border-bottom: 0.1875rem solid red;
+          margin-top: clamp(0.75rem, 1vw, 1rem);
+        }
+
+        .search-icon {
+          position: absolute;
+          right: 0.75rem;
+          top: 50%;
+          transform: translateY(-50%);
+          cursor: pointer;
+          color: #555;
+          display: flex;
+          align-items: center;
+
+          svg {
+            margin-top: 1rem;
+            font-size: 2rem;
+          }
+        }
       }
     }
 

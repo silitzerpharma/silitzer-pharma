@@ -27,7 +27,7 @@ import PendingActionsIcon from '@mui/icons-material/PendingActions';
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 
-const EmployeeNavbar = ({isActive , setIsActive}) => {
+const EmployeeNavbar = ({isActive , setIsActive,locationError}) => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -87,6 +87,13 @@ const handleSignOut = async () => {
               <FaRegDotCircle className="menu-icon login"  />
             )}
           </div>
+          {locationError && (
+  <div className="location-warning">
+    <span style={{ color: 'red', fontSize: '0.8rem' }}>
+      ⚠️ Location access failed
+    </span>
+  </div>
+)}
           <button
             className="menu-button"
             onClick={() => setMenuOpen(!menuOpen)}

@@ -106,8 +106,8 @@
     left: 10px;
     transform: translateY(-50%);
     color: #888;
-    font-size: 18px;
-    pointer-events: none;
+    cursor: pointer;
+  pointer-events: auto
   }
 
   @keyframes fadeIn {
