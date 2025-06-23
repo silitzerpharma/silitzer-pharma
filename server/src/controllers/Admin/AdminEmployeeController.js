@@ -609,6 +609,7 @@ exports.getEmployeeTodaysActivity = async (req, res) => {
       startDate: { $gte: startOfTodayUTC, $lte: endOfTodayUTC },
     }).sort({ dueDate: 1 });
 
+    console.log("startOfTodayUTC:", startOfTodayUTC.toISOString());
     const pendingTasks = await Task.find({
       assignedTo: employeeId,
       startDate: { $lt: startOfTodayUTC },
