@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
-import "./style/Table.scss"
-import ViewOrder from "../View/ViewOrder";
+import "./style/Table.scss";
 import socket from "../../../store/socket";
 import { Checkbox, FormControlLabel } from "@mui/material";
-
+import { useNavigate } from "react-router-dom";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 import Loader from "../../common/Loader";
 
@@ -35,8 +34,6 @@ const OrdersTable = ({ refreshFlag }) => {
   const [orderBy, setOrderBy] = useState(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const [showViewOrder, setShowViewOrder] = useState(false);
   const [productListDialog, setProductListDialog] = useState(false);
   const [orderStatusDialog, setOrderStatusDialog] = useState(false);
   const [paymentStatusDialog, setPaymentStatusDialog] = useState(false);
@@ -52,41 +49,44 @@ const OrdersTable = ({ refreshFlag }) => {
   const [filterDate, setFilterDate] = useState("");
   const [showPending, setShowPending] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
-const validStatusOptions = ["Processing", "Shipped", "Delivered", "Hold"];
-const selectValue = validStatusOptions.includes(updatedOrderStatus) ? updatedOrderStatus : '';
+  const navigate = useNavigate();
+
+  const validStatusOptions = ["Processing", "Shipped", "Delivered", "Hold"];
+  const selectValue = validStatusOptions.includes(updatedOrderStatus)
+    ? updatedOrderStatus
+    : "";
 
   const handleChangeViewBy = (e) => {
     setSelectedView(e.target.value);
     setPage(0);
   };
 
-useEffect(() => {
-  const fetchOrders = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(
-        `${BASE_URL}/admin/getallorders?page=${page}&limit=${rowsPerPage}&view=${selectedView}&search=${encodeURIComponent(
-          searchTerm
-        )}&filterDate=${filterDate}&showPending=${showPending}`,
-        {
-          credentials: 'include', // ✅ Important for sending cookies
-        }
-      );
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(
+          `${BASE_URL}/admin/getallorders?page=${page}&limit=${rowsPerPage}&view=${selectedView}&search=${encodeURIComponent(
+            searchTerm
+          )}&filterDate=${filterDate}&showPending=${showPending}`,
+          {
+            credentials: "include",
+          }
+        );
+        const data = await response.json();
+        setOrders(data.orders);
+        setTotalOrders(data.totalCount);
+      } catch (err) {
+        console.error("Error fetching orders:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      const data = await response.json();
-      setOrders(data.orders);
-      setTotalOrders(data.totalCount);
-    } catch (err) {
-      console.error("Error fetching orders:", err);
-    }
-    finally{
-      setLoading(false);
-    }
-  };
-
-  fetchOrders();
-}, [refreshTrigger, selectedView, page, rowsPerPage, searchTerm, filterDate, showPending]);
+    fetchOrders();
+  }, [refreshTrigger, selectedView, page, rowsPerPage, searchTerm, filterDate, showPending]);
 
   useEffect(() => {
     socket.on("orderUpdated", () => {
@@ -133,9 +133,7 @@ useEffect(() => {
   };
 
   const sortedOrders =
-    order && orderBy
-      ? stableSort(orders, getComparator(order, orderBy))
-      : orders;
+    order && orderBy ? stableSort(orders, getComparator(order, orderBy)) : orders;
 
   const headCells = [
     { id: "order_id", label: "Order ID" },
@@ -147,13 +145,7 @@ useEffect(() => {
   ];
 
   const handleOrderIdClick = (order) => {
-    setSelectedOrder(order);
-    setShowViewOrder(true);
-  };
-
-  const handleCloseDetails = () => {
-    setShowViewOrder(false);
-    setSelectedOrder(null);
+    navigate(`/admin/order/${order.id}`);
   };
 
   const handleProductListClick = (order) => {
@@ -174,29 +166,23 @@ useEffect(() => {
   };
 
   const handleOrderStatusUpdate = async () => {
-    const updatedOrder = {
-      orderId: selectedOrder.id,
-      status: updatedOrderStatus,
-    };
     try {
-      const response = await fetch(
-        `${BASE_URL}/admin/updateorderstatus`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-           credentials: "include",
-          body: JSON.stringify(updatedOrder),
-        }
-      );
-      if (!response.ok) {
-        setMessageDialog({
-          open: true,
-          message: "Failed to update order status",
-        });
-      } else {
-        setMessageDialog({ open: true, message: "Order status updated" });
-      }
-    } catch (error) {
+      const response = await fetch(`${BASE_URL}/admin/updateorderstatus`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          orderId: selectedOrder.id,
+          status: updatedOrderStatus,
+        }),
+      });
+
+      const message = response.ok
+        ? "Order status updated"
+        : "Failed to update order status";
+
+      setMessageDialog({ open: true, message });
+    } catch {
       setMessageDialog({
         open: true,
         message: "Failed to update order. Try again.",
@@ -206,29 +192,23 @@ useEffect(() => {
   };
 
   const handlePaymentStatusUpdate = async () => {
-    const updatedOrder = {
-      orderId: selectedOrder.id,
-      paymentStatus: updatedPaymentStatus,
-    };
     try {
-      const response = await fetch(
-        `${BASE_URL}/admin/updateorderpaymentstatus`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-           credentials: "include",
-          body: JSON.stringify(updatedOrder),
-        }
-      );
-      if (!response.ok) {
-        setMessageDialog({
-          open: true,
-          message: "Failed to update payment status",
-        });
-      } else {
-        setMessageDialog({ open: true, message: "Payment status updated" });
-      }
-    } catch (error) {
+      const response = await fetch(`${BASE_URL}/admin/updateorderpaymentstatus`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          orderId: selectedOrder.id,
+          paymentStatus: updatedPaymentStatus,
+        }),
+      });
+
+      const message = response.ok
+        ? "Payment status updated"
+        : "Failed to update payment status";
+
+      setMessageDialog({ open: true, message });
+    } catch {
       setMessageDialog({
         open: true,
         message: "Failed to update payment. Try again.",
@@ -264,6 +244,7 @@ useEffect(() => {
             <option value="Hold">Hold</option>
           </select>
         </div>
+
         <input
           type="text"
           placeholder="Search by Distributor, Order ID, Product..."
@@ -273,216 +254,180 @@ useEffect(() => {
             setPage(0);
           }}
         />
-<FormControlLabel
-  control={
-    <Checkbox
-      checked={showPending}
-      onChange={(e) => {
-        setShowPending(e.target.checked);
-        setPage(0); // Reset pagination
-      }}
-      color="primary"
-    />
-  }
-  label="Pending Orders"
-/>
 
-
-   
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={showPending}
+              onChange={(e) => {
+                setShowPending(e.target.checked);
+                setPage(0);
+              }}
+              color="primary"
+            />
+          }
+          label="Pending Orders"
+        />
       </div>
 
-      {!showViewOrder ? (
-        <>
-          <TableContainer component={Paper} className="table-container">
-            <Table aria-label="orders table">
-              <TableHead>
-                <TableRow>
-                  {headCells.map((headCell) => (
-                    <TableCell
-                      key={headCell.id}
-                      align="center"
-                      sortDirection={orderBy === headCell.id ? order : false}
-                    >
-                      <TableSortLabel
-                        active={orderBy === headCell.id}
-                        direction={orderBy === headCell.id ? order : "asc"}
-                        onClick={() => handleRequestSort(headCell.id)}
-                      >
-                        {headCell.label}
-                      </TableSortLabel>
-                    </TableCell>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {sortedOrders.map((order) => {
-                  const status = order.order_status?.toLowerCase();
-                  const isStatusEditable = ![
-                    "pending",
-                    "cancel",
-                    "cancelled",
-                    "canceled",
-                  ].includes(status);
-                  return (
-                    <TableRow key={order.order_id}>
-                      <TableCell
-                        align="center"
-                        style={{
-                          cursor: "pointer",
-                          color: "blue",
-                          textDecoration: "underline",
-                        }}
-                        onClick={() => handleOrderIdClick(order)}
-                      >
-                        {order.order_id}
-                      </TableCell>
-                      <TableCell align="center">{order.Distributor}</TableCell>
-                      <TableCell align="center">
-                        {new Date(order.order_date).toLocaleString("en-GB", {
-                          year: "numeric",
-                          month: "2-digit",
-                          day: "2-digit",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </TableCell>
-                      <TableCell
-                        align="center"
-                        className={`order-status ${order.order_status}`}
-                        onClick={() => {
-                          if (isStatusEditable) handleOrderStatusClick(order);
-                        }}
-                        style={{
-                          cursor: isStatusEditable ? "pointer" : "default",
-                          color: isStatusEditable ? "inherit" : "gray",
-                        }}
-                      >
-                        {order.order_status}
-                      </TableCell>
-                      <TableCell
-                        align="center"
-                        className={`payment-status ${order.payment_status}`}
-                        onClick={() => handlePaymentStatusClick(order)}
-                      >
-                        {order.payment_status}
-                      </TableCell>
-                      <TableCell
-                        align="center"
-                        onClick={() => handleProductListClick(order)}
-                        style={{ cursor: "pointer", color: "#0077cc" }}
-                      >
-                        Products
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-            <TablePagination
-              component="div"
-              count={totalOrders}
-              page={page}
-              onPageChange={handleChangePage}
-              rowsPerPage={rowsPerPage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-              rowsPerPageOptions={[5, 10, 25, 50]}
-            />
-          </TableContainer>
-
-          <Dialog
-            open={productListDialog}
-            onClose={() => setProductListDialog(false)}
-          >
-            <DialogTitle>Product List</DialogTitle>
-            <DialogContent>
-              {(selectedOrder?.products_list || []).map((product, index) => (
-                <div key={index}>
-                  <strong>{product.product_name}</strong> - Quantity:{" "}
-                  {product.quantity}
-                </div>
-              ))}
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setProductListDialog(false)}>Close</Button>
-            </DialogActions>
-          </Dialog>
-
-          <Dialog
-            open={orderStatusDialog}
-            onClose={() => setOrderStatusDialog(false)}
-          >
-            <DialogTitle>Update Order Status</DialogTitle>
-            <DialogContent>
-            <FormControl fullWidth>
-  <InputLabel>Order Status</InputLabel>
-  <Select
-    value={selectValue}
-    onChange={(e) => setUpdatedOrderStatus(e.target.value)}
-  >
-    <MenuItem value="Processing">Processing</MenuItem>
-    <MenuItem value="Shipped">Shipped</MenuItem>
-    <MenuItem value="Delivered">Delivered</MenuItem>
-    <MenuItem value="Hold">Hold</MenuItem>
-  </Select>
-</FormControl>
-            </DialogContent>
-            <DialogActions>
-              <Button
-                onClick={handleOrderStatusUpdate}
-                disabled={!updatedOrderStatus}
-              >
-                Update
-              </Button>
-              <Button onClick={() => setOrderStatusDialog(false)}>
-                Cancel
-              </Button>
-            </DialogActions>
-          </Dialog>
-
-          <Dialog
-            open={paymentStatusDialog}
-            onClose={() => setPaymentStatusDialog(false)}
-          >
-            <DialogTitle>Update Payment Status</DialogTitle>
-            <DialogContent>
-              <FormControl fullWidth>
-                <InputLabel>Payment Status</InputLabel>
-                <Select
-                  value={updatedPaymentStatus}
-                  onChange={(e) => setUpdatedPaymentStatus(e.target.value)}
+      <TableContainer component={Paper} className="table-container">
+        <Table>
+          <TableHead>
+            <TableRow>
+              {headCells.map((headCell) => (
+                <TableCell
+                  key={headCell.id}
+                  align="center"
+                  sortDirection={orderBy === headCell.id ? order : false}
                 >
-                  <MenuItem value="Pending">Pending</MenuItem>
-                  <MenuItem value="Partially Paid">Partially Paid</MenuItem>
-                  <MenuItem value="Completed">Completed</MenuItem>
-                </Select>
-              </FormControl>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handlePaymentStatusUpdate}>Update</Button>
-              <Button onClick={() => setPaymentStatusDialog(false)}>
-                Cancel
-              </Button>
-            </DialogActions>
-          </Dialog>
+                  <TableSortLabel
+                    active={orderBy === headCell.id}
+                    direction={orderBy === headCell.id ? order : "asc"}
+                    onClick={() => handleRequestSort(headCell.id)}
+                  >
+                    {headCell.label}
+                  </TableSortLabel>
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {sortedOrders.map((order) => {
+              const status = order.order_status?.toLowerCase();
+              const isStatusEditable = !["pending", "cancel", "cancelled", "canceled"].includes(status);
+              return (
+                <TableRow key={order.order_id}>
+                  <TableCell
+                    align="center"
+                    style={{
+                      cursor: "pointer",
+                      color: "blue",
+                      textDecoration: "underline",
+                    }}
+                    onClick={() => handleOrderIdClick(order)}
+                  >
+                    {order.order_id}
+                  </TableCell>
+                  <TableCell align="center">{order.Distributor}</TableCell>
+                  <TableCell align="center">
+                    {new Date(order.order_date).toLocaleString("en-GB", {
+                      year: "numeric",
+                      month: "2-digit",
+                      day: "2-digit",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </TableCell>
+                  <TableCell
+                    align="center"
+                    className={`order-status ${order.order_status}`}
+                    onClick={() => {
+                      if (isStatusEditable) handleOrderStatusClick(order);
+                    }}
+                    style={{
+                      cursor: isStatusEditable ? "pointer" : "default",
+                      color: isStatusEditable ? "inherit" : "gray",
+                    }}
+                  >
+                    {order.order_status}
+                  </TableCell>
+                  <TableCell
+                    align="center"
+                    className={`payment-status ${order.payment_status}`}
+                    onClick={() => handlePaymentStatusClick(order)}
+                  >
+                    {order.payment_status}
+                  </TableCell>
+                  <TableCell
+                    align="center"
+                    onClick={() => handleProductListClick(order)}
+                    style={{ cursor: "pointer", color: "#0077cc" }}
+                  >
+                    Products
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
 
-          <Dialog
-            open={messageDialog.open}
-            onClose={() => setMessageDialog({ open: false, message: "" })}
-          >
-            <DialogTitle>Notification</DialogTitle>
-            <DialogContent>{messageDialog.message}</DialogContent>
-            <DialogActions>
-              <Button
-                onClick={() => setMessageDialog({ open: false, message: "" })}
-              >
-                OK
-              </Button>
-            </DialogActions>
-          </Dialog>
-        </>
-      ) : (
-        <ViewOrder order={selectedOrder} onBack={handleCloseDetails} />
-      )}
+        <TablePagination
+          component="div"
+          count={totalOrders}
+          page={page}
+          onPageChange={handleChangePage}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          rowsPerPageOptions={[5, 10, 25, 50]}
+        />
+      </TableContainer>
+
+      <Dialog open={productListDialog} onClose={() => setProductListDialog(false)}>
+        <DialogTitle>Product List</DialogTitle>
+        <DialogContent>
+          {(selectedOrder?.products_list || []).map((product, index) => (
+            <div key={index}>
+              <strong>{product.product_name}</strong> - Quantity: {product.quantity}
+            </div>
+          ))}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setProductListDialog(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={orderStatusDialog} onClose={() => setOrderStatusDialog(false)}>
+        <DialogTitle>Update Order Status</DialogTitle>
+        <DialogContent>
+          <FormControl fullWidth>
+            <InputLabel>Order Status</InputLabel>
+            <Select
+              value={selectValue}
+              onChange={(e) => setUpdatedOrderStatus(e.target.value)}
+            >
+              <MenuItem value="Processing">Processing</MenuItem>
+              <MenuItem value="Shipped">Shipped</MenuItem>
+              <MenuItem value="Delivered">Delivered</MenuItem>
+              <MenuItem value="Hold">Hold</MenuItem>
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleOrderStatusUpdate} disabled={!updatedOrderStatus}>
+            Update
+          </Button>
+          <Button onClick={() => setOrderStatusDialog(false)}>Cancel</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={paymentStatusDialog} onClose={() => setPaymentStatusDialog(false)}>
+        <DialogTitle>Update Payment Status</DialogTitle>
+        <DialogContent>
+          <FormControl fullWidth>
+            <InputLabel>Payment Status</InputLabel>
+            <Select
+              value={updatedPaymentStatus}
+              onChange={(e) => setUpdatedPaymentStatus(e.target.value)}
+            >
+              <MenuItem value="Pending">Pending</MenuItem>
+              <MenuItem value="Partially Paid">Partially Paid</MenuItem>
+              <MenuItem value="Completed">Completed</MenuItem>
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handlePaymentStatusUpdate}>Update</Button>
+          <Button onClick={() => setPaymentStatusDialog(false)}>Cancel</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={messageDialog.open} onClose={() => setMessageDialog({ open: false, message: "" })}>
+        <DialogTitle>Notification</DialogTitle>
+        <DialogContent>{messageDialog.message}</DialogContent>
+        <DialogActions>
+          <Button onClick={() => setMessageDialog({ open: false, message: "" })}>OK</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

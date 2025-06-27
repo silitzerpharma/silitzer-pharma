@@ -10,7 +10,8 @@ exports.saveNotificationForAdmin = async (
   autoDelete = false,
   expiresAt = null,
   icon = null,
-  priority = 'low'
+  priority = 'low',
+  link = null // ✅ Add this
 ) => {
   try {
     const admin = await Admin.findOne(); // assuming only one admin
@@ -32,12 +33,13 @@ exports.saveNotificationForAdmin = async (
       expiresAt,
       icon,
       priority,
+      link, // ✅ Use the link
     });
 
     await notification.save();
-    return true
+    return true;
   } catch (err) {
     console.error('Error saving admin notification:', err);
-       return false
+    return false;
   }
 };

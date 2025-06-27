@@ -1,10 +1,16 @@
 import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import CloseIcon from '@mui/icons-material/Close';
 import ConfirmationDialog from '../../common/ConfirmationDialog';
 import Loader from '../../common/Loader';
 import './style/ApproveOrder.scss';
 
 const ApproveOrder = ({ order, onBack, refreshProductList }) => {
+  const { id: paramId } = useParams();
+  const navigate = useNavigate();
+
+  const orderId = order?.id || paramId;
+
   const [loading, setLoading] = useState(false);
   const [orderLoading, setOrderLoading] = useState(false);
   const [orderData, setOrderData] = useState({});
@@ -17,30 +23,39 @@ const ApproveOrder = ({ order, onBack, refreshProductList }) => {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false);
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-useEffect(() => {
-  const fetchPendingOrders = async () => {
-    setOrderLoading(true);
-    try {
-      const response = await fetch(`${BASE_URL}/admin/getorder`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // ✅ Include cookies/session
-        body: JSON.stringify({ id: order.id }),
-      });
-      const data = await response.json();
-      setOrderData(data);
-    } catch (err) {
-      console.error('Error fetching pending orders:', err);
-    }
-    finally{
-      setOrderLoading(false)
+  const handleBack = () => {
+    if (onBack) {
+      onBack();
+    } else {
+      navigate(-1);
     }
   };
 
-  fetchPendingOrders();
-}, [order.id]);
+  useEffect(() => {
+    if (!orderId) return;
+
+    const fetchPendingOrders = async () => {
+      setOrderLoading(true);
+      try {
+        const response = await fetch(`${BASE_URL}/admin/getorder`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ id: orderId }),
+        });
+        const data = await response.json();
+        setOrderData(data);
+      } catch (err) {
+        console.error('Error fetching pending orders:', err);
+      } finally {
+        setOrderLoading(false);
+      }
+    };
+
+    fetchPendingOrders();
+  }, [orderId]);
 
   useEffect(() => {
     if (orderData?.products_list?.length) {
@@ -113,7 +128,7 @@ useEffect(() => {
         body: JSON.stringify(approveOrderData),
       });
       setLoading(false);
-      onBack();
+      handleBack();
     } catch (err) {
       console.error('Error approving order:', err);
       setLoading(false);
@@ -143,20 +158,19 @@ useEffect(() => {
         body: JSON.stringify({ orderId: orderData.id, status: "Cancelled" }),
       });
       alert("Order cancelled");
-      onBack();
+      handleBack();
     } catch (err) {
       console.error('Error cancelling order:', err);
     }
   };
 
   if (loading) return <Loader message="Please wait, approving order..." />;
- if (orderLoading) return <Loader message="Loading Order Details..." />; 
-
+  if (orderLoading) return <Loader message="Loading Order Details..." />;
 
   return (
     <div className="approve-order">
       <div className="top">
-        <button onClick={onBack}>
+        <button onClick={handleBack}>
           <CloseIcon sx={{ fontSize: 30 }} />
         </button>
       </div>
@@ -230,10 +244,7 @@ useEffect(() => {
                   </td>
                   {isEditing && (
                     <td>
-                      <button
-                        className="remove-btn"
-                        onClick={() => handleRemoveProduct(index)}
-                      >
+                      <button className="remove-btn" onClick={() => handleRemoveProduct(index)}>
                         Remove
                       </button>
                     </td>
@@ -305,11 +316,11 @@ useEffect(() => {
       </div>
 
       {orderData.orderInstructions && (
-  <div className="orderInstructions">
-    <div>Order Instructions</div>
-    <p>{orderData.orderInstructions }</p>
-  </div>
-)}
+        <div className="orderInstructions">
+          <div>Order Instructions</div>
+          <p>{orderData.orderInstructions}</p>
+        </div>
+      )}
 
       <ConfirmationDialog
         open={confirmOpen}

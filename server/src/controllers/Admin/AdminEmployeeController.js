@@ -609,7 +609,7 @@ exports.getEmployeeTodaysActivity = async (req, res) => {
       startDate: { $gte: startOfTodayUTC, $lte: endOfTodayUTC },
     }).sort({ dueDate: 1 });
 
-    console.log("startOfTodayUTC:", startOfTodayUTC.toISOString());
+    
     const pendingTasks = await Task.find({
       assignedTo: employeeId,
       startDate: { $lt: startOfTodayUTC },
@@ -627,8 +627,6 @@ exports.getEmployeeTodaysActivity = async (req, res) => {
     return res.status(500).json({ error: "Server error" });
   }
 };
-
-
 exports.getEmployeedaysActivity = async (req, res) => {
   try {
     const { employeeId, day } = req.body;
@@ -676,13 +674,6 @@ exports.getEmployeedaysActivity = async (req, res) => {
   }
 };
 
-
-
-
-
-
-
-
 exports.getEmployeeWorkSessions = async (req, res) => {
   try {
     const { employeeId, page = 1, limit = 10, startDate, endDate } = req.query;
@@ -704,7 +695,7 @@ exports.getEmployeeWorkSessions = async (req, res) => {
     }
 
     // ✅ Convert startDate and endDate to IST then to UTC range
-    const istFrom = startDate ? new Date(startDate) : employee.JoiningDate;
+   const istFrom = startDate ? new Date(startDate) : employee.createdAt;
     const istTo = endDate ? new Date(endDate) : subDays(new Date(), 1);
 
     const istStart = startOfDay(istFrom, { timeZone: TIMEZONE });
@@ -1065,5 +1056,63 @@ exports.downloadWorkSessions = async (req, res) => {
   } catch (err) {
     console.error('Error generating work sessions file:', err);
     res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+exports.getTaskCancelRequest = async (req, res) => {
+  try {
+    const { id } = req.query;
+
+    if (!id) {
+      return res.status(400).json({ message: "Missing request ID" });
+    }
+
+    const cancelRequest = await TaskCancelRequest.findById(id);
+    if (!cancelRequest) {
+      return res.status(404).json({ message: "TaskCancelRequest not found" });
+    }
+
+    // Fetch task using taskId (stored as string in request)
+    const task = await Task.findOne({ taskId: cancelRequest.taskId });
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    // Fetch employee using employeeId
+    const employee = await Employee.findById(cancelRequest.employeeId);
+    if (!employee) {
+      return res.status(404).json({ message: "Employee not found" });
+    }
+
+    // Get AuthUser to fetch employee name
+    const authUser = await AuthUser.findOne({
+      refId: employee._id,
+      roleModel: 'Employee',
+    });
+
+    const responseData = {
+      _id: cancelRequest._id,
+      reason: cancelRequest.reason,
+      status: cancelRequest.status,
+      requestedAt: cancelRequest.requestedAt,
+      employee: {
+        _id: employee._id,
+        name: authUser?.username || 'Unknown',
+      },
+      task: {
+        _id: task._id,
+        title: task.title,
+        address: task.address,
+        assignDate: task.assignDate,
+        startDate: task.startDate,
+        dueDate: task.dueDate,
+      },
+    };
+
+    return res.status(200).json(responseData);
+
+  } catch (err) {
+    console.error("Error in getTaskCancelRequest:", err);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };

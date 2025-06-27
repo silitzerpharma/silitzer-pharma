@@ -18,6 +18,9 @@ const { format, addDays } = require('date-fns');
 const LeaveRequest = require("../models/employee/LeaveRequestModel");
 const imagekit = require('../config/imagekit');
 const LocationService = require('../services/LocationServices')
+const NotificationServices =require('../services/NotificationServices')
+const SocketServices = require('../services/SocketServices')
+
 
 exports.login = async (req, res) => {
   const { latitude, longitude, deviceInfo } = req.body;
@@ -275,39 +278,6 @@ exports.addTask = async (req, res) => {
   }
 };
 
-// exports.getTodayTasks = async (req, res) => {
-//   try {
-//     const employee = await EmployeeServices.getEmployeeByReq(req);
-//     if (!employee) {
-//       return res.status(401).json({ message: 'Unauthorized: No employee' });
-//     }
-
-//     // Set your actual timezone here, e.g., 'Asia/Kolkata'
-//     const TIMEZONE = 'Asia/Kolkata';
-
-//     // Local start and end of today
-//     const localStart = startOfToday(); // e.g., 2025-06-03T00:00:00.000 in local tz
-//     const localEnd = endOfDay(localStart); // e.g., 2025-06-03T23:59:59.999 in local tz
-
-//     // Convert to UTC for MongoDB query
-//     const startDateUtc = zonedTimeToUtc(localStart, TIMEZONE);
-//     const endDateUtc = zonedTimeToUtc(localEnd, TIMEZONE);
-
-//     const tasks = await Task.find({
-//       assignedTo: employee._id,
-//       startDate: {
-//         $gte: startDateUtc,
-//         $lte: endDateUtc,
-//       },
-//     }).sort({ createdAt: -1 });
-
-//     return res.status(200).json(tasks);
-//   } catch (error) {
-//     console.error('Error getting today\'s tasks:', error);
-//     return res.status(500).json({ message: 'Internal Server Error' });
-//   }
-// };
-
 exports.getTodayTasks = async (req, res) => {
   try {
     const employee = await EmployeeServices.getEmployeeByReq(req);
@@ -334,13 +304,6 @@ exports.getTodayTasks = async (req, res) => {
     return res.status(500).json({ message: 'Internal Server Error' });
   }
 };
-
-
-
-
-
-
-
 
 exports.getPendingTasks = async (req, res) => {
   try {
@@ -415,7 +378,6 @@ exports.updateTasksStatus = async (req, res) => {
   }
 };
 
-
 exports.getTaskByMonth = async (req, res) => {
   try {
     const employee = await EmployeeServices.getEmployeeByReq(req);
@@ -456,11 +418,6 @@ exports.getTaskByMonth = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
-
-
-
-
 
 exports.getDistributors = async (req, res) => {
   try {
@@ -726,6 +683,21 @@ exports.cancelTaskRequest = async (req, res) => {
     });
 
     await cancelRequest.save();
+const authUser = await AuthUser.findOne({
+  refId: employee._id,
+  roleModel: 'Employee',
+});
+const username = authUser?.username || 'Employee';
+await NotificationServices.saveNotificationForAdmin(
+  'Task Cancel Request',
+  `Employee ${username} has requested to cancel task #${task.taskId}`,
+  'task',
+  cancelRequest._id,
+  'TaskCancelRequest',
+  true
+);
+ SocketServices.updateAdminNotificationSocket(req);
+    
 
     return res.status(200).json({
       message: "Task cancel request submitted successfully",
@@ -902,12 +874,40 @@ exports.saveEmployeeLeaveRequest = async (req, res) => {
     // Save to DB
     const savedRequest = await newLeaveRequest.save();
 
+const authUser = await AuthUser.findOne({
+  refId: employee._id,
+  roleModel: 'Employee',
+});
+
+const username = authUser?.username || 'Employee';
+const link = `/employee/${authUser._id}?tab=requests`;
+await NotificationServices.saveNotificationForAdmin(
+  'Leave Request',
+  `Employee ${username} has submitted a leave request`,
+  'task', // or 'info' or 'system' as per your categorization
+  savedRequest._id,
+  'LeaveRequest',
+  true,
+  null,
+  null,
+  'low',
+  link 
+);
+SocketServices.updateAdminNotificationSocket(req);
+
+
     return res.status(201).json(savedRequest);
   } catch (error) {
     console.error("Error saving leave request:", error);
     return res.status(500).json({ message: "Server error" });
   }
 };
+
+
+
+
+
+
 
 exports.getEmployeeLeaveRequest = async (req, res) => {
   try {

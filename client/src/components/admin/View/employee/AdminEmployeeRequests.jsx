@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./style/EmployeeRequests.scss";
 import { format } from "date-fns";
+import { useParams } from "react-router-dom";
 
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -12,7 +13,7 @@ import TextField from "@mui/material/TextField";
 
 
 
-const EmployeeRequests = ({ employeeId,refreshEmployeeData }) => {
+const AdminEmployeeRequests = ({ employeeId: propEmployeeId, refreshEmployeeData = () => {} }) => {
   const [cancelRequests, setCancelRequests] = useState([]);
   const [leaveRequests, setLeaveRequests] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -33,6 +34,8 @@ const EmployeeRequests = ({ employeeId,refreshEmployeeData }) => {
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
+  const { employeeId: paramEmployeeId } = useParams(); // ✅ get from URL
+  const employeeId = paramEmployeeId || propEmployeeId;
 
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -44,6 +47,7 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   setError(null);
 
   try {
+    console.log(employeeId)
 const res = await fetch(`${BASE_URL}/admin/employee/requests?employeeId=${employeeId}`, {
   method: 'GET',
   credentials: 'include', 
@@ -311,4 +315,4 @@ const handleConfirmAction = async () => {
   );
 };
 
-export default EmployeeRequests;
+export default AdminEmployeeRequests;

@@ -7,12 +7,11 @@ const notificationSchema = new mongoose.Schema(
       required: true,
       ref: 'recipientModel', // or Employee, Distributor, etc.
     },
-recipientModel: {
-  type: String,
-  required: true,
-  enum: ['Admin', 'Employee', 'Distributor'],
-},
-
+    recipientModel: {
+      type: String,
+      required: true,
+      enum: ['Admin', 'Employee', 'Distributor'],
+    },
     title: {
       type: String,
       required: true,
@@ -34,7 +33,8 @@ recipientModel: {
       type: String,
       validate: {
         validator: function (v) {
-          return /^\/[a-zA-Z0-9\-_/]*$/.test(v); // basic relative URL path validation
+          // ✅ supports optional query string
+          return /^\/[a-zA-Z0-9\-_/]*(\?[a-zA-Z0-9=&_%-]*)?$/.test(v);
         },
         message: (props) => `${props.value} is not a valid relative URL path!`,
       },
@@ -50,34 +50,41 @@ recipientModel: {
     },
     relatedModel: {
       type: String,
-      enum: ['Order', 'Task','Employee','Product','ProductOffer','LeaveRequest','LoginSession','TaskCancelRequest'], // add more as needed
+      enum: [
+        'Order',
+        'Task',
+        'Employee',
+        'Product',
+        'ProductOffer',
+        'LeaveRequest',
+        'LoginSession',
+        'TaskCancelRequest',
+      ],
     },
     autoDelete: {
       type: Boolean,
-      default: false, // only auto-deletes if true
+      default: false,
     },
     expiresAt: {
       type: Date,
     },
   },
   {
-    timestamps: true, // adds createdAt and updatedAt
+    timestamps: true,
   }
 );
 
-// ✅ TTL index: auto-delete when expiresAt is reached
+// TTL index for auto-deletion
 notificationSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
-// ✅ Auto-fill link and expiresAt before saving
+// Auto-fill link and expiresAt before saving
 notificationSchema.pre('save', function (next) {
-  // auto-generate link if not set
   if (!this.link && this.relatedModel && this.relatedTo) {
     this.link = `/${this.relatedModel.toLowerCase()}/${this.relatedTo.toString()}`;
   }
 
-  // auto-set expiresAt if autoDelete is true and not already set
   if (this.autoDelete && !this.expiresAt) {
-    this.expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
+    this.expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hrs
   }
 
   next();

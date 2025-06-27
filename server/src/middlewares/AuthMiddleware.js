@@ -31,9 +31,6 @@ exports.protectAdmin = async (req, res, next) => {
 };
 
 
-
-
-
 exports.protectEmployee = async (req, res, next) => {
   try {
     const token = req.cookies.token;

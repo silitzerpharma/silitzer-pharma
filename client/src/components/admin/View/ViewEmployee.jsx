@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
 import CloseIcon from '@mui/icons-material/Close';
 import Badge from '@mui/material/Badge';
 import './style/ViewEmployee.scss';
@@ -8,30 +9,38 @@ import TaskTable from "../tables/TaskTable";
 import EmployeeWorkSessions from "../tables/EmployeeWorkSessions";
 import EmployeeProfile from './employee/EmployeeProfile';
 import EmployeeLeave from './employee/EmployeeLeave';
-import EmployeeRequests from './employee/EmployeeRequests';  // NEW
+import AdminEmployeeRequests from './employee/AdminEmployeeRequests';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const ViewEmployee = ({ openViewEmployee, EmployeeId, EmployeeObjectId, refreshEmployeesList }) => {
-  const [activeTab, setActiveTab] = useState('today');
+  const { id: urlEmployeeId } = useParams();
+  const [searchParams] = useSearchParams();
+
+  const tabParam = searchParams.get('tab');
+  const validTabs = ['profile', 'today', 'sessions', 'tasks', 'leave', 'requests'];
+  const [activeTab, setActiveTab] = useState(validTabs.includes(tabParam) ? tabParam : 'today');
+
+  const effectiveEmployeeId = EmployeeId || urlEmployeeId;
+
   const [employee, setEmployee] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [username, setUsername] = useState('');
-  const [requestCount, setRequestCount] = useState(1); // example default value
+  const [requestCount, setRequestCount] = useState(1);
 
-    const [refreshFlag, setRefreshFlag] = useState(false);
-    const refreshEmployeeData = () => setRefreshFlag((prev) => !prev);
+  const [refreshFlag, setRefreshFlag] = useState(false);
+  const refreshEmployeeData = () => setRefreshFlag(prev => !prev);
 
   useEffect(() => {
-    if (!EmployeeId) return;
+    if (!effectiveEmployeeId) return;
 
     setLoading(true);
     fetch(`${BASE_URL}/admin/employee/data`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: 'include',
-      body: JSON.stringify({ EmployeeID: EmployeeId }),
+      body: JSON.stringify({ EmployeeID: effectiveEmployeeId }),
     })
       .then(res => {
         if (!res.ok) throw new Error("Failed to fetch employee data");
@@ -53,9 +62,7 @@ const ViewEmployee = ({ openViewEmployee, EmployeeId, EmployeeObjectId, refreshE
         setError(err.message);
         setLoading(false);
       });
-
-
-  }, [EmployeeId,refreshFlag]);
+  }, [effectiveEmployeeId, refreshFlag]);
 
   const tabs = [
     { key: "profile", label: "Profile" },
@@ -63,31 +70,36 @@ const ViewEmployee = ({ openViewEmployee, EmployeeId, EmployeeObjectId, refreshE
     { key: "sessions", label: "Work Sessions" },
     { key: "tasks", label: "Manage Tasks" },
     { key: "leave", label: "Leave" },
- {
-  key: "requests",
-  label: (
-    <Badge
-      badgeContent={requestCount}
-      color="error"
-      max={99}
-      sx={{
-        '& .MuiBadge-badge': {
-          fontSize: '10px',
-          height: '16px',
-          minWidth: '16px',
-          top: '2px',
-          right: '-8px',
-        },
-      }}
-    >
-      Requests
-    </Badge>
-  ),
-}
+    {
+      key: "requests",
+      label: (
+        <Badge
+          badgeContent={requestCount}
+          color="error"
+          max={99}
+          sx={{
+            '& .MuiBadge-badge': {
+              fontSize: '10px',
+              height: '16px',
+              minWidth: '16px',
+              top: '2px',
+              right: '-8px',
+            },
+          }}
+        >
+          Requests
+        </Badge>
+      ),
+    },
   ];
 
   return (
     <div className="ViewEmployee">
+    <div className='ViewEmployee-head'>
+  <h2 className="ViewEmployee-username">{username}</h2>
+</div>
+
+
       <nav className="ViewEmployee-nav">
         {tabs.map(tab => (
           <div
@@ -98,9 +110,12 @@ const ViewEmployee = ({ openViewEmployee, EmployeeId, EmployeeObjectId, refreshE
             {tab.label}
           </div>
         ))}
-        <button className="nav-link btn" onClick={openViewEmployee}>
-          <CloseIcon />
-        </button>
+
+        {openViewEmployee && (
+          <button className="nav-link btn" onClick={openViewEmployee}>
+            <CloseIcon />
+          </button>
+        )}
       </nav>
 
       <div className="ViewEmployee-container">
@@ -113,17 +128,22 @@ const ViewEmployee = ({ openViewEmployee, EmployeeId, EmployeeObjectId, refreshE
               <EmployeeProfile
                 employee={employee}
                 username={username}
-                AuthUser_id={EmployeeId}
+                AuthUser_id={effectiveEmployeeId}
                 refreshEmployeesList={refreshEmployeesList}
                 openViewEmployee={openViewEmployee}
               />
             )}
 
-            {activeTab === 'today' && <EmployeeTodaysActivity employeeId={EmployeeObjectId} />}
-            {activeTab === 'sessions' && <EmployeeWorkSessions employeeId={EmployeeObjectId} />}
-            {activeTab === 'tasks' && <TaskTable employeeId={EmployeeObjectId} />}
-            {activeTab === 'leave' && <EmployeeLeave employeeId={EmployeeObjectId} />}
-            {activeTab === 'requests' && <EmployeeRequests employeeId={EmployeeObjectId} refreshEmployeeData={refreshEmployeeData}  />} {/* NEW */}
+            {activeTab === 'today' && <EmployeeTodaysActivity employeeId={employee?._id} />}
+            {activeTab === 'sessions' && <EmployeeWorkSessions employeeId={employee?._id} />}
+            {activeTab === 'tasks' && <TaskTable employeeId={employee?._id} />}
+            {activeTab === 'leave' && <EmployeeLeave employeeId={employee?._id} />}
+            {activeTab === 'requests' && (
+              <AdminEmployeeRequests
+                employeeId={employee?._id}
+                refreshEmployeeData={refreshEmployeeData}
+              />
+            )}
           </>
         )}
       </div>

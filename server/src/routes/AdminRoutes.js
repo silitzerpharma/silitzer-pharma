@@ -49,6 +49,7 @@ router.post('/employee/daysactivity', AdminEmployeeController.getEmployeedaysAct
 router.get('/employee/employee-work-sessions', AdminEmployeeController.getEmployeeWorkSessions);
 router.get('/employee/leaves', AdminEmployeeController.getEmployeeLeave);
 router.get('/employee/requests', AdminEmployeeController.getEmployeeRequests);
+router.get('/employee/taskcancelrequest', AdminEmployeeController.getTaskCancelRequest);
 router.post('/employee/taskcancelrequest/update', AdminEmployeeController.updateTaskCancelRequest);
 router.post('/employee/leaverequest/update', AdminEmployeeController.updateLeaveRequest);
 router.get('/employee/worksessions/download', AdminEmployeeController.downloadWorkSessions);

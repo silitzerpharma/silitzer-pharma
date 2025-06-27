@@ -61,6 +61,7 @@ const NotificationPanel = ({ onClose }) => {
    
 
   let link = notification.link;
+  console.log(link);
   if (!link.startsWith('/admin')) {
     link = `/admin${link}`;
   }

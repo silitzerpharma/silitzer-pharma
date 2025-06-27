@@ -1,49 +1,3 @@
-// .ViewEmployee-nav {
-//   display: flex;
-//   gap: 1rem;
-//   padding: 0.5rem;
-//   background: #d1ecf8;
-//   border-bottom: 1px solid #ccc;
-//   margin: 1rem 1rem;
-// }
-
-// .nav-link {
-//   padding: 0.5rem 1rem;
-//   cursor: pointer;
-//   border-radius: 5px;
-//   font-weight: bold;
-//   color: #333;
-//   transition: background 0.3s;
-//   &.active {
-//     background-color: #69be8c;
-//     color: white;
-//     font-weight: bold;
-//   }
-//   &:hover {
-//     background-color: #0fd669;
-//   }
-// }
-
-// .btn {
-//   margin-left: auto;
-//   background: none;
-//   border: none;
-//   cursor: pointer;
-// }
-
-// .ViewEmployee-container{
-//   margin: 1rem;
-// }
-
-// .ViewEmployee-nav .nav-link .MuiBadge-root {
-//   display: inline-flex;
-//   align-items: center;
-// }
-
-
-
-
-
 .ViewEmployee-nav {
   display: flex;
   gap: 1rem;
@@ -87,6 +41,31 @@
 .ViewEmployee-container {
   margin: 1rem;
 }
+
+
+.ViewEmployee-head{
+
+display: flex;
+align-items: center;
+justify-content: center;
+
+.ViewEmployee-username {
+  font-size: 24px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 16px 0;
+  text-transform: capitalize; // optional
+  border-bottom: 3px solid #029e3e;
+display: inline-block;
+padding-bottom: 4px;
+text-shadow: 0 1px 2px rgba(13, 172, 66, 0.1);
+}
+
+}
+
+
+
+
 
 // ----------------------
 // ✅ Responsive styles

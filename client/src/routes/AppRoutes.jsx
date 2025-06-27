@@ -14,6 +14,7 @@ import AdminLayout from "../layouts/AdminLayout";
 
 
 
+
 // Lazy-loaded pages
 const DistributorDashboard = lazy(() => import("../pages/distributor/DistributorDashboard"));
 const Orders = lazy(() => import("../pages/distributor/Orders"));
@@ -47,6 +48,11 @@ const EmployeeOrders = lazy(() => import("../pages/employee/EmployeeOrders"));
 const EmployeeRequests = lazy(() => import("../pages/employee/EmployeeRequests"));
 const EmployeeWork = lazy(() => import("../pages/employee/EmployeeWork"));
 const EmployeeTodayLogin = lazy(() => import("../pages/employee/EmployeeTodayLogin"));
+const ApproveOrder = lazy(() => import("../components/admin/View/ApproveOrder"));
+const AdminEmployeeRequests = lazy(() => import("../components/admin/View/employee/AdminEmployeeRequests"));
+const TaskCancelRequest = lazy(() => import("../components/admin/View/employee/TaskCancelRequest"));
+const ViewEmployee = lazy(() => import("../components/admin/View/ViewEmployee"));
+
 
 // Auth pages (typically small, but can still be lazy)
 const Login = lazy(() => import("../pages/auth/Login"));
@@ -92,6 +98,11 @@ const AppRoutes = () => {
             <Route path="profile" element={<AdminProfile />} />
             <Route path="todayorders" element={<TodayOrders />} />
             <Route path="order/:id" element={<ViewOrder />} />
+            <Route path="order/approve/:id" element={<ApproveOrder />} />
+            <Route path="employee/requests/:employeeId" element={<AdminEmployeeRequests />} />
+            <Route path="taskcancelrequest/:id" element={<TaskCancelRequest />} />
+             <Route path="employee/:id" element={<ViewEmployee />} />
+
           </Route>
         </Route>
 
