@@ -9,7 +9,7 @@ lerna-debug.log*
 
 # Build output
 /build
-/dist
+# /dist
 /dist-ssr
 
 # Local environment files

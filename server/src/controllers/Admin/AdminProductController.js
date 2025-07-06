@@ -9,7 +9,22 @@ const imagekit = require('../../config/imagekit');
 
 
 
+exports.getProductsData = async (req, res) => {
+  try {
+    const totalCount = await Product.countDocuments({ isDeleted: false });
 
+    res.status(200).json({
+      success: true,
+      totalCount,
+    });
+  } catch (error) {
+    console.error("Error fetching products data:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to retrieve products data.",
+    });
+  }
+};
 
 exports.addProduct = async (req, res) => {
   try {
@@ -76,11 +91,6 @@ exports.addProduct = async (req, res) => {
     res.status(500).json({ msg: 'Server error' });
   }
 };
-
-
-
-
-
 
 exports.updateProduct = async (req, res) => {
   try {
@@ -155,8 +165,6 @@ exports.updateProduct = async (req, res) => {
   }
 };
 
-
-
 exports.getProductDetails = async (req, res) => {
   const { productId } = req.body
   if (!productId) {
@@ -174,10 +182,6 @@ exports.getProductDetails = async (req, res) => {
     res.status(400).json({ msg: 'Invalid ID or server error' });
   }
 }
-
-
-
-
 
 exports.removeProduct = async (req, res) => {
   try {
@@ -209,7 +213,6 @@ exports.removeProduct = async (req, res) => {
     return res.status(500).json({ error: "Server error" });
   }
 };
-
 const escapeRegExp = (string) => {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 };

@@ -30,10 +30,12 @@ router.put('/editdistributor', AdminDistributorController.editDistributor);
 router.get('/getalldistributors', AdminDistributorController.getAllDistributors);
 router.get('/distributor', AdminDistributorController.getDistributorData);
 router.put('/distributor/block', AdminDistributorController.blockDistributor);
+router.get('/distributors/data', AdminDistributorController.getDistributorsData);
 
 
 
        //Employee
+router.get('/employees/data', AdminEmployeeController.getEmployees);         
 router.post('/employee/add', AdminEmployeeController.addEmployee);   
 router.get('/employee/all', AdminEmployeeController.getAllEmployees);  
 router.post('/employee/data', AdminEmployeeController.getAllEmployeeData); 
@@ -58,6 +60,7 @@ router.get('/employee/worksessions/download', AdminEmployeeController.downloadWo
 
 
       //product
+router.get('/products/data', AdminProductController.getProductsData);
 router.post('/product/add', AdminProductController.addProduct);
 router.get('/products/check', AdminProductController.checkProduct);
 router.post('/product/details', AdminProductController.getProductDetails);

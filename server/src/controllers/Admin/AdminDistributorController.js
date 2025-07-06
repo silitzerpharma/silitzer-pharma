@@ -384,3 +384,21 @@ exports.blockDistributor = async (req, res) => {
   }
 };
 
+
+
+exports.getDistributorsData = async (req, res) => {
+  try {
+    const totalCount = await Distributor.countDocuments({ isDeleted: false });
+
+    res.status(200).json({
+      success: true,
+      totalCount,
+    });
+  } catch (error) {
+    console.error("Error fetching distributors data:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to retrieve distributors data.",
+    });
+  }
+};

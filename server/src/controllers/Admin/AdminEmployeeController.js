@@ -1116,3 +1116,23 @@ exports.getTaskCancelRequest = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+exports.getEmployees = async (req, res) => {
+  try {
+    const employees = await Employee.find({ isDeleted: false }).sort({ createdAt: -1 });
+
+    const totalCount = await Employee.countDocuments({ isDeleted: false });
+
+    res.status(200).json({
+      success: true,
+      totalCount,
+      employees,
+    });
+  } catch (error) {
+    console.error("Error fetching employees:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch employees.",
+    });
+  }
+};

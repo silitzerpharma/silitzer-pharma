@@ -6,6 +6,7 @@ const http = require('http');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const socketIO = require('socket.io');
+const path = require('path');
 
 // Custom modules
 const connectDB = require('./src/config/DbConnections');
@@ -20,13 +21,12 @@ const server = http.createServer(app);
 app.set('trust proxy', true);
 
 // Middleware
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, '../client/dist')));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 
-
-const FRONTEND_ORIGIN ="https://silitzerpharma.onrender.com";
+const FRONTEND_ORIGIN ="https://silitzer-pharma.onrender.com";
 
 app.use(cors({
   origin: FRONTEND_ORIGIN,
@@ -81,7 +81,11 @@ async function startServer() {
     app.use('/distributor', AuthMiddleware.protectDistributor, distributorRoutes);
     app.use('/employee', AuthMiddleware.protectEmployee, employeeRoutes);
 
+const frontendPath = path.join(__dirname, '../client/dist', 'index.html');
 
+    app.get('*', (req, res) => {
+  res.sendFile(frontendPath);
+});
 
 
     // Start server

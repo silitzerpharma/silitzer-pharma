@@ -47,10 +47,16 @@ exports.login = async (req, res) => {
     // Create JWT token
     const token = getTokenByUserId(user._id);
 
+// res.cookie("token", token, {
+//   httpOnly: true,
+//   secure: true,
+//   sameSite: "None",     // Must be 'None' for cross-origin
+//   maxAge: 12 * 60 * 60 * 1000,
+// });
 res.cookie("token", token, {
   httpOnly: true,
-  secure: true,
-  sameSite: "None",     // Must be 'None' for cross-origin
+  secure: true,          // Keep this true in production (HTTPS)
+  sameSite: "Strict",    // or 'Lax' if needed for navigation
   maxAge: 12 * 60 * 60 * 1000,
 });
 

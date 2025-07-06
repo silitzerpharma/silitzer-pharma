@@ -1,0 +1,1 @@
+import{o as a,j as e,aK as r}from"./index-DlcvTWOH.js";const n=()=>{var s;const o=a(l=>l.user.user);if(!o)return e.jsx(r,{to:"/login",replace:!0});const t=(s=o.role)==null?void 0:s.toLowerCase();return t?["admin","distributor","employee"].includes(t)?e.jsx(r,{to:`/${t}`,replace:!0}):e.jsx(r,{to:"/login",replace:!0}):e.jsx(r,{to:"/login",replace:!0})};export{n as default};
